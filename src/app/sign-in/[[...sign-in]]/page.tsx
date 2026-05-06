@@ -6,7 +6,7 @@ export default function SignInPage() {
     <div className="grid h-screen lg:grid-cols-2">
       <AuthLeftPanel />
       <div className="flex items-center justify-center p-8">
-        <SignIn />
+        <SignIn forceRedirectUrl="/dashboard" />
       </div>
     </div>
   );

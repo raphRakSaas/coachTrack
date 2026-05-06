@@ -1,3 +1,5 @@
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -10,7 +12,10 @@ import {
 } from "lucide-react";
 import { Nav } from "@/components/marketing/nav";
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const { userId } = await auth();
+  if (userId) redirect("/dashboard");
+
   return (
     <div className="min-h-screen bg-white">
       <Nav />
