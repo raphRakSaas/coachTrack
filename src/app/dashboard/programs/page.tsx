@@ -72,7 +72,10 @@ export default async function ProgramsPage() {
               key={program.id}
               className="group rounded-xl border border-zinc-200 bg-white p-4 transition-all hover:border-violet-200 hover:shadow-sm"
             >
-              <div className="mb-3 flex items-start justify-between gap-2">
+              <Link
+                href={`/dashboard/programs/${program.id}`}
+                className="mb-3 flex items-start justify-between gap-2"
+              >
                 <div className="flex items-center gap-3">
                   <ClientAvatar
                     firstName={program.client.firstName}
@@ -93,7 +96,7 @@ export default async function ProgramsPage() {
                     Archivé
                   </Badge>
                 )}
-              </div>
+              </Link>
               <div className="flex items-center justify-between border-t border-zinc-100 pt-3">
                 <div className="flex items-center gap-2 text-xs text-zinc-500">
                   <span className={`rounded-md ${accent.badge} px-2 py-0.5 font-medium`}>

@@ -13,6 +13,7 @@ import { EditClientSheet } from "./edit-client-sheet"
 import { WeightChart } from "@/components/charts/weight-chart"
 import { deleteMeasurement } from "@/app/dashboard/clients/[id]/actions"
 import { SECTION_ACCENTS } from "@/lib/colors"
+import { SessionsSparkline } from "@/components/charts/sessions-sparkline"
 import {
   FITNESS_LEVEL_LABELS,
   GOAL_TYPE_LABELS,
@@ -65,6 +66,45 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
     .filter((m) => m.weight !== null)
     .map((m) => ({ date: m.date, weight: m.weight as number }))
 
+  const lastSession = client.sessions[0] ?? null
+  const sessions30d = (() => {
+    const d = new Date()
+    d.setDate(d.getDate() - 29)
+    d.setHours(0, 0, 0, 0)
+    return client.sessions.filter((s) => new Date(s.date) >= d).length
+  })()
+
+  const weightDelta = (() => {
+    const sorted = [...client.measurements]
+      .filter((m) => m.weight !== null)
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    if (sorted.length < 2) return null
+    const first = sorted[0]?.weight ?? null
+    const last = sorted[sorted.length - 1]?.weight ?? null
+    if (first === null || last === null) return null
+    return Math.round((last - first) * 10) / 10
+  })()
+
+  // 14-day session buckets for sparkline (client)
+  const sparklineBuckets = (() => {
+    const start = new Date()
+    start.setDate(start.getDate() - 13)
+    start.setHours(0, 0, 0, 0)
+    const buckets: { day: string; count: number }[] = []
+    for (let i = 0; i < 14; i++) {
+      const day = new Date(start)
+      day.setDate(start.getDate() + i)
+      const key = day.toISOString().split("T")[0]
+      buckets.push({
+        day: day.toLocaleDateString("fr-FR", { weekday: "short" }),
+        count: client.sessions.filter(
+          (s) => new Date(s.date).toISOString().split("T")[0] === key
+        ).length,
+      })
+    }
+    return buckets
+  })()
+
   return (
     <div className="p-8">
       {/* Header */}
@@ -104,6 +144,63 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
           </div>
           <EditClientSheet client={client} />
         </div>
+      </div>
+
+      {/* Suivi overview */}
+      <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-4">
+        <div className="rounded-xl border border-zinc-200 bg-white p-5">
+          <p className="text-xs font-semibold text-zinc-500">Séances (30 jours)</p>
+          <p className="mt-2 text-3xl font-bold text-zinc-900">{sessions30d}</p>
+          <p className="mt-1 text-xs text-zinc-500">Activité récente du client</p>
+        </div>
+        <div className="rounded-xl border border-zinc-200 bg-white p-5">
+          <p className="text-xs font-semibold text-zinc-500">Dernière séance</p>
+          <p className="mt-2 text-sm font-semibold text-zinc-900">
+            {lastSession
+              ? new Date(lastSession.date).toLocaleDateString("fr-FR", {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                })
+              : "—"}
+          </p>
+          <p className="mt-1 text-xs text-zinc-500">
+            {lastSession?.duration ? `${lastSession.duration} min` : "Aucune durée"}
+            {lastSession?.rpe ? ` · RPE ${lastSession.rpe}` : ""}
+          </p>
+        </div>
+        <div className="rounded-xl border border-zinc-200 bg-white p-5">
+          <p className="text-xs font-semibold text-zinc-500">Programmes</p>
+          <p className="mt-2 text-3xl font-bold text-zinc-900">
+            {client.programs.filter((p) => p.isActive).length}
+          </p>
+          <p className="mt-1 text-xs text-zinc-500">
+            {client.programs.length} au total
+          </p>
+        </div>
+        <div className="rounded-xl border border-zinc-200 bg-white p-5">
+          <p className="text-xs font-semibold text-zinc-500">Poids</p>
+          <p className="mt-2 text-3xl font-bold text-zinc-900">
+            {weightData[0]?.weight ? `${weightData[0].weight} kg` : "—"}
+          </p>
+          <p className="mt-1 text-xs text-zinc-500">
+            {weightDelta === null
+              ? "Ajoutez des mesures pour voir l’évolution."
+              : `${weightDelta > 0 ? "+" : ""}${weightDelta} kg depuis le début`}
+          </p>
+        </div>
+      </div>
+
+      <div className="mb-6 rounded-xl border border-zinc-200 bg-white p-5">
+        <div className="mb-3 flex items-center justify-between">
+          <p className="text-sm font-semibold text-zinc-900">
+            Activité 14 jours
+          </p>
+          <p className="text-xs text-zinc-400">
+            {client.sessions.length} séance{client.sessions.length !== 1 ? "s" : ""}
+          </p>
+        </div>
+        <SessionsSparkline data={sparklineBuckets} />
       </div>
 
       <Tabs defaultValue="profil">
@@ -388,9 +485,10 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
           ) : (
             <div className="divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-white">
               {client.programs.map((p) => (
-                <div
+                <Link
                   key={p.id}
-                  className="flex items-center justify-between px-4 py-3"
+                  href={`/dashboard/programs/${p.id}`}
+                  className="flex items-center justify-between px-4 py-3 hover:bg-zinc-50"
                 >
                   <div>
                     <p className="text-sm font-medium text-zinc-900">
@@ -405,7 +503,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                   {!p.isActive && (
                     <span className="text-xs text-zinc-400">Inactif</span>
                   )}
-                </div>
+                </Link>
               ))}
             </div>
           )}

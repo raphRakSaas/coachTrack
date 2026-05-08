@@ -48,7 +48,8 @@ async function fetchAllExerciseImages() {
     "https://wger.de/api/v2/exerciseimage/?limit=200&offset=0"
 
   while (nextUrl) {
-    const page = await fetchJson<WgerPaginated<WgerExerciseImage>>(nextUrl)
+    const page: WgerPaginated<WgerExerciseImage> =
+      await fetchJson<WgerPaginated<WgerExerciseImage>>(nextUrl)
     for (const item of page.results) {
       if (!exerciseIdToAnyImageUrl.has(item.exercise)) {
         exerciseIdToAnyImageUrl.set(item.exercise, item.image)
@@ -85,7 +86,8 @@ async function findImageForSearchTerm(input: {
       name_search: input.searchEn,
     }).toString()
 
-  const page = await fetchJson<WgerPaginated<WgerExerciseTranslation>>(url)
+  const page: WgerPaginated<WgerExerciseTranslation> =
+    await fetchJson<WgerPaginated<WgerExerciseTranslation>>(url)
   const normalize = (value: string) =>
     value
       .toLowerCase()

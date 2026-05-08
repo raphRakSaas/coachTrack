@@ -30,7 +30,8 @@ async function main() {
     "https://wger.de/api/v2/exerciseimage/?limit=50&offset=0"
 
   while (nextUrl) {
-    const page = await fetchJson<WgerPaginated<WgerExerciseImage>>(nextUrl)
+    const page: WgerPaginated<WgerExerciseImage> =
+      await fetchJson<WgerPaginated<WgerExerciseImage>>(nextUrl)
     for (const item of page.results) {
       if (item.image && !urls.includes(item.image)) urls.push(item.image)
     }

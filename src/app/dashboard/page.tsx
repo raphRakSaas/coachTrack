@@ -16,6 +16,11 @@ import { SECTION_ACCENTS } from "@/lib/colors"
 import { buttonVariants } from "@/components/ui/button"
 import { ClientAvatar } from "@/components/ui/client-avatar"
 import { SessionsSparkline } from "@/components/charts/sessions-sparkline"
+import { StatisticsCard, type StatisticItem } from "@/components/dashboard/overview/statistics-card"
+import { AnalyticsCard } from "@/components/dashboard/overview/analytics-card"
+import { Sessions30dChart } from "@/components/charts/sessions-30d-chart"
+import { Sessions6mBarChart } from "@/components/charts/sessions-6m-bar-chart"
+import { SessionsWeekdayDonut } from "@/components/charts/sessions-weekday-donut"
 
 function startOfDay(d = new Date()) {
   const x = new Date(d)
@@ -33,6 +38,24 @@ function startOfWeek() {
 function startOfMonth() {
   const d = startOfDay()
   d.setDate(1)
+  return d
+}
+
+function startOfPreviousWeek() {
+  const d = startOfWeek()
+  d.setDate(d.getDate() - 7)
+  return d
+}
+
+function startOfPreviousMonth() {
+  const d = startOfMonth()
+  d.setMonth(d.getMonth() - 1)
+  return d
+}
+
+function startOfMonthsAgo(monthsAgo: number) {
+  const d = startOfMonth()
+  d.setMonth(d.getMonth() - monthsAgo)
   return d
 }
 
@@ -55,10 +78,15 @@ export default async function DashboardPage() {
     activeClients,
     sessionsThisWeek,
     sessionsThisMonth,
+    sessionsPreviousWeek,
+    sessionsPreviousMonth,
     recentSessions,
     sessionsForSparkline,
     topClients,
     activeProgramsCount,
+    customExercisesCount,
+    sessionsLast30Days,
+    sessionsLast6Months,
   ] = await Promise.all([
     prisma.client.count({ where: { coachId: user.id, isActive: true } }),
     prisma.session.count({
@@ -66,6 +94,18 @@ export default async function DashboardPage() {
     }),
     prisma.session.count({
       where: { coachId: user.id, date: { gte: startOfMonth() } },
+    }),
+    prisma.session.count({
+      where: {
+        coachId: user.id,
+        date: { gte: startOfPreviousWeek(), lt: startOfWeek() },
+      },
+    }),
+    prisma.session.count({
+      where: {
+        coachId: user.id,
+        date: { gte: startOfPreviousMonth(), lt: startOfMonth() },
+      },
     }),
     prisma.session.findMany({
       where: { coachId: user.id },
@@ -84,6 +124,18 @@ export default async function DashboardPage() {
       include: { _count: { select: { sessions: true } } },
     }),
     prisma.program.count({ where: { coachId: user.id, isActive: true } }),
+    prisma.exercise.count({ where: { coachId: user.id, isGlobal: false } }),
+    prisma.session.findMany({
+      where: {
+        coachId: user.id,
+        date: { gte: new Date(new Date().setDate(new Date().getDate() - 29)) },
+      },
+      select: { date: true },
+    }),
+    prisma.session.findMany({
+      where: { coachId: user.id, date: { gte: startOfMonthsAgo(5) } },
+      select: { date: true },
+    }),
   ])
 
   // Build 14-day sparkline buckets
@@ -132,50 +184,225 @@ export default async function DashboardPage() {
   ]
 
   const firstName = user.name?.split(" ")[0] ?? null
+  const welcomeTitle = `${greetingByHour()}${firstName ? `, ${firstName}` : ""}`
+
+  const percent = (current: number, previous: number) => {
+    if (previous <= 0) return current > 0 ? 100 : 0
+    return Math.round(((current - previous) / previous) * 100)
+  }
+
+  const weekDelta = percent(sessionsThisWeek, sessionsPreviousWeek)
+  const monthDelta = percent(sessionsThisMonth, sessionsPreviousMonth)
+
+  const statisticsItems: StatisticItem[] = [
+    {
+      title: "Clients actifs",
+      value: activeClients.toLocaleString("fr-FR"),
+      statusLabel: "Cette semaine",
+      statusValue: `${sessionsThisWeek.toLocaleString("fr-FR")} séances`,
+      isPositive: sessionsThisWeek >= sessionsPreviousWeek,
+      cardIcon: "solar:users-group-rounded-line-duotone",
+      statusIcon:
+        sessionsThisWeek >= sessionsPreviousWeek
+          ? "solar:course-up-line-duotone"
+          : "solar:course-down-line-duotone",
+    },
+    {
+      title: "Séances",
+      value: sessionsThisMonth.toLocaleString("fr-FR"),
+      statusLabel: "Vs mois dernier",
+      statusValue: `${monthDelta > 0 ? "+" : ""}${monthDelta}%`,
+      isPositive: monthDelta >= 0,
+      cardIcon: "solar:calendar-line-duotone",
+      statusIcon:
+        monthDelta >= 0
+          ? "solar:course-up-line-duotone"
+          : "solar:course-down-line-duotone",
+    },
+    {
+      title: "Programmes",
+      value: activeProgramsCount.toLocaleString("fr-FR"),
+      statusLabel: "Actifs",
+      statusValue: "en cours",
+      isPositive: true,
+      cardIcon: "solar:clipboard-check-line-duotone",
+      statusIcon: "solar:course-up-line-duotone",
+    },
+    {
+      title: "Exercices",
+      value: customExercisesCount.toLocaleString("fr-FR"),
+      statusLabel: "Personnalisés",
+      statusValue: "bibliothèque",
+      isPositive: true,
+      cardIcon: "solar:dumbbell-large-line-duotone",
+      statusIcon: "solar:course-up-line-duotone",
+    },
+  ]
+
+  // Sessions 30 days (daily buckets)
+  const today = startOfDay()
+  const start30 = new Date(today)
+  start30.setDate(today.getDate() - 29)
+  const sessions30 = []
+  for (let i = 0; i < 30; i++) {
+    const d = new Date(start30)
+    d.setDate(start30.getDate() + i)
+    const key = d.toISOString().split("T")[0]
+    sessions30.push({
+      dateLabel: d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" }),
+      count: sessionsLast30Days.filter(
+        (s) => new Date(s.date).toISOString().split("T")[0] === key
+      ).length,
+    })
+  }
+
+  // Sessions 6 months (month buckets)
+  const monthBuckets: { monthLabel: string; count: number }[] = []
+  for (let i = 5; i >= 0; i--) {
+    const monthStart = startOfMonthsAgo(i)
+    const next = startOfMonthsAgo(i - 1)
+    const count = sessionsLast6Months.filter((s) => {
+      const date = new Date(s.date)
+      return date >= monthStart && date < next
+    }).length
+    monthBuckets.push({
+      monthLabel: monthStart.toLocaleDateString("fr-FR", { month: "short" }),
+      count,
+    })
+  }
+
+  // Sessions by weekday (last 30 days)
+  const weekdayOrder = ["lun.", "mar.", "mer.", "jeu.", "ven.", "sam.", "dim."]
+  const weekdayBuckets: Record<string, number> = Object.fromEntries(
+    weekdayOrder.map((label) => [label, 0])
+  )
+  for (const session of sessionsLast30Days) {
+    const label = new Date(session.date).toLocaleDateString("fr-FR", {
+      weekday: "short",
+    })
+    if (label in weekdayBuckets) weekdayBuckets[label] += 1
+  }
+  const weekdayData = weekdayOrder.map((label) => ({
+    label,
+    count: weekdayBuckets[label] ?? 0,
+  }))
 
   return (
     <div className="p-8">
-      {/* Header */}
+      <div className="pointer-events-none fixed inset-0 -z-10">
+        <div className="absolute -top-28 left-1/4 h-72 w-72 rounded-full bg-indigo-200/35 blur-3xl" />
+        <div className="absolute top-24 right-1/4 h-72 w-72 rounded-full bg-emerald-200/25 blur-3xl" />
+        <div className="absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-amber-200/25 blur-3xl" />
+      </div>
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-zinc-900">
-            {greetingByHour()}{firstName ? `, ${firstName}` : ""} 👋
+            {welcomeTitle}
           </h1>
           <p className="text-sm text-zinc-500">
-            {sessionsThisWeek === 0
-              ? "Aucune séance encore cette semaine."
-              : `${sessionsThisWeek} séance${sessionsThisWeek !== 1 ? "s" : ""} cette semaine.`}
+            Tableau de bord · Suivi de votre activité
           </p>
         </div>
-        <Link
-          href="/dashboard/sessions"
-          className={buttonVariants() + " gap-2"}
-        >
+        <Link href="/dashboard/sessions" className={buttonVariants() + " gap-2"}>
           <Plus className="h-4 w-4" />
           Nouvelle séance
         </Link>
       </div>
 
-      {/* Stats */}
-      <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {stats.map(({ label, value, icon: Icon, href, accent }) => (
-          <Link
-            key={label}
-            href={href}
-            className="group rounded-xl border border-zinc-200 bg-white p-5 transition-all hover:border-zinc-300 hover:shadow-sm"
-          >
-            <div className="mb-3 flex items-center justify-between">
-              <div
-                className={`flex h-9 w-9 items-center justify-center rounded-lg ${accent.bgSoft}`}
-              >
-                <Icon className={`h-4 w-4 ${accent.icon}`} />
-              </div>
-              <ArrowRight className="h-4 w-4 text-zinc-300 transition-all group-hover:translate-x-0.5 group-hover:text-zinc-500" />
-            </div>
-            <p className="text-3xl font-bold text-zinc-900">{value}</p>
-            <p className="mt-0.5 text-xs text-zinc-500">{label}</p>
-          </Link>
-        ))}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <AnalyticsCard
+            title="Dashboard"
+            description="Vérifiez vos statistiques clés"
+            metrics={[
+              {
+                label: "Séances (semaine)",
+                value: sessionsThisWeek.toLocaleString("fr-FR"),
+                percentage: `${weekDelta > 0 ? "+" : ""}${weekDelta}%`,
+                isPositive: weekDelta >= 0,
+              },
+              {
+                label: "Séances (mois)",
+                value: sessionsThisMonth.toLocaleString("fr-FR"),
+                percentage: `${monthDelta > 0 ? "+" : ""}${monthDelta}%`,
+                isPositive: monthDelta >= 0,
+              },
+            ]}
+          />
+        </div>
+        <div className="grid gap-6">
+          <div className="rounded-2xl border border-zinc-200 bg-white p-5">
+            <p className="text-xs font-medium text-muted-foreground">
+              Activité semaine
+            </p>
+            <p className="mt-2 text-3xl font-bold text-zinc-900">
+              {sessionsThisWeek}
+            </p>
+            <p className="mt-1 text-xs text-zinc-500">
+              {weekDelta >= 0 ? "+" : ""}
+              {weekDelta}% vs semaine dernière
+            </p>
+            <Link
+              href="/dashboard/sessions"
+              className={buttonVariants({ variant: "outline", size: "sm" }) + " mt-4 w-full"}
+            >
+              Voir les séances
+            </Link>
+          </div>
+          <div className="rounded-2xl border border-zinc-200 bg-white p-5">
+            <p className="text-xs font-medium text-muted-foreground">
+              Programmes actifs
+            </p>
+            <p className="mt-2 text-3xl font-bold text-zinc-900">
+              {activeProgramsCount}
+            </p>
+            <p className="mt-1 text-xs text-zinc-500">
+              Bibliothèque personnalisée: {customExercisesCount} exercices
+            </p>
+            <Link
+              href="/dashboard/programs"
+              className={buttonVariants({ variant: "outline", size: "sm" }) + " mt-4 w-full"}
+            >
+              Gérer les programmes
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-8">
+        <StatisticsCard items={statisticsItems} />
+      </div>
+
+      <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="rounded-xl border border-zinc-200 bg-white p-5 lg:col-span-2">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-zinc-900">
+              Sessions (30 derniers jours)
+            </h2>
+            <p className="text-xs text-zinc-400">
+              {sessionsLast30Days.length} séance{sessionsLast30Days.length !== 1 ? "s" : ""}
+            </p>
+          </div>
+          <Sessions30dChart data={sessions30} />
+        </div>
+
+        <div className="rounded-xl border border-zinc-200 bg-white p-5">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-zinc-900">
+              Répartition (jours)
+            </h2>
+          </div>
+          <SessionsWeekdayDonut data={weekdayData} />
+        </div>
+      </div>
+
+      <div className="mt-6 rounded-xl border border-zinc-200 bg-white p-5">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-zinc-900">
+            Sessions (6 mois)
+          </h2>
+        </div>
+        <Sessions6mBarChart data={monthBuckets} />
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
