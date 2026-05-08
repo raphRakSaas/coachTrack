@@ -134,10 +134,18 @@ model Exercise {
   description String?
   imageUrl    String?
   imagePublicId String?
+  sourceExerciseId String?
+  sourceExercise   Exercise? @relation("ExerciseSource", fields: [sourceExerciseId], references: [id], onDelete: SetNull)
+  derivedExercises Exercise[] @relation("ExerciseSource")
   isGlobal    Boolean     @default(false)
 
   programExercises ProgramExercise[]
   sessionExercises SessionExercise[]
+
+  @@index([coachId])
+  @@index([isGlobal])
+  @@index([muscleGroup])
+  @@unique([coachId, name])
 }
 
 enum MuscleGroup {

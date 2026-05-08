@@ -2,7 +2,7 @@
 
 import { useRef, useState, useTransition } from "react"
 import { MuscleGroup } from "@prisma/client"
-import { Trash2 } from "lucide-react"
+import { Copy, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,7 +18,10 @@ import {
 import { MUSCLE_GROUPS } from "@/lib/constants"
 import { getExerciseImageUrl } from "@/lib/exercise-images"
 import { updateExercise } from "@/app/dashboard/exercises/actions"
-import { deleteExerciseAndRedirect } from "@/app/dashboard/exercises/[id]/actions"
+import {
+  deleteExerciseAndRedirect,
+  duplicateExerciseToMyLibrary,
+} from "@/app/dashboard/exercises/[id]/actions"
 
 type ExerciseDetailInput = {
   id: string
@@ -80,14 +83,23 @@ export function ExerciseDetail({ exercise }: { exercise: ExerciseDetailInput }) 
                 : "Modifiez le nom, la description et l'image."}
             </p>
           </div>
-          {!exercise.isGlobal && (
-            <form action={deleteExerciseAndRedirect.bind(null, exercise.id)}>
-              <Button type="submit" variant="destructive" size="sm">
-                <Trash2 className="h-4 w-4" />
-                Supprimer
-              </Button>
-            </form>
-          )}
+          <div className="flex items-center gap-2">
+            {exercise.isGlobal ? (
+              <form action={duplicateExerciseToMyLibrary.bind(null, exercise.id)}>
+                <Button type="submit" variant="secondary" size="sm">
+                  <Copy className="h-4 w-4" />
+                  Dupliquer
+                </Button>
+              </form>
+            ) : (
+              <form action={deleteExerciseAndRedirect.bind(null, exercise.id)}>
+                <Button type="submit" variant="destructive" size="sm">
+                  <Trash2 className="h-4 w-4" />
+                  Supprimer
+                </Button>
+              </form>
+            )}
+          </div>
         </div>
 
         <form

@@ -17,13 +17,9 @@ export async function POST(req: Request) {
     return new Response("Missing Cloudinary env vars", { status: 500 })
   }
 
-  const body = (await req.json().catch(() => null)) as
-    | { folder?: string; publicId?: string }
-    | null
-
-  const folder =
-    body?.folder?.trim() || `coachtrack/exercises/${user.id}`
-  const publicId = body?.publicId?.trim() || crypto.randomUUID()
+  // Never trust client-provided folder/publicId: enforce tenant isolation.
+  const folder = `coachtrack/exercises/${user.id}`
+  const publicId = crypto.randomUUID()
 
   // Cloudinary signed upload signature is a SHA-1 of the sorted parameters + api_secret.
   // We only sign the parameters we actually send.
