@@ -1,0 +1,297 @@
+"use client"
+
+import Link from "next/link"
+import { useRef, useTransition } from "react"
+import { ArrowLeft, Plus, Trash2 } from "lucide-react"
+import { MuscleGroup } from "@prisma/client"
+import type { Prisma } from "@prisma/client"
+
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
+  addExerciseToSession,
+  removeExerciseFromSession,
+  addSetToExercise,
+  removeSet,
+} from "@/app/dashboard/sessions/[id]/actions"
+import { EditSessionSheet } from "./edit-session-sheet"
+import { ClientAvatar } from "@/components/ui/client-avatar"
+import { MUSCLE_GROUPS } from "@/lib/constants"
+import { SECTION_ACCENTS } from "@/lib/colors"
+
+type SessionWithRelations = Prisma.SessionGetPayload<{
+  include: {
+    client: { select: { id: true; firstName: true; lastName: true } }
+    exercises: {
+      include: {
+        exercise: { select: { id: true; name: true; muscleGroup: true } }
+        sets: true
+      }
+    }
+  }
+}>
+
+type Exercise = { id: string; name: string; muscleGroup: MuscleGroup }
+
+function StatBadge({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex flex-col items-center rounded-lg border border-zinc-200 bg-white px-4 py-3">
+      <p className="text-xs text-zinc-400">{label}</p>
+      <p className="text-lg font-semibold text-zinc-900">{value}</p>
+    </div>
+  )
+}
+
+export function SessionDetail({
+  session,
+  exercises,
+}: {
+  session: SessionWithRelations
+  exercises: Exercise[]
+}) {
+  const [isPending, startTransition] = useTransition()
+  const addSetFormRefs = useRef<Record<string, HTMLFormElement | null>>({})
+
+  function handleAddExercise(exerciseId: string | null) {
+    if (!exerciseId) return
+    startTransition(async () => {
+      await addExerciseToSession(session.id, exerciseId)
+    })
+  }
+
+  function handleRemoveExercise(sessionExerciseId: string) {
+    startTransition(async () => {
+      await removeExerciseFromSession(sessionExerciseId, session.id)
+    })
+  }
+
+  function handleAddSet(sessionExerciseId: string, formData: FormData) {
+    startTransition(async () => {
+      await addSetToExercise(sessionExerciseId, session.id, formData)
+      addSetFormRefs.current[sessionExerciseId]?.reset()
+    })
+  }
+
+  function handleRemoveSet(setId: string) {
+    startTransition(async () => {
+      await removeSet(setId, session.id)
+    })
+  }
+
+  return (
+    <div className="p-8">
+      {/* Header */}
+      <div className="mb-6">
+        <Link
+          href={`/dashboard/clients/${session.client.id}`}
+          className="mb-4 flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-900"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {session.client.firstName} {session.client.lastName}
+        </Link>
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <ClientAvatar
+              firstName={session.client.firstName}
+              lastName={session.client.lastName}
+              size="lg"
+              ring
+            />
+            <div>
+              <h1 className="text-2xl font-bold text-zinc-900">
+                {new Date(session.date).toLocaleDateString("fr-FR", {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </h1>
+              <p className="text-sm text-zinc-500">
+                <span className={SECTION_ACCENTS.sessions.text + " font-medium"}>
+                  {session.client.firstName} {session.client.lastName}
+                </span>
+                {session.duration ? ` · ${session.duration} min` : ""}
+              </p>
+            </div>
+          </div>
+          <EditSessionSheet session={session} />
+        </div>
+      </div>
+
+      {/* Stats row */}
+      {(session.rpe || session.mood || session.energy) && (
+        <div className="mb-6 grid grid-cols-3 gap-3">
+          {session.rpe && (
+            <StatBadge label="RPE" value={`${session.rpe}/10`} />
+          )}
+          {session.mood && (
+            <StatBadge label="Humeur" value={`${session.mood}/5`} />
+          )}
+          {session.energy && (
+            <StatBadge label="Énergie" value={`${session.energy}/5`} />
+          )}
+        </div>
+      )}
+
+      {/* Notes */}
+      {session.notes && (
+        <div className="mb-6 rounded-xl border border-zinc-200 bg-white p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400 mb-1">
+            Notes
+          </p>
+          <p className="text-sm text-zinc-700">{session.notes}</p>
+        </div>
+      )}
+
+      {/* Exercises */}
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-base font-semibold text-zinc-900">
+          Exercices ({session.exercises.length})
+        </h2>
+      </div>
+
+      <div className="flex flex-col gap-4">
+        {session.exercises.map((se) => (
+          <div
+            key={se.id}
+            className="rounded-xl border border-zinc-200 bg-white"
+          >
+            <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-3">
+              <div>
+                <p className="text-sm font-medium text-zinc-900">
+                  {se.exercise.name}
+                </p>
+                <p className="text-xs text-zinc-400">
+                  {MUSCLE_GROUPS[se.exercise.muscleGroup]}
+                </p>
+              </div>
+              <button
+                onClick={() => handleRemoveExercise(se.id)}
+                disabled={isPending}
+                className="rounded p-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-red-500 disabled:opacity-50"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Sets */}
+            {se.sets.length > 0 && (
+              <div className="px-4 py-2">
+                <div className="mb-1 grid grid-cols-3 gap-2 text-xs font-semibold text-zinc-400">
+                  <span>Série</span>
+                  <span>Reps</span>
+                  <span>Charge</span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  {se.sets.map((set) => (
+                    <div
+                      key={set.id}
+                      className="grid grid-cols-3 gap-2 items-center"
+                    >
+                      <span className="text-sm font-medium text-zinc-700">
+                        #{set.setNumber}
+                      </span>
+                      <span className="text-sm text-zinc-700">
+                        {set.reps ?? "—"}
+                      </span>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-zinc-700">
+                          {set.weight ? `${set.weight} kg` : "—"}
+                        </span>
+                        <button
+                          onClick={() => handleRemoveSet(set.id)}
+                          disabled={isPending}
+                          className="rounded p-1 text-zinc-300 hover:text-red-400 disabled:opacity-50"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Add set form */}
+            <form
+              ref={(el) => {
+                addSetFormRefs.current[se.id] = el
+              }}
+              action={(formData) => handleAddSet(se.id, formData)}
+              className="flex items-end gap-2 border-t border-zinc-100 px-4 py-3"
+            >
+              <div className="flex flex-col gap-1">
+                <Label className="text-xs">Reps</Label>
+                <Input
+                  name="reps"
+                  type="number"
+                  min={1}
+                  placeholder="10"
+                  className="h-8 w-20 text-xs"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <Label className="text-xs">Charge (kg)</Label>
+                <Input
+                  name="weight"
+                  type="number"
+                  min={0}
+                  step="0.5"
+                  placeholder="—"
+                  className="h-8 w-24 text-xs"
+                />
+              </div>
+              <Button
+                type="submit"
+                variant="outline"
+                size="sm"
+                disabled={isPending}
+                className="h-8"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Série
+              </Button>
+            </form>
+          </div>
+        ))}
+
+        {/* Add exercise selector */}
+        <Select onValueChange={handleAddExercise}>
+          <SelectTrigger className="w-full border-dashed">
+            <SelectValue placeholder="Ajouter un exercice..." />
+          </SelectTrigger>
+          <SelectContent>
+            {(Object.entries(MUSCLE_GROUPS) as [MuscleGroup, string][]).map(
+              ([group, groupLabel]) => {
+                const groupExercises = exercises.filter(
+                  (e) => e.muscleGroup === group
+                )
+                if (groupExercises.length === 0) return null
+                return (
+                  <SelectGroup key={group}>
+                    <SelectLabel>{groupLabel}</SelectLabel>
+                    {groupExercises.map((e) => (
+                      <SelectItem key={e.id} value={e.id}>
+                        {e.name}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                )
+              }
+            )}
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  )
+}

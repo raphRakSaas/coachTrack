@@ -21,6 +21,22 @@ export async function createExercise(formData: FormData) {
   revalidatePath("/dashboard/exercises")
 }
 
+export async function updateExercise(id: string, formData: FormData) {
+  const user = await getCurrentUser()
+  if (!user) throw new Error("Unauthorized")
+
+  await prisma.exercise.update({
+    where: { id, coachId: user.id },
+    data: {
+      name: formData.get("name") as string,
+      muscleGroup: formData.get("muscleGroup") as MuscleGroup,
+      description: (formData.get("description") as string) || null,
+    },
+  })
+
+  revalidatePath("/dashboard/exercises")
+}
+
 export async function deleteExercise(id: string) {
   const user = await getCurrentUser()
   if (!user) throw new Error("Unauthorized")

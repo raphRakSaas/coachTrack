@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState, useTransition } from "react"
-import { Plus } from "lucide-react"
+import { Pencil } from "lucide-react"
 import { MuscleGroup } from "@prisma/client"
 
 import { Button } from "@/components/ui/button"
@@ -23,34 +23,48 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { createExercise } from "@/app/dashboard/exercises/actions"
+import { updateExercise } from "@/app/dashboard/exercises/actions"
 import { MUSCLE_GROUPS } from "@/lib/constants"
 
-export function ExerciseSheet() {
+type ExerciseInput = {
+  id: string
+  name: string
+  muscleGroup: MuscleGroup
+  description: string | null
+}
+
+export function EditExerciseSheet({ exercise }: { exercise: ExerciseInput }) {
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
-  const [muscleGroup, setMuscleGroup] = useState<MuscleGroup>("CHEST")
+  const [muscleGroup, setMuscleGroup] = useState<MuscleGroup>(
+    exercise.muscleGroup
+  )
   const formRef = useRef<HTMLFormElement>(null)
 
   function handleSubmit(formData: FormData) {
     formData.set("muscleGroup", muscleGroup)
     startTransition(async () => {
-      await createExercise(formData)
-      formRef.current?.reset()
-      setMuscleGroup("CHEST")
+      await updateExercise(exercise.id, formData)
       setOpen(false)
     })
   }
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger render={<Button />}>
-        <Plus />
-        Ajouter un exercice
+      <SheetTrigger
+        render={
+          <button
+            type="button"
+            className="rounded p-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700"
+            aria-label="Modifier"
+          />
+        }
+      >
+        <Pencil className="h-4 w-4" />
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Nouvel exercice</SheetTitle>
+          <SheetTitle>Modifier l&apos;exercice</SheetTitle>
         </SheetHeader>
         <form
           ref={formRef}
@@ -62,7 +76,7 @@ export function ExerciseSheet() {
             <Input
               id="name"
               name="name"
-              placeholder="Développé couché"
+              defaultValue={exercise.name}
               required
             />
           </div>
@@ -70,7 +84,7 @@ export function ExerciseSheet() {
             <Label>Groupe musculaire</Label>
             <Select
               value={muscleGroup}
-              onValueChange={(v) => setMuscleGroup(v as MuscleGroup)}
+              onValueChange={(v) => v && setMuscleGroup(v as MuscleGroup)}
             >
               <SelectTrigger className="w-full">
                 <SelectValue>{MUSCLE_GROUPS[muscleGroup]}</SelectValue>
@@ -87,20 +101,17 @@ export function ExerciseSheet() {
             </Select>
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="description">
-              Description{" "}
-              <span className="text-muted-foreground">(optionnel)</span>
-            </Label>
+            <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
               name="description"
-              placeholder="Instructions ou conseils..."
+              defaultValue={exercise.description ?? ""}
               rows={3}
             />
           </div>
           <SheetFooter>
             <Button type="submit" disabled={isPending} className="w-full">
-              {isPending ? "Enregistrement..." : "Enregistrer"}
+              {isPending ? "Enregistrement..." : "Mettre à jour"}
             </Button>
           </SheetFooter>
         </form>

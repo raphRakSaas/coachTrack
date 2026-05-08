@@ -9,41 +9,117 @@ datasource db {
 // ─── COACH ───────────────────────────────────────────────────────────────────
 
 model User {
-  id        String   @id @default(cuid())
-  clerkId   String   @unique
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                    String   @id @default(cuid())
+  clerkId               String   @unique
+  email                 String   @unique
+  name                  String?
+  specialty             String?
+  bio                   String?
+  yearsExperience       Int?
+  onboardingCompleted   Boolean  @default(false)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
   clients      Client[]
   programs     Program[]
   sessions     Session[]
   exercises    Exercise[]
   subscription Subscription?
+  measurements BodyMeasurement[]
 }
 
 // ─── CLIENT ──────────────────────────────────────────────────────────────────
 
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum FitnessLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  ELITE
+}
+
+enum GoalType {
+  WEIGHT_LOSS
+  MUSCLE_GAIN
+  PERFORMANCE
+  ENDURANCE
+  WELLBEING
+  REHABILITATION
+}
+
 model Client {
-  id        String    @id @default(cuid())
-  coachId   String
-  coach     User      @relation(fields: [coachId], references: [id], onDelete: Cascade)
+  id       String @id @default(cuid())
+  coachId  String
+  coach    User   @relation(fields: [coachId], references: [id], onDelete: Cascade)
 
-  firstName String
-  lastName  String
-  email     String?
-  phone     String?
-  birthDate DateTime?
-  goal      String?
-  notes     String?
-  isActive  Boolean   @default(true)
+  // Identité
+  firstName        String
+  lastName         String
+  email            String?
+  phone            String?
+  phoneCountryCode String?      @default("+33")
+  gender           Gender?
+  birthDate        DateTime?
 
+  // Physique
+  height Float? // cm
+
+  // Profil sportif
+  fitnessLevel    FitnessLevel @default(BEGINNER)
+  weeklyFrequency Int?
+
+  // Objectifs
+  goalType         GoalType?
+  goal             String? // free text (legacy/complementary)
+  goalTargetWeight Float? // kg
+  goalDeadline     DateTime?
+
+  // Médical
+  injuries     String?
+  medicalNotes String?
+
+  // Administratif
+  contractStart DateTime?
+  hourlyRate    Float?
+  notes         String?
+
+  isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  programs Program[]
-  sessions Session[]
+  programs     Program[]
+  sessions     Session[]
+  measurements BodyMeasurement[]
+}
+
+// ─── MESURES CORPORELLES ─────────────────────────────────────────────────────
+
+model BodyMeasurement {
+  id       String @id @default(cuid())
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  coachId  String
+  coach    User   @relation(fields: [coachId], references: [id], onDelete: Cascade)
+
+  date       DateTime @default(now())
+  weight     Float? // kg
+  bodyFat    Float? // %
+  muscleMass Float? // kg
+  waist      Float? // cm
+  hips       Float? // cm
+  chest      Float? // cm
+  leftArm    Float? // cm
+  rightArm   Float? // cm
+  leftThigh  Float? // cm
+  rightThigh Float? // cm
+  notes      String?
+
+  createdAt DateTime @default(now())
 }
 
 // ─── BIBLIOTHÈQUE D'EXERCICES ────────────────────────────────────────────────
@@ -125,15 +201,18 @@ model ProgramExercise {
 // ─── SÉANCE ──────────────────────────────────────────────────────────────────
 
 model Session {
-  id       String   @id @default(cuid())
+  id       String @id @default(cuid())
   coachId  String
-  coach    User     @relation(fields: [coachId], references: [id], onDelete: Cascade)
+  coach    User   @relation(fields: [coachId], references: [id], onDelete: Cascade)
   clientId String
-  client   Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   date     DateTime
   duration Int?
   notes    String?
+  rpe      Int? // 1-10 effort perçu
+  mood     Int? // 1-5 humeur client
+  energy   Int? // 1-5 énergie client
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -164,6 +243,7 @@ model SessionSet {
   weight    Float?
   duration  Int?
   completed Boolean @default(true)
+  notes     String?
 }
 
 // ─── ABONNEMENT STRIPE ───────────────────────────────────────────────────────

@@ -224,7 +224,11 @@ export function ProgramStepper({
                 <Label>Client</Label>
                 <Select value={clientId} onValueChange={(v) => setClientId(v ?? "")}>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Choisir un client" />
+                    <SelectValue placeholder="Choisir un client">
+                      {selectedClient
+                        ? `${selectedClient.firstName} ${selectedClient.lastName}`
+                        : undefined}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {clients.map((c) => (

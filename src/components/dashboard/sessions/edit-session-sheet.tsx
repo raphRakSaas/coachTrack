@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState, useTransition } from "react"
-import { Plus } from "lucide-react"
+import { Pencil } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -22,9 +22,17 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { createSession } from "@/app/dashboard/sessions/actions"
+import { updateSession } from "@/app/dashboard/sessions/actions"
 
-type Client = { id: string; firstName: string; lastName: string }
+type SessionInput = {
+  id: string
+  date: Date | string
+  duration: number | null
+  notes: string | null
+  rpe: number | null
+  mood: number | null
+  energy: number | null
+}
 
 const RPE_OPTIONS = Array.from({ length: 10 }, (_, i) => i + 1)
 const MOOD_OPTIONS = [
@@ -35,45 +43,42 @@ const MOOD_OPTIONS = [
   { value: 5, label: "5 – Excellent" },
 ]
 
-export function SessionSheet({ clients }: { clients: Client[] }) {
+export function EditSessionSheet({ session }: { session: SessionInput }) {
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
-  const [clientId, setClientId] = useState("")
-  const [rpe, setRpe] = useState("")
-  const [mood, setMood] = useState("")
-  const [energy, setEnergy] = useState("")
   const formRef = useRef<HTMLFormElement>(null)
 
-  const today = new Date().toISOString().split("T")[0]
+  const [rpe, setRpe] = useState(session.rpe ? String(session.rpe) : "")
+  const [mood, setMood] = useState(session.mood ? String(session.mood) : "")
+  const [energy, setEnergy] = useState(
+    session.energy ? String(session.energy) : ""
+  )
 
-  const selectedClient = clients.find((c) => c.id === clientId)
+  const isoDate = new Date(session.date).toISOString().split("T")[0]
 
   function handleSubmit(formData: FormData) {
-    formData.set("clientId", clientId)
     if (rpe) formData.set("rpe", rpe)
+    else formData.delete("rpe")
     if (mood) formData.set("mood", mood)
+    else formData.delete("mood")
     if (energy) formData.set("energy", energy)
+    else formData.delete("energy")
 
     startTransition(async () => {
-      await createSession(formData)
-      formRef.current?.reset()
-      setClientId("")
-      setRpe("")
-      setMood("")
-      setEnergy("")
+      await updateSession(session.id, formData)
       setOpen(false)
     })
   }
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger render={<Button />}>
-        <Plus />
-        Nouvelle séance
+      <SheetTrigger render={<Button variant="outline" size="sm" />}>
+        <Pencil className="h-4 w-4" />
+        Modifier
       </SheetTrigger>
       <SheetContent className="overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>Nouvelle séance</SheetTitle>
+          <SheetTitle>Modifier la séance</SheetTitle>
         </SheetHeader>
         <form
           ref={formRef}
@@ -81,31 +86,25 @@ export function SessionSheet({ clients }: { clients: Client[] }) {
           className="flex flex-col gap-4 px-4 py-2"
         >
           <div className="flex flex-col gap-1.5">
-            <Label>Client *</Label>
-            <Select value={clientId} onValueChange={(v) => setClientId(v ?? "")}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Choisir un client">
-                  {selectedClient
-                    ? `${selectedClient.firstName} ${selectedClient.lastName}`
-                    : undefined}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                {clients.map((client) => (
-                  <SelectItem key={client.id} value={client.id}>
-                    {client.firstName} {client.lastName}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex flex-col gap-1.5">
             <Label htmlFor="date">Date *</Label>
-            <Input id="date" name="date" type="date" defaultValue={today} required />
+            <Input
+              id="date"
+              name="date"
+              type="date"
+              defaultValue={isoDate}
+              required
+            />
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="duration">Durée (min)</Label>
-            <Input id="duration" name="duration" type="number" min={1} max={300} placeholder="60" />
+            <Input
+              id="duration"
+              name="duration"
+              type="number"
+              min={1}
+              max={300}
+              defaultValue={session.duration ?? ""}
+            />
           </div>
 
           <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
@@ -116,9 +115,7 @@ export function SessionSheet({ clients }: { clients: Client[] }) {
               <Label>RPE (1-10)</Label>
               <Select value={rpe} onValueChange={(v) => setRpe(v ?? "")}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="—">
-                    {rpe || undefined}
-                  </SelectValue>
+                  <SelectValue placeholder="—">{rpe || undefined}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {RPE_OPTIONS.map((n) => (
@@ -130,12 +127,10 @@ export function SessionSheet({ clients }: { clients: Client[] }) {
               </Select>
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label>Humeur (1-5)</Label>
+              <Label>Humeur</Label>
               <Select value={mood} onValueChange={(v) => setMood(v ?? "")}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="—">
-                    {mood || undefined}
-                  </SelectValue>
+                  <SelectValue placeholder="—">{mood || undefined}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {MOOD_OPTIONS.map((o) => (
@@ -147,7 +142,7 @@ export function SessionSheet({ clients }: { clients: Client[] }) {
               </Select>
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label>Énergie (1-5)</Label>
+              <Label>Énergie</Label>
               <Select value={energy} onValueChange={(v) => setEnergy(v ?? "")}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="—">
@@ -167,11 +162,16 @@ export function SessionSheet({ clients }: { clients: Client[] }) {
 
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="notes">Notes</Label>
-            <Textarea id="notes" name="notes" placeholder="Observations..." rows={3} />
+            <Textarea
+              id="notes"
+              name="notes"
+              defaultValue={session.notes ?? ""}
+              rows={3}
+            />
           </div>
           <SheetFooter>
-            <Button type="submit" disabled={isPending || !clientId} className="w-full">
-              {isPending ? "Enregistrement..." : "Enregistrer"}
+            <Button type="submit" disabled={isPending} className="w-full">
+              {isPending ? "Enregistrement..." : "Mettre à jour"}
             </Button>
           </SheetFooter>
         </form>

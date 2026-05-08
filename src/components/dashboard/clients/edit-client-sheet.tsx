@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState, useTransition } from "react"
-import { Plus } from "lucide-react"
+import { Pencil } from "lucide-react"
 import { FitnessLevel, GoalType, Gender } from "@prisma/client"
 
 import { Button } from "@/components/ui/button"
@@ -23,7 +23,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { createClient } from "@/app/dashboard/clients/actions"
+import { updateClient } from "@/app/dashboard/clients/[id]/actions"
 import {
   GENDER_LABELS,
   FITNESS_LEVEL_LABELS,
@@ -31,29 +31,54 @@ import {
   COUNTRY_CODES,
 } from "@/lib/constants"
 
-export function ClientSheet() {
+type ClientInput = {
+  id: string
+  firstName: string
+  lastName: string
+  email: string | null
+  phone: string | null
+  phoneCountryCode: string | null
+  gender: Gender | null
+  birthDate: Date | string | null
+  height: number | null
+  fitnessLevel: FitnessLevel
+  weeklyFrequency: number | null
+  goalType: GoalType | null
+  goal: string | null
+  goalTargetWeight: number | null
+  goalDeadline: Date | string | null
+  injuries: string | null
+  medicalNotes: string | null
+  isActive: boolean
+}
+
+function isoDate(d: Date | string | null) {
+  if (!d) return ""
+  return new Date(d).toISOString().split("T")[0]
+}
+
+export function EditClientSheet({ client }: { client: ClientInput }) {
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
   const formRef = useRef<HTMLFormElement>(null)
 
-  const [gender, setGender] = useState<string>("")
-  const [fitnessLevel, setFitnessLevel] = useState<string>("BEGINNER")
-  const [goalType, setGoalType] = useState<string>("")
-  const [countryCode, setCountryCode] = useState<string>("+33")
+  const [gender, setGender] = useState<string>(client.gender ?? "")
+  const [fitnessLevel, setFitnessLevel] = useState<string>(client.fitnessLevel)
+  const [goalType, setGoalType] = useState<string>(client.goalType ?? "")
+  const [countryCode, setCountryCode] = useState<string>(
+    client.phoneCountryCode ?? "+33"
+  )
+  const [isActive, setIsActive] = useState(client.isActive)
 
   function handleSubmit(formData: FormData) {
     if (gender) formData.set("gender", gender)
     formData.set("fitnessLevel", fitnessLevel)
     if (goalType) formData.set("goalType", goalType)
     formData.set("phoneCountryCode", countryCode)
+    formData.set("isActive", isActive ? "true" : "false")
 
     startTransition(async () => {
-      await createClient(formData)
-      formRef.current?.reset()
-      setGender("")
-      setFitnessLevel("BEGINNER")
-      setGoalType("")
-      setCountryCode("+33")
+      await updateClient(client.id, formData)
       setOpen(false)
     })
   }
@@ -65,31 +90,40 @@ export function ClientSheet() {
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger render={<Button />}>
-        <Plus />
-        Ajouter un client
+      <SheetTrigger render={<Button variant="outline" size="sm" />}>
+        <Pencil className="h-4 w-4" />
+        Modifier
       </SheetTrigger>
       <SheetContent className="overflow-y-auto sm:max-w-lg">
         <SheetHeader>
-          <SheetTitle>Nouveau client</SheetTitle>
+          <SheetTitle>Modifier le client</SheetTitle>
         </SheetHeader>
         <form
           ref={formRef}
           action={handleSubmit}
           className="flex flex-col gap-5 px-4 py-2"
         >
-          {/* Identité */}
           <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
             Identité
           </p>
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="firstName">Prénom *</Label>
-              <Input id="firstName" name="firstName" placeholder="Jean" required />
+              <Input
+                id="firstName"
+                name="firstName"
+                defaultValue={client.firstName}
+                required
+              />
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="lastName">Nom *</Label>
-              <Input id="lastName" name="lastName" placeholder="Dupont" required />
+              <Input
+                id="lastName"
+                name="lastName"
+                defaultValue={client.lastName}
+                required
+              />
             </div>
           </div>
           <div className="flex flex-col gap-1.5">
@@ -111,11 +145,21 @@ export function ClientSheet() {
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="birthDate">Date de naissance</Label>
-            <Input id="birthDate" name="birthDate" type="date" />
+            <Input
+              id="birthDate"
+              name="birthDate"
+              type="date"
+              defaultValue={isoDate(client.birthDate)}
+            />
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" name="email" type="email" placeholder="jean@exemple.fr" />
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              defaultValue={client.email ?? ""}
+            />
           </div>
           <div className="flex flex-col gap-1.5">
             <Label>Téléphone</Label>
@@ -137,11 +181,14 @@ export function ClientSheet() {
                   ))}
                 </SelectContent>
               </Select>
-              <Input name="phone" type="tel" placeholder="06 12 34 56 78" />
+              <Input
+                name="phone"
+                type="tel"
+                defaultValue={client.phone ?? ""}
+              />
             </div>
           </div>
 
-          {/* Profil sportif */}
           <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
             Profil sportif
           </p>
@@ -174,7 +221,7 @@ export function ClientSheet() {
                 type="number"
                 min={1}
                 max={14}
-                placeholder="3"
+                defaultValue={client.weeklyFrequency ?? ""}
               />
             </div>
           </div>
@@ -186,21 +233,21 @@ export function ClientSheet() {
               type="number"
               min={100}
               max={250}
-              placeholder="175"
+              defaultValue={client.height ?? ""}
             />
           </div>
 
-          {/* Objectifs */}
           <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
             Objectifs
           </p>
           <div className="flex flex-col gap-1.5">
-            <Label>Type d'objectif</Label>
-            <Select value={goalType} onValueChange={(v) => setGoalType(v ?? "")}>
+            <Label>Type d&apos;objectif</Label>
+            <Select
+              value={goalType}
+              onValueChange={(v) => setGoalType(v ?? "")}
+            >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Choisir">
-                  {selectedGoal}
-                </SelectValue>
+                <SelectValue placeholder="Choisir">{selectedGoal}</SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {(Object.keys(GOAL_TYPE_LABELS) as GoalType[]).map((g) => (
@@ -211,19 +258,72 @@ export function ClientSheet() {
               </SelectContent>
             </Select>
           </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="goalTargetWeight">Poids cible (kg)</Label>
+              <Input
+                id="goalTargetWeight"
+                name="goalTargetWeight"
+                type="number"
+                step="0.1"
+                defaultValue={client.goalTargetWeight ?? ""}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="goalDeadline">Échéance</Label>
+              <Input
+                id="goalDeadline"
+                name="goalDeadline"
+                type="date"
+                defaultValue={isoDate(client.goalDeadline)}
+              />
+            </div>
+          </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="goal">Objectif détaillé</Label>
             <Textarea
               id="goal"
               name="goal"
-              placeholder="Perdre 5 kg avant l'été..."
+              defaultValue={client.goal ?? ""}
               rows={2}
             />
           </div>
 
+          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+            Médical
+          </p>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="injuries">Blessures</Label>
+            <Textarea
+              id="injuries"
+              name="injuries"
+              defaultValue={client.injuries ?? ""}
+              rows={2}
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="medicalNotes">Notes médicales</Label>
+            <Textarea
+              id="medicalNotes"
+              name="medicalNotes"
+              defaultValue={client.medicalNotes ?? ""}
+              rows={2}
+            />
+          </div>
+
+          <label className="flex items-center gap-2 text-sm text-zinc-700">
+            <input
+              type="checkbox"
+              checked={isActive}
+              onChange={(e) => setIsActive(e.target.checked)}
+              className="h-4 w-4"
+            />
+            Client actif
+          </label>
+
           <SheetFooter>
             <Button type="submit" disabled={isPending} className="w-full">
-              {isPending ? "Enregistrement..." : "Enregistrer"}
+              {isPending ? "Enregistrement..." : "Mettre à jour"}
             </Button>
           </SheetFooter>
         </form>

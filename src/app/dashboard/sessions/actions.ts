@@ -8,19 +8,50 @@ export async function createSession(formData: FormData) {
   const user = await getCurrentUser()
   if (!user) throw new Error("Unauthorized")
 
-  const durationStr = formData.get("duration") as string
+  const parseInt_ = (key: string) => {
+    const v = formData.get(key) as string
+    return v ? parseInt(v) : null
+  }
 
   await prisma.session.create({
     data: {
       coachId: user.id,
       clientId: formData.get("clientId") as string,
       date: new Date(formData.get("date") as string),
-      duration: durationStr ? parseInt(durationStr) : null,
+      duration: parseInt_("duration"),
       notes: (formData.get("notes") as string) || null,
+      rpe: parseInt_("rpe"),
+      mood: parseInt_("mood"),
+      energy: parseInt_("energy"),
     },
   })
 
   revalidatePath("/dashboard/sessions")
+}
+
+export async function updateSession(id: string, formData: FormData) {
+  const user = await getCurrentUser()
+  if (!user) throw new Error("Unauthorized")
+
+  const parseInt_ = (key: string) => {
+    const v = formData.get(key) as string
+    return v ? parseInt(v) : null
+  }
+
+  await prisma.session.update({
+    where: { id, coachId: user.id },
+    data: {
+      date: new Date(formData.get("date") as string),
+      duration: parseInt_("duration"),
+      notes: (formData.get("notes") as string) || null,
+      rpe: parseInt_("rpe"),
+      mood: parseInt_("mood"),
+      energy: parseInt_("energy"),
+    },
+  })
+
+  revalidatePath("/dashboard/sessions")
+  revalidatePath(`/dashboard/sessions/${id}`)
 }
 
 export async function deleteSession(id: string) {
