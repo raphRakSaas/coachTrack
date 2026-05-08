@@ -1,8 +1,8 @@
-import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Users, CalendarCheck, TrendingUp, Plus } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
 
@@ -22,20 +22,8 @@ function startOfMonth() {
 }
 
 export default async function DashboardPage() {
-  const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
-
-  const user = await prisma.user.findUnique({ where: { clerkId: userId } });
-
-  if (!user) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <p className="text-sm text-zinc-500">
-          Configuration du compte en cours...
-        </p>
-      </div>
-    );
-  }
+  const user = await getCurrentUser();
+  if (!user) redirect("/sign-in");
 
   const [activeClients, sessionsThisWeek, sessionsThisMonth, recentSessions] =
     await Promise.all([
@@ -84,7 +72,7 @@ export default async function DashboardPage() {
             Bienvenue{user.name ? `, ${user.name}` : ""}
           </p>
         </div>
-        <Link href="/dashboard/sessions/new" className={buttonVariants()}>
+        <Link href="/dashboard/sessions" className={buttonVariants()}>
           <Plus className="h-4 w-4" />
           Nouvelle séance
         </Link>
