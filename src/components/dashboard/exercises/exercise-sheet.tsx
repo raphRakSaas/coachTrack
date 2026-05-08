@@ -98,6 +98,18 @@ export function ExerciseSheet() {
               rows={3}
             />
           </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="imageUrl">
+              Image{" "}
+              <span className="text-muted-foreground">(optionnel)</span>
+            </Label>
+            <Input
+              id="imageUrl"
+              name="imageUrl"
+              placeholder="https://..."
+              inputMode="url"
+            />
+          </div>
           <SheetFooter>
             <Button type="submit" disabled={isPending} className="w-full">
               {isPending ? "Enregistrement..." : "Enregistrer"}

@@ -132,6 +132,7 @@ model Exercise {
   name        String
   muscleGroup MuscleGroup
   description String?
+  imageUrl    String?
   isGlobal    Boolean     @default(false)
 
   programExercises ProgramExercise[]

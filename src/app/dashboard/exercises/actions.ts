@@ -14,6 +14,7 @@ export async function createExercise(formData: FormData) {
       name: formData.get("name") as string,
       muscleGroup: formData.get("muscleGroup") as MuscleGroup,
       description: (formData.get("description") as string) || null,
+      imageUrl: (formData.get("imageUrl") as string) || null,
       coachId: user.id,
     },
   })
@@ -31,10 +32,12 @@ export async function updateExercise(id: string, formData: FormData) {
       name: formData.get("name") as string,
       muscleGroup: formData.get("muscleGroup") as MuscleGroup,
       description: (formData.get("description") as string) || null,
+      imageUrl: (formData.get("imageUrl") as string) || null,
     },
   })
 
   revalidatePath("/dashboard/exercises")
+  revalidatePath(`/dashboard/exercises/${id}`)
 }
 
 export async function deleteExercise(id: string) {

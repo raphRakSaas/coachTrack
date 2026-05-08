@@ -1,0 +1,230 @@
+{
+  "Développé couché": {
+    "candidatesCount": 10
+  },
+  "Développé couché incliné": {
+    "candidatesCount": 10
+  },
+  "Développé décliné": {
+    "candidatesCount": 10
+  },
+  "Développé haltères": {
+    "candidatesCount": 10
+  },
+  "Pompes": {
+    "candidatesCount": 10
+  },
+  "Pompes inclinées": {
+    "candidatesCount": 10
+  },
+  "Écarté haltères": {
+    "candidatesCount": 10
+  },
+  "Écarté à la poulie": {
+    "candidatesCount": 10
+  },
+  "Pec deck": {
+    "candidatesCount": 10
+  },
+  "Tractions": {
+    "candidatesCount": 10
+  },
+  "Tractions supination": {
+    "error": "AbortError: This operation was aborted"
+  },
+  "Tirage horizontal": {
+    "candidatesCount": 10
+  },
+  "Tirage vertical": {
+    "candidatesCount": 10
+  },
+  "Rowing barre": {
+    "candidatesCount": 10
+  },
+  "Rowing haltère un bras": {
+    "candidatesCount": 10
+  },
+  "Rowing T-bar": {
+    "candidatesCount": 10
+  },
+  "Soulevé de terre": {
+    "error": "AbortError: This operation was aborted"
+  },
+  "Tirage à la poulie basse": {
+    "error": "AbortError: This operation was aborted"
+  },
+  "Pull-over": {
+    "candidatesCount": 10
+  },
+  "Développé militaire": {
+    "error": "AbortError: This operation was aborted"
+  },
+  "Développé haltères assis": {
+    "candidatesCount": 10
+  },
+  "Élévations latérales": {
+    "candidatesCount": 10
+  },
+  "Élévations frontales": {
+    "candidatesCount": 10
+  },
+  "Oiseau": {
+    "candidatesCount": 10
+  },
+  "Face pull": {
+    "candidatesCount": 10
+  },
+  "Shrugs": {
+    "error": "AbortError: This operation was aborted"
+  },
+  "Curl barre": {
+    "candidatesCount": 10
+  },
+  "Curl haltères": {
+    "error": "AbortError: This operation was aborted"
+  },
+  "Curl marteau": {
+    "candidatesCount": 10
+  },
+  "Curl pupitre": {
+    "candidatesCount": 10
+  },
+  "Curl à la poulie": {
+    "error": "AbortError: This operation was aborted"
+  },
+  "Curl concentré": {
+    "candidatesCount": 10
+  },
+  "Dips": {
+    "candidatesCount": 10
+  },
+  "Extensions à la poulie": {
+    "error": "AbortError: This operation was aborted"
+  },
+  "Extensions au-dessus de la tête": {
+    "candidatesCount": 10
+  },
+  "Développé couché prise serrée": {
+    "candidatesCount": 10
+  },
+  "Kickback": {
+    "candidatesCount": 10
+  },
+  "Skull crusher": {
+    "candidatesCount": 10
+  },
+  "Squat": {
+    "candidatesCount": 10
+  },
+  "Front squat": {
+    "error": "AbortError: This operation was aborted"
+  },
+  "Squat bulgare": {
+    "candidatesCount": 10
+  },
+  "Soulevé de terre roumain": {
+    "candidatesCount": 10
+  },
+  "Presse à cuisses": {
+    "candidatesCount": 10
+  },
+  "Fentes": {
+    "candidatesCount": 10
+  },
+  "Extensions de jambes": {
+    "candidatesCount": 10
+  },
+  "Leg curl": {
+    "error": "AbortError: This operation was aborted"
+  },
+  "Mollets debout": {
+    "candidatesCount": 10
+  },
+  "Mollets assis": {
+    "candidatesCount": 10
+  },
+  "Hip thrust": {
+    "candidatesCount": 10
+  },
+  "Glute bridge": {
+    "candidatesCount": 10
+  },
+  "Kickback à la poulie": {
+    "candidatesCount": 10
+  },
+  "Sumo squat": {
+    "candidatesCount": 10
+  },
+  "Step up": {
+    "candidatesCount": 10
+  },
+  "Crunch": {
+    "candidatesCount": 10
+  },
+  "Planche": {
+    "candidatesCount": 10
+  },
+  "Planche latérale": {
+    "candidatesCount": 10
+  },
+  "Russian twist": {
+    "candidatesCount": 10
+  },
+  "Relevés de jambes suspendu": {
+    "candidatesCount": 10
+  },
+  "Mountain climber": {
+    "candidatesCount": 10
+  },
+  "Hollow hold": {
+    "candidatesCount": 10
+  },
+  "Roue abdominale": {
+    "candidatesCount": 10
+  },
+  "Course à pied": {
+    "candidatesCount": 10
+  },
+  "Vélo": {
+    "candidatesCount": 10
+  },
+  "Rameur": {
+    "candidatesCount": 10
+  },
+  "Corde à sauter": {
+    "candidatesCount": 10
+  },
+  "Vélo elliptique": {
+    "candidatesCount": 10
+  },
+  "Tapis incliné": {
+    "candidatesCount": 10
+  },
+  "Sprint": {
+    "candidatesCount": 10
+  },
+  "Burpees": {
+    "candidatesCount": 10
+  },
+  "Kettlebell swing": {
+    "candidatesCount": 10
+  },
+  "Thrusters": {
+    "candidatesCount": 10
+  },
+  "Clean and press": {
+    "error": "AbortError: This operation was aborted"
+  },
+  "Turkish get-up": {
+    "candidatesCount": 10
+  },
+  "Farmer's walk": {
+    "candidatesCount": 10
+  },
+  "Wall ball": {
+    "candidatesCount": 10
+  },
+  "Snatch": {
+    "error": "AbortError: This operation was aborted"
+  }
+}

@@ -1,15 +1,13 @@
 import { redirect } from "next/navigation"
-import { Dumbbell, Trash2 } from "lucide-react"
+import { Dumbbell } from "lucide-react"
 
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser } from "@/lib/auth"
 import { MUSCLE_GROUPS } from "@/lib/constants"
 import { SECTION_ACCENTS } from "@/lib/colors"
-import { Badge } from "@/components/ui/badge"
 import { ExerciseSheet } from "@/components/dashboard/exercises/exercise-sheet"
-import { EditExerciseSheet } from "@/components/dashboard/exercises/edit-exercise-sheet"
+import { ExerciseCard3d } from "@/components/dashboard/exercises/exercise-card-3d"
 import { SearchInput } from "@/components/dashboard/search-input"
-import { deleteExercise } from "./actions"
 
 export default async function ExercisesPage({
   searchParams,
@@ -80,44 +78,19 @@ export default async function ExercisesPage({
                 </p>
                 <span className="text-xs text-zinc-400">{items.length}</span>
               </div>
-              <div className="divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-white">
-                {items.map((exercise) => (
-                  <div
-                    key={exercise.id}
-                    className="group flex items-center justify-between px-4 py-3 hover:bg-zinc-50/50"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-zinc-900">
-                        {exercise.name}
-                      </p>
-                      {exercise.description && (
-                        <p className="mt-0.5 truncate text-xs text-zinc-500">
-                          {exercise.description}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      {exercise.isGlobal ? (
-                        <Badge variant="secondary" className="text-xs">
-                          Global
-                        </Badge>
-                      ) : (
-                        <>
-                          <EditExerciseSheet exercise={exercise} />
-                          <form action={deleteExercise.bind(null, exercise.id)}>
-                            <button
-                              type="submit"
-                              className="rounded p-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-red-500"
-                              aria-label="Supprimer"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          </form>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                ))}
+              <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white p-4">
+                <div className="flex gap-4 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  {items.map((exercise) => (
+                    <ExerciseCard3d
+                      key={exercise.id}
+                      href={`/dashboard/exercises/${exercise.id}`}
+                      name={exercise.name}
+                      description={exercise.description}
+                      muscleGroup={exercise.muscleGroup}
+                      imageUrl={exercise.imageUrl}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           ))}

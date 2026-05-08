@@ -31,6 +31,7 @@ type ExerciseInput = {
   name: string
   muscleGroup: MuscleGroup
   description: string | null
+  imageUrl?: string | null
 }
 
 export function EditExerciseSheet({ exercise }: { exercise: ExerciseInput }) {
@@ -107,6 +108,16 @@ export function EditExerciseSheet({ exercise }: { exercise: ExerciseInput }) {
               name="description"
               defaultValue={exercise.description ?? ""}
               rows={3}
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="imageUrl">Image</Label>
+            <Input
+              id="imageUrl"
+              name="imageUrl"
+              defaultValue={exercise.imageUrl ?? ""}
+              placeholder="https://..."
+              inputMode="url"
             />
           </div>
           <SheetFooter>
