@@ -44,6 +44,7 @@ import {
   toggleActiveClient,
 } from "@/app/dashboard/clients/[id]/actions"
 import { SECTION_ACCENTS } from "@/lib/colors"
+import { cn } from "@/lib/utils"
 import {
   FITNESS_LEVEL_LABELS,
   GOAL_TYPE_LABELS,
@@ -152,6 +153,8 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
   const [newNoteOpen, setNewNoteOpen] = useState(false)
   const [showTrackingForm, setShowTrackingForm] = useState(false)
   const [calendarWeekOffset, setCalendarWeekOffset] = useState(0)
+  const [calendarMonthOffset, setCalendarMonthOffset] = useState(0)
+  const [calendarView, setCalendarView] = useState<"week" | "month">("week")
   const newNoteRef = useRef<HTMLTextAreaElement>(null)
   const editNoteRef = useRef<HTMLTextAreaElement>(null)
 
@@ -267,6 +270,48 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
       return `${calWeekStart.getDate()} – ${end.getDate()} ${months[calWeekStart.getMonth()]} ${calWeekStart.getFullYear()}`
     }
     return `${calWeekStart.getDate()} ${months[calWeekStart.getMonth()]} – ${end.getDate()} ${months[end.getMonth()]} ${calWeekStart.getFullYear()}`
+  })()
+
+  const calMonthAnchor = (() => {
+    const anchor = new Date()
+    anchor.setDate(1)
+    anchor.setHours(0, 0, 0, 0)
+    anchor.setMonth(anchor.getMonth() + calendarMonthOffset)
+    return anchor
+  })()
+
+  const calMonthYear = calMonthAnchor.getFullYear()
+  const calMonthIndex = calMonthAnchor.getMonth()
+
+  const calMonthFirstMonday = getMonday(new Date(calMonthYear, calMonthIndex, 1))
+
+  const calendarTodayKey = new Date().toISOString().split("T")[0]!
+
+  const calMonthCells = Array.from({ length: 42 }, (_, cellIndex) => {
+    const cellDate = new Date(calMonthFirstMonday)
+    cellDate.setDate(calMonthFirstMonday.getDate() + cellIndex)
+    const dayKey = cellDate.toISOString().split("T")[0]!
+    const inMonth = cellDate.getMonth() === calMonthIndex
+    const daySessions = client.sessions.filter(
+      (session) =>
+        new Date(session.date).toISOString().split("T")[0] === dayKey
+    )
+    const isTodayCell = dayKey === calendarTodayKey
+    return {
+      date: cellDate,
+      key: dayKey,
+      inMonth,
+      sessions: daySessions,
+      isToday: isTodayCell,
+    }
+  })
+
+  const calMonthLabel = (() => {
+    const raw = calMonthAnchor.toLocaleDateString("fr-FR", {
+      month: "long",
+      year: "numeric",
+    })
+    return raw.charAt(0).toUpperCase() + raw.slice(1)
   })()
 
   // ── Handlers ─────────────────────────────────────────────────────────────
@@ -987,80 +1032,222 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
               CALENDRIER
           ════════════════════════════════════ */}
           <TabsContent value="calendrier" className="px-6 py-6">
-            {/* Week navigation */}
-            <div className="mb-4 flex items-center justify-between">
-              <div className="flex items-center gap-2">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+              <div
+                className="inline-flex rounded-lg border border-border bg-muted/40 p-0.5"
+                role="group"
+                aria-label="Vue du calendrier"
+              >
                 <button
-                  onClick={() => setCalendarWeekOffset((n) => n - 1)}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card hover:bg-muted/60"
+                  type="button"
+                  onClick={() => setCalendarView("week")}
+                  className={cn(
+                    "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
+                    calendarView === "week"
+                      ? "bg-card text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  Semaine
                 </button>
-                <span className="text-sm font-medium text-foreground">
-                  {calWeekLabel}
-                </span>
                 <button
-                  onClick={() => setCalendarWeekOffset((n) => n + 1)}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card hover:bg-muted/60"
+                  type="button"
+                  onClick={() => setCalendarView("month")}
+                  className={cn(
+                    "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
+                    calendarView === "month"
+                      ? "bg-card text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
                 >
-                  <ChevronRight className="h-4 w-4" />
+                  Mois
                 </button>
               </div>
-              <button
-                onClick={() => setCalendarWeekOffset(0)}
-                className="rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted/60"
-              >
-                Aujourd&apos;hui
-              </button>
+
+              <div className="flex flex-wrap items-center justify-between gap-2 sm:justify-end">
+                <div className="flex items-center gap-2">
+                  {calendarView === "week" ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setCalendarWeekOffset((previous) => previous - 1)}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card hover:bg-muted/60"
+                        aria-label="Semaine précédente"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </button>
+                      <span className="min-w-[10rem] text-center text-sm font-medium text-foreground sm:min-w-[14rem]">
+                        {calWeekLabel}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setCalendarWeekOffset((previous) => previous + 1)}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card hover:bg-muted/60"
+                        aria-label="Semaine suivante"
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setCalendarMonthOffset((previous) => previous - 1)
+                        }
+                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card hover:bg-muted/60"
+                        aria-label="Mois précédent"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </button>
+                      <span className="min-w-[10rem] text-center text-sm font-medium capitalize text-foreground sm:min-w-[12rem]">
+                        {calMonthLabel}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setCalendarMonthOffset((previous) => previous + 1)
+                        }
+                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card hover:bg-muted/60"
+                        aria-label="Mois suivant"
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </button>
+                    </>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCalendarWeekOffset(0)
+                    setCalendarMonthOffset(0)
+                  }}
+                  className="rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted/60"
+                >
+                  Aujourd&apos;hui
+                </button>
+              </div>
             </div>
 
-            <div className="overflow-hidden rounded-xl border border-border bg-card">
-              {/* Day headers */}
-              <div className="grid grid-cols-7 border-b border-border">
-                {calDays.map(({ date, isToday }, idx) => (
-                  <div
-                    key={idx}
-                    className={`border-r border-border px-2 py-3 text-center last:border-r-0 ${isToday ? "bg-blue-50" : ""}`}
-                  >
-                    <p
-                      className={`text-[11px] font-semibold uppercase tracking-wide ${isToday ? "text-blue-600" : "text-muted-foreground"}`}
+            {calendarView === "week" ? (
+              <div className="overflow-hidden rounded-xl border border-border bg-card">
+                <div className="grid grid-cols-7 border-b border-border">
+                  {calDays.map(({ date, isToday }, idx) => (
+                    <div
+                      key={idx}
+                      className={cn(
+                        "border-r border-border px-2 py-3 text-center last:border-r-0",
+                        isToday && "bg-blue-50 dark:bg-blue-950/40"
+                      )}
                     >
-                      {WEEKDAY_LABELS[idx]}
-                    </p>
-                    <p
-                      className={`mt-0.5 text-base font-bold ${isToday ? "text-blue-700" : "text-foreground"}`}
-                    >
-                      {date.getDate()}
-                    </p>
-                  </div>
-                ))}
-              </div>
-              {/* Events */}
-              <div className="grid grid-cols-7 divide-x divide-border">
-                {calDays.map(({ sessions: daySessions, isToday }, idx) => (
-                  <div
-                    key={idx}
-                    className={`min-h-32 p-2 ${isToday ? "bg-blue-50/30" : ""}`}
-                  >
-                    {daySessions.map((s) => (
-                      <Link
-                        key={s.id}
-                        href={`/dashboard/sessions/${s.id}`}
-                        className="mb-1 block rounded-lg bg-emerald-50 border border-emerald-200 p-1.5 transition-all hover:shadow-sm"
+                      <p
+                        className={cn(
+                          "text-[11px] font-semibold uppercase tracking-wide",
+                          isToday
+                            ? "text-blue-600 dark:text-blue-400"
+                            : "text-muted-foreground"
+                        )}
                       >
-                        <p className="truncate text-[11px] font-semibold text-emerald-700">
-                          Séance
-                        </p>
-                        <p className="text-[10px] text-muted-foreground">
-                          {s.duration ? `${s.duration} min` : ""}
-                          {s.rpe ? ` · RPE ${s.rpe}` : ""}
-                        </p>
-                      </Link>
-                    ))}
-                  </div>
-                ))}
+                        {WEEKDAY_LABELS[idx]}
+                      </p>
+                      <p
+                        className={cn(
+                          "mt-0.5 text-base font-bold",
+                          isToday
+                            ? "text-blue-700 dark:text-blue-300"
+                            : "text-foreground"
+                        )}
+                      >
+                        {date.getDate()}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                <div className="grid grid-cols-7 divide-x divide-border">
+                  {calDays.map(({ sessions: daySessions, isToday }, idx) => (
+                    <div
+                      key={idx}
+                      className={cn(
+                        "min-h-32 p-2",
+                        isToday && "bg-blue-50/30 dark:bg-blue-950/25"
+                      )}
+                    >
+                      {daySessions.map((sessionRow) => (
+                        <Link
+                          key={sessionRow.id}
+                          href={`/dashboard/sessions/${sessionRow.id}`}
+                          className="mb-1 block rounded-lg border border-emerald-200 bg-emerald-50 p-1.5 transition-all hover:shadow-sm dark:border-emerald-900/50 dark:bg-emerald-950/40"
+                        >
+                          <p className="truncate text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
+                            Séance
+                          </p>
+                          <p className="text-[10px] text-muted-foreground">
+                            {sessionRow.duration
+                              ? `${sessionRow.duration} min`
+                              : ""}
+                            {sessionRow.rpe ? ` · RPE ${sessionRow.rpe}` : ""}
+                          </p>
+                        </Link>
+                      ))}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="overflow-hidden rounded-xl border border-border bg-card">
+                <div className="grid grid-cols-7 border-b border-border bg-muted/20">
+                  {WEEKDAY_LABELS.map((weekdayLabel) => (
+                    <div
+                      key={weekdayLabel}
+                      className="border-r border-border px-1 py-2 text-center last:border-r-0"
+                    >
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                        {weekdayLabel}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                <div className="grid grid-cols-7">
+                  {calMonthCells.map((cell, cellIndex) => (
+                    <div
+                      key={`${cell.key}-${cellIndex}`}
+                      className={cn(
+                        "min-h-[5.5rem] border-b border-r border-border p-1.5",
+                        (cellIndex + 1) % 7 === 0 && "border-r-0",
+                        !cell.inMonth && "bg-muted/25 text-muted-foreground",
+                        cell.inMonth && "bg-card",
+                        cell.isToday &&
+                          "bg-blue-50/90 dark:bg-blue-950/35"
+                      )}
+                    >
+                      <p
+                        className={cn(
+                          "mb-1 text-sm font-semibold tabular-nums",
+                          cell.isToday &&
+                            "text-blue-700 dark:text-blue-300"
+                        )}
+                      >
+                        {cell.date.getDate()}
+                      </p>
+                      <div className="flex flex-col gap-1">
+                        {cell.sessions.map((sessionRow) => (
+                          <Link
+                            key={sessionRow.id}
+                            href={`/dashboard/sessions/${sessionRow.id}`}
+                            className="block truncate rounded-md border border-emerald-200 bg-emerald-50 px-1 py-0.5 text-[10px] font-medium text-emerald-800 transition-colors hover:bg-emerald-100 dark:border-emerald-900/60 dark:bg-emerald-950/50 dark:text-emerald-300 dark:hover:bg-emerald-950/80"
+                          >
+                            Séance
+                            {sessionRow.duration
+                              ? ` · ${sessionRow.duration} min`
+                              : ""}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </TabsContent>
 
           {/* ════════════════════════════════════
