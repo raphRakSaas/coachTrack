@@ -10,6 +10,8 @@ import {
   ClipboardList,
   CalendarCheck,
   Settings,
+  UserSearch,
+  CalendarDays,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -26,6 +28,8 @@ type NavItem = {
 const navItems: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, section: "dashboard" },
   { label: "Clients", href: "/dashboard/clients", icon: Users, section: "clients" },
+  { label: "Prospects", href: "/dashboard/prospects", icon: UserSearch, section: "prospects" },
+  { label: "Calendrier", href: "/dashboard/calendar", icon: CalendarDays, section: "calendar" },
   { label: "Séances", href: "/dashboard/sessions", icon: CalendarCheck, section: "sessions" },
   { label: "Programmes", href: "/dashboard/programs", icon: ClipboardList, section: "programs" },
   { label: "Exercices", href: "/dashboard/exercises", icon: Dumbbell, section: "exercises" },

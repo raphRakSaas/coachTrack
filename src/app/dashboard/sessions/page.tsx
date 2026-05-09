@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import Link from "next/link"
-import { CalendarCheck, Trash2, ChevronRight, Flame } from "lucide-react"
+import { CalendarCheck, Trash2, ChevronRight, Flame, Users } from "lucide-react"
 
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser } from "@/lib/auth"
@@ -22,18 +22,33 @@ function formatDateGroup(d: Date): string {
   return date.toLocaleDateString("fr-FR", { month: "long", year: "numeric" })
 }
 
-export default async function SessionsPage() {
+export default async function SessionsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ clientId?: string }>
+}) {
+  const { clientId } = await searchParams
   const user = await getCurrentUser()
   if (!user) redirect("/sign-in")
 
   const accent = SECTION_ACCENTS.sessions
 
-  const [sessions, clients] = await Promise.all([
+  const now = new Date()
+  const startOfWeek = new Date(now)
+  startOfWeek.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1))
+  startOfWeek.setHours(0, 0, 0, 0)
+
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+
+  const [sessions, clients, sessionsThisWeek, sessionsThisMonth] = await Promise.all([
     prisma.session.findMany({
-      where: { coachId: user.id },
+      where: {
+        coachId: user.id,
+        ...(clientId ? { clientId } : {}),
+      },
       orderBy: { date: "desc" },
       include: {
-        client: { select: { firstName: true, lastName: true } },
+        client: { select: { id: true, firstName: true, lastName: true } },
         _count: { select: { exercises: true } },
       },
     }),
@@ -42,9 +57,14 @@ export default async function SessionsPage() {
       orderBy: { firstName: "asc" },
       select: { id: true, firstName: true, lastName: true },
     }),
+    prisma.session.count({
+      where: { coachId: user.id, date: { gte: startOfWeek } },
+    }),
+    prisma.session.count({
+      where: { coachId: user.id, date: { gte: startOfMonth } },
+    }),
   ])
 
-  // Group sessions by relative date
   const grouped = sessions.reduce(
     (acc, session) => {
       const key = formatDateGroup(session.date)
@@ -54,31 +74,104 @@ export default async function SessionsPage() {
     {} as Record<string, typeof sessions>
   )
 
+  const selectedClient = clientId
+    ? clients.find((c) => c.id === clientId)
+    : null
+
   return (
     <div className="p-8">
-      <div className="mb-8 flex items-center justify-between">
+      {/* Header */}
+      <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${accent.bgSoft}`}>
+          <div
+            className={`flex h-10 w-10 items-center justify-center rounded-xl ${accent.bgSoft}`}
+          >
             <CalendarCheck className={`h-5 w-5 ${accent.icon}`} />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-zinc-900">Séances</h1>
             <p className="text-sm text-zinc-500">
-              {sessions.length} séance{sessions.length !== 1 ? "s" : ""} enregistrée{sessions.length !== 1 ? "s" : ""}
+              {sessions.length} séance{sessions.length !== 1 ? "s" : ""}
+              {selectedClient &&
+                ` · ${selectedClient.firstName} ${selectedClient.lastName}`}
             </p>
           </div>
         </div>
         <SessionSheet clients={clients} />
       </div>
 
+      {/* Stats + filtre */}
+      <div className="mb-6 flex flex-wrap items-center gap-4">
+        <div className="flex items-center gap-3">
+          <div className="rounded-xl border border-zinc-200 bg-white px-4 py-3 text-center">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-zinc-400">
+              Cette semaine
+            </p>
+            <p className="mt-0.5 text-2xl font-bold text-zinc-900">
+              {sessionsThisWeek}
+            </p>
+          </div>
+          <div className="rounded-xl border border-zinc-200 bg-white px-4 py-3 text-center">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-zinc-400">
+              Ce mois
+            </p>
+            <p className="mt-0.5 text-2xl font-bold text-zinc-900">
+              {sessionsThisMonth}
+            </p>
+          </div>
+          <div className="rounded-xl border border-zinc-200 bg-white px-4 py-3 text-center">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-zinc-400">
+              Total
+            </p>
+            <p className="mt-0.5 text-2xl font-bold text-zinc-900">
+              {sessions.length}
+            </p>
+          </div>
+        </div>
+
+        {/* Client filter */}
+        <div className="ml-auto flex items-center gap-2">
+          <Users className="h-4 w-4 text-zinc-400" />
+          <div className="flex flex-wrap gap-1">
+            <Link
+              href="/dashboard/sessions"
+              className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-all ${
+                !clientId
+                  ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                  : "border-zinc-200 bg-white text-zinc-500 hover:border-zinc-300"
+              }`}
+            >
+              Tous
+            </Link>
+            {clients.slice(0, 6).map((c) => (
+              <Link
+                key={c.id}
+                href={`/dashboard/sessions?clientId=${c.id}`}
+                className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-all ${
+                  clientId === c.id
+                    ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                    : "border-zinc-200 bg-white text-zinc-500 hover:border-zinc-300"
+                }`}
+              >
+                {c.firstName} {c.lastName[0]}.
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {sessions.length === 0 ? (
         <div className="flex flex-col items-center rounded-xl border border-dashed border-zinc-200 bg-white py-20 text-center">
-          <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-2xl ${accent.bgSoft}`}>
+          <div
+            className={`mb-4 flex h-12 w-12 items-center justify-center rounded-2xl ${accent.bgSoft}`}
+          >
             <CalendarCheck className={`h-6 w-6 ${accent.icon}`} />
           </div>
           <p className="text-sm font-medium text-zinc-700">Aucune séance</p>
           <p className="mt-1 text-xs text-zinc-500">
-            Enregistrez votre première séance pour commencer le suivi.
+            {clientId
+              ? "Ce client n'a pas encore de séances."
+              : "Enregistrez votre première séance pour commencer le suivi."}
           </p>
         </div>
       ) : (
@@ -113,13 +206,17 @@ export default async function SessionsPage() {
                             day: "numeric",
                             month: "short",
                           })}
-                          {session.duration ? ` · ${session.duration} min` : ""}
+                          {session.duration
+                            ? ` · ${session.duration} min`
+                            : ""}
                           {session._count.exercises > 0 &&
                             ` · ${session._count.exercises} exercice${session._count.exercises !== 1 ? "s" : ""}`}
                         </p>
                       </div>
                       {session.rpe && (
-                        <div className={`flex items-center gap-1 rounded-md ${accent.badge} px-2 py-0.5 text-xs font-medium`}>
+                        <div
+                          className={`flex items-center gap-1 rounded-md ${accent.badge} px-2 py-0.5 text-xs font-medium`}
+                        >
                           <Flame className="h-3 w-3" />
                           RPE {session.rpe}
                         </div>

@@ -17,11 +17,21 @@ export default async function ClientDetailPage({
     where: { id, coachId: user.id },
     include: {
       measurements: { orderBy: { date: "desc" } },
-      sessions: { orderBy: { date: "desc" }, take: 30 },
+      sessions: {
+        orderBy: { date: "desc" },
+        take: 50,
+        include: {
+          _count: { select: { exercises: true } },
+        },
+      },
       programs: {
         orderBy: { createdAt: "desc" },
-        include: { _count: { select: { workoutDays: true } } },
+        include: {
+          _count: { select: { workoutDays: true } },
+        },
       },
+      clientNotes: { orderBy: { createdAt: "desc" } },
+      trackingItems: { orderBy: { createdAt: "asc" } },
     },
   })
 

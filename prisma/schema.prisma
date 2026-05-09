@@ -20,12 +20,14 @@ model User {
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 
-  clients      Client[]
-  programs     Program[]
-  sessions     Session[]
-  exercises    Exercise[]
-  subscription Subscription?
-  measurements BodyMeasurement[]
+  clients       Client[]
+  programs      Program[]
+  sessions      Session[]
+  exercises     Exercise[]
+  subscription  Subscription?
+  measurements  BodyMeasurement[]
+  clientNotes   ClientNote[]
+  trackingItems TrackingItem[]
 }
 
 // ─── CLIENT ──────────────────────────────────────────────────────────────────
@@ -52,6 +54,44 @@ enum GoalType {
   REHABILITATION
 }
 
+enum ProspectStatus {
+  NEW
+  CONTACTED
+  HOT
+  COLD
+  CONVERTED
+  LOST
+}
+
+enum ActivityLevel {
+  SEDENTARY
+  LIGHT
+  MODERATE
+  ACTIVE
+  VERY_ACTIVE
+}
+
+enum BodyType {
+  ECTOMORPH
+  MESOMORPH
+  ENDOMORPH
+}
+
+enum DietaryPreferences {
+  STANDARD
+  VEGETARIAN
+  VEGAN
+  GLUTEN_FREE
+  LACTOSE_FREE
+}
+
+enum TrackingItemType {
+  BILAN
+  HABITUDE
+  QUESTIONNAIRE
+  MESURE
+}
+
 model Client {
   id       String @id @default(cuid())
   coachId  String
@@ -72,12 +112,34 @@ model Client {
   // Profil sportif
   fitnessLevel    FitnessLevel @default(BEGINNER)
   weeklyFrequency Int?
+  activityLevel   ActivityLevel?
+
+  // Style de vie
+  bodyType            BodyType?
+  dietaryPreferences  DietaryPreferences?
+  hasTCA              Boolean  @default(false)
 
   // Objectifs
-  goalType         GoalType?
-  goal             String? // free text (legacy/complementary)
-  goalTargetWeight Float? // kg
-  goalDeadline     DateTime?
+  goalType             GoalType?
+  goal                 String?
+  goalTargetWeight     Float? // kg — poids cible
+  goalDeadline         DateTime?
+  coachingStartDate    DateTime?
+  weightStart          Float? // kg — poids de départ explicite
+  goalWeeklyLoss       Float? // kg/semaine visé
+
+  // Nutrition — objectifs journaliers
+  dailyCaloriesGoal    Int?
+  dailyWaterGoal       Float? // litres
+  // Répartition calories par repas (% )
+  mealBreakfastPct     Int?   @default(25)
+  mealLunchPct         Int?   @default(40)
+  mealDinnerPct        Int?   @default(30)
+  mealSnackPct         Int?   @default(5)
+  // Macronutriments (%)
+  macrosCarbsPct       Int?   @default(50)
+  macrosProteinsPct    Int?   @default(20)
+  macrosFatsPct        Int?   @default(30)
 
   // Médical
   injuries     String?
@@ -86,18 +148,85 @@ model Client {
   /// Horodatage : le coach confirme une base légale explicite pour ces données sensibles (voir politique de confidentialité).
   sensitiveDataConsentAt DateTime?
 
+  // Coordonnées
+  company    String?
+  address    String?
+  postalCode String?
+  city       String?
+  country    String?   @default("France")
+
+  // Réseaux sociaux
+  linkedin  String?
+  instagram String?
+  facebook  String?
+  twitter   String?
+
+  // Préférences
+  language String?   @default("fr")
+  timezone String?   @default("Europe/Paris")
+
   // Administratif
   contractStart DateTime?
   hourlyRate    Float?
   notes         String?
 
+  // Prospect pipeline
+  isProspect      Boolean         @default(false)
+  prospectStatus  ProspectStatus?
+  prospectSource  String?
+  prospectNotes   String?
+
+  /// Client fictif créé pour chaque coach (même scénario pour tous ; pas une ligne partagée entre comptes).
+  isDemo    Boolean  @default(false)
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  programs     Program[]
-  sessions     Session[]
-  measurements BodyMeasurement[]
+  programs      Program[]
+  sessions      Session[]
+  measurements  BodyMeasurement[]
+  clientNotes   ClientNote[]
+  trackingItems TrackingItem[]
+
+  @@index([coachId, isDemo])
+}
+
+// ─── NOTES CLIENT ─────────────────────────────────────────────────────────────
+
+model ClientNote {
+  id        String   @id @default(cuid())
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  coachId   String
+  coach     User     @relation(fields: [coachId], references: [id], onDelete: Cascade)
+
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([clientId])
+}
+
+// ─── SUIVI (TRACKING) ────────────────────────────────────────────────────────
+
+model TrackingItem {
+  id          String           @id @default(cuid())
+  clientId    String
+  client      Client           @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  coachId     String
+  coach       User             @relation(fields: [coachId], references: [id], onDelete: Cascade)
+
+  type        TrackingItemType
+  name        String
+  description String?
+  frequency   String?          // "daily", "weekly", "monthly", "once"
+  isActive    Boolean          @default(true)
+  lastAnsweredAt DateTime?
+
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([clientId])
 }
 
 // ─── MESURES CORPORELLES ─────────────────────────────────────────────────────

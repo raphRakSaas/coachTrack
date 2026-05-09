@@ -53,6 +53,17 @@ export async function deleteClient(id: string) {
   const user = await getCurrentUser()
   if (!user) throw new Error("Unauthorized")
 
+  const row = await prisma.client.findFirst({
+    where: { id, coachId: user.id },
+    select: { isDemo: true },
+  })
+  if (!row) return
+  if (row.isDemo) {
+    throw new Error(
+      "Le client de démonstration ne peut pas être supprimé. Il est partagé comme exemple pour tous les comptes Revo."
+    )
+  }
+
   await prisma.client.delete({ where: { id, coachId: user.id } })
 
   revalidatePath("/dashboard/clients")

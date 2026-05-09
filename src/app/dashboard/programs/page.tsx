@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import Link from "next/link"
-import { ClipboardList, Plus, Trash2 } from "lucide-react"
+import { ClipboardList, Plus, Trash2, Users } from "lucide-react"
 
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser } from "@/lib/auth"
@@ -10,36 +10,97 @@ import { Badge } from "@/components/ui/badge"
 import { ClientAvatar } from "@/components/ui/client-avatar"
 import { deleteProgram } from "./actions"
 
-export default async function ProgramsPage() {
+type StatusFilter = "all" | "active" | "archived"
+
+export default async function ProgramsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ clientId?: string; status?: string }>
+}) {
+  const { clientId, status } = await searchParams
+  const statusFilter: StatusFilter =
+    status === "active"
+      ? "active"
+      : status === "archived"
+        ? "archived"
+        : "all"
+
   const user = await getCurrentUser()
   if (!user) redirect("/sign-in")
 
   const accent = SECTION_ACCENTS.programs
 
-  const programs = await prisma.program.findMany({
-    where: { coachId: user.id },
-    orderBy: [{ isActive: "desc" }, { createdAt: "desc" }],
-    include: {
-      client: { select: { firstName: true, lastName: true } },
-      _count: { select: { workoutDays: true } },
-    },
-  })
+  const [allPrograms, clients] = await Promise.all([
+    prisma.program.findMany({
+      where: { coachId: user.id },
+      orderBy: [{ isActive: "desc" }, { createdAt: "desc" }],
+      include: {
+        client: { select: { id: true, firstName: true, lastName: true } },
+        _count: { select: { workoutDays: true } },
+      },
+    }),
+    prisma.client.findMany({
+      where: { coachId: user.id, isActive: true },
+      orderBy: { firstName: "asc" },
+      select: { id: true, firstName: true, lastName: true },
+    }),
+  ])
 
-  const activeCount = programs.filter((p) => p.isActive).length
+  const activeCount = allPrograms.filter((p) => p.isActive).length
+  const archivedCount = allPrograms.filter((p) => !p.isActive).length
+
+  const programs = allPrograms
+    .filter((p) => (clientId ? p.client.id === clientId : true))
+    .filter((p) => {
+      if (statusFilter === "active") return p.isActive
+      if (statusFilter === "archived") return !p.isActive
+      return true
+    })
+
+  const selectedClient = clientId
+    ? clients.find((c) => c.id === clientId)
+    : null
+
+  function buildHref(opts: { status?: StatusFilter; clientId?: string }) {
+    const params = new URLSearchParams()
+    const resolvedClientId = opts.clientId !== undefined ? opts.clientId : clientId
+    const resolvedStatus =
+      opts.status !== undefined ? opts.status : statusFilter
+    if (resolvedClientId) params.set("clientId", resolvedClientId)
+    if (resolvedStatus && resolvedStatus !== "all")
+      params.set("status", resolvedStatus)
+    const qs = params.toString()
+    return `/dashboard/programs${qs ? `?${qs}` : ""}`
+  }
+
+  const filterTabs = [
+    { label: "Tous", value: "all" as StatusFilter, count: allPrograms.length },
+    { label: "Actifs", value: "active" as StatusFilter, count: activeCount },
+    {
+      label: "Archivés",
+      value: "archived" as StatusFilter,
+      count: archivedCount,
+    },
+  ]
 
   return (
     <div className="p-8">
-      <div className="mb-8 flex items-center justify-between">
+      {/* Header */}
+      <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${accent.bgSoft}`}>
+          <div
+            className={`flex h-10 w-10 items-center justify-center rounded-xl ${accent.bgSoft}`}
+          >
             <ClipboardList className={`h-5 w-5 ${accent.icon}`} />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-zinc-900">Programmes</h1>
             <p className="text-sm text-zinc-500">
               {activeCount} actif{activeCount !== 1 ? "s" : ""}
-              {programs.length > activeCount &&
-                ` · ${programs.length - activeCount} archivé${programs.length - activeCount !== 1 ? "s" : ""}`}
+              {archivedCount > 0 &&
+                ` · ${archivedCount} archivé${archivedCount !== 1 ? "s" : ""}`}
+              {selectedClient &&
+                ` · ${selectedClient.firstName} ${selectedClient.lastName}`}
             </p>
           </div>
         </div>
@@ -49,18 +110,88 @@ export default async function ProgramsPage() {
         </Link>
       </div>
 
+      {/* Filtres */}
+      <div className="mb-6 flex flex-wrap items-center gap-4">
+        {/* Statut */}
+        <div className="flex items-center gap-1 rounded-xl border border-zinc-200 bg-zinc-50 p-1">
+          {filterTabs.map((tab) => {
+            const isActive = statusFilter === tab.value
+            return (
+              <Link
+                key={tab.value}
+                href={buildHref({ status: tab.value })}
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-all ${
+                  isActive
+                    ? "bg-white text-zinc-900 shadow-sm"
+                    : "text-zinc-500 hover:text-zinc-700"
+                }`}
+              >
+                {tab.label}
+                <span
+                  className={`rounded-full px-1.5 py-0.5 text-xs font-semibold ${
+                    isActive
+                      ? "bg-violet-50 text-violet-700"
+                      : "bg-zinc-200 text-zinc-500"
+                  }`}
+                >
+                  {tab.count}
+                </span>
+              </Link>
+            )
+          })}
+        </div>
+
+        {/* Client filter */}
+        {clients.length > 0 && (
+          <div className="ml-auto flex items-center gap-2">
+            <Users className="h-4 w-4 text-zinc-400" />
+            <div className="flex flex-wrap gap-1">
+              <Link
+                href={buildHref({ clientId: "" })}
+                className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-all ${
+                  !clientId
+                    ? "border-violet-200 bg-violet-50 text-violet-700"
+                    : "border-zinc-200 bg-white text-zinc-500 hover:border-zinc-300"
+                }`}
+              >
+                Tous
+              </Link>
+              {clients.slice(0, 5).map((c) => (
+                <Link
+                  key={c.id}
+                  href={buildHref({ clientId: c.id })}
+                  className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-all ${
+                    clientId === c.id
+                      ? "border-violet-200 bg-violet-50 text-violet-700"
+                      : "border-zinc-200 bg-white text-zinc-500 hover:border-zinc-300"
+                  }`}
+                >
+                  {c.firstName} {c.lastName[0]}.
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
       {programs.length === 0 ? (
         <div className="flex flex-col items-center rounded-xl border border-dashed border-zinc-200 bg-white py-20 text-center">
-          <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-2xl ${accent.bgSoft}`}>
+          <div
+            className={`mb-4 flex h-12 w-12 items-center justify-center rounded-2xl ${accent.bgSoft}`}
+          >
             <ClipboardList className={`h-6 w-6 ${accent.icon}`} />
           </div>
           <p className="text-sm font-medium text-zinc-700">Aucun programme</p>
           <p className="mt-1 text-xs text-zinc-500">
-            Créez un programme d&apos;entraînement personnalisé pour un client.
+            {clientId
+              ? "Ce client n'a pas encore de programme."
+              : "Créez un programme d'entraînement personnalisé pour un client."}
           </p>
           <Link
             href="/dashboard/programs/new"
-            className={buttonVariants({ variant: "outline", size: "sm" }) + " mt-4"}
+            className={
+              buttonVariants({ variant: "outline", size: "sm" }) + " mt-4"
+            }
           >
             Créer un programme
           </Link>
@@ -99,12 +230,15 @@ export default async function ProgramsPage() {
               </Link>
               <div className="flex items-center justify-between border-t border-zinc-100 pt-3">
                 <div className="flex items-center gap-2 text-xs text-zinc-500">
-                  <span className={`rounded-md ${accent.badge} px-2 py-0.5 font-medium`}>
+                  <span
+                    className={`rounded-md ${accent.badge} px-2 py-0.5 font-medium`}
+                  >
                     {program._count.workoutDays} jour
                     {program._count.workoutDays !== 1 ? "s" : ""}
                   </span>
                   <span>
-                    Début {new Date(program.startDate).toLocaleDateString("fr-FR")}
+                    Début{" "}
+                    {new Date(program.startDate).toLocaleDateString("fr-FR")}
                   </span>
                 </div>
                 <form action={deleteProgram.bind(null, program.id)}>

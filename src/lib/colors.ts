@@ -1,7 +1,7 @@
 // Section accents — one Tailwind palette per major area.
 // Use the static class name strings (Tailwind needs to see them at compile time).
 
-export type Section = "dashboard" | "clients" | "sessions" | "programs" | "exercises" | "settings"
+export type Section = "dashboard" | "clients" | "sessions" | "programs" | "exercises" | "settings" | "prospects" | "calendar"
 
 export const SECTION_ACCENTS: Record<
   Section,
@@ -96,6 +96,32 @@ export const SECTION_ACCENTS: Record<
     activeBg: "bg-zinc-100",
     activeText: "text-zinc-900",
     hex: "#52525b",
+  },
+  prospects: {
+    text: "text-orange-700",
+    textMuted: "text-orange-500",
+    bg: "bg-orange-500",
+    bgSoft: "bg-orange-50",
+    border: "border-orange-200",
+    ring: "ring-orange-500/30",
+    icon: "text-orange-600",
+    badge: "bg-orange-100 text-orange-700",
+    activeBg: "bg-orange-50",
+    activeText: "text-orange-700",
+    hex: "#ea580c",
+  },
+  calendar: {
+    text: "text-teal-700",
+    textMuted: "text-teal-500",
+    bg: "bg-teal-600",
+    bgSoft: "bg-teal-50",
+    border: "border-teal-200",
+    ring: "ring-teal-500/30",
+    icon: "text-teal-600",
+    badge: "bg-teal-100 text-teal-700",
+    activeBg: "bg-teal-50",
+    activeText: "text-teal-700",
+    hex: "#0d9488",
   },
 }
 

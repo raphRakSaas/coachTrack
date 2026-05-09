@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { Webhook } from "svix";
 import { prisma } from "@/lib/prisma";
+import { ensureDemoClientForCoach } from "@/lib/demo-client";
 
 type ClerkUserEvent = {
   type: string;
@@ -44,9 +45,10 @@ export async function POST(req: Request) {
     const email = email_addresses[0]?.email_address;
     const name = [first_name, last_name].filter(Boolean).join(" ") || null;
 
-    await prisma.user.create({
+    const user = await prisma.user.create({
       data: { clerkId: id, email, name },
     });
+    await ensureDemoClientForCoach(user.id);
   }
 
   if (event.type === "user.deleted") {
