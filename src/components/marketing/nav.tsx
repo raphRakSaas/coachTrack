@@ -2,62 +2,91 @@
 
 import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
+import { ArrowRight } from "lucide-react";
 
 export function Nav() {
   const { isSignedIn } = useAuth();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/95 backdrop-blur-sm">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-        <Link href="/" className="text-base font-bold text-zinc-900">
-          CoachTrack
-        </Link>
-
-        <nav className="hidden items-center gap-8 md:flex">
-          <Link
-            href="#fonctionnalites"
-            className="text-sm text-zinc-600 transition-colors hover:text-zinc-900"
-          >
-            Fonctionnalités
-          </Link>
-          <Link
-            href="#comment"
-            className="text-sm text-zinc-600 transition-colors hover:text-zinc-900"
-          >
-            Comment ça marche
-          </Link>
-          <Link
-            href="#tarifs"
-            className="text-sm text-zinc-600 transition-colors hover:text-zinc-900"
-          >
-            Tarifs
-          </Link>
-        </nav>
-
-        <div className="flex items-center gap-3">
-          {isSignedIn ? (
-            <Link
-              href="/dashboard"
-              className="inline-flex h-9 items-center rounded-lg bg-zinc-900 px-4 text-sm font-medium text-white transition-colors hover:bg-zinc-700"
+    <header className="fixed top-0 left-0 right-0 z-50">
+      <div className="mx-auto max-w-6xl px-6 pt-4">
+        <div
+          className="flex h-14 items-center justify-between rounded-2xl border px-5"
+          style={{
+            background: "rgba(7,12,20,0.85)",
+            borderColor: "rgba(255,255,255,0.08)",
+            backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
+          }}
+        >
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-1.5">
+            <span
+              className="text-lg font-[family-name:var(--font-display)] font-bold tracking-tight text-white"
             >
-              Tableau de bord
-            </Link>
-          ) : (
-            <>
+              Revo
+            </span>
+            <span
+              className="h-1.5 w-1.5 rounded-full"
+              style={{ background: "#8b5cf6" }}
+            />
+          </Link>
+
+          {/* Nav links */}
+          <nav className="hidden items-center gap-7 md:flex">
+            {[
+              { href: "#fonctionnalites", label: "Fonctionnalités" },
+              { href: "#comment", label: "Comment ça marche" },
+              { href: "#tarifs", label: "Tarifs" },
+            ].map(({ href, label }) => (
               <Link
-                href="/sign-in"
-                className="text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-900"
+                key={href}
+                href={href}
+                className="text-sm font-medium transition-colors"
+                style={{ color: "rgba(255,255,255,0.55)" }}
+                onMouseEnter={(e) =>
+                  ((e.target as HTMLAnchorElement).style.color = "rgba(255,255,255,0.9)")
+                }
+                onMouseLeave={(e) =>
+                  ((e.target as HTMLAnchorElement).style.color = "rgba(255,255,255,0.55)")
+                }
               >
-                Se connecter
+                {label}
               </Link>
+            ))}
+          </nav>
+
+          {/* CTA */}
+          <div className="flex items-center gap-3">
+            {isSignedIn ? (
               <Link
-                href="/sign-up"
-                className="inline-flex h-9 items-center rounded-lg bg-zinc-900 px-4 text-sm font-medium text-white transition-colors hover:bg-zinc-700"
+                href="/dashboard"
+                className="inline-flex h-8 items-center gap-1.5 rounded-xl px-4 text-sm font-semibold text-white transition-opacity hover:opacity-80"
+                style={{ background: "#8b5cf6" }}
               >
-                Commencer gratuitement
+                Tableau de bord
+                <ArrowRight className="h-3.5 w-3.5" />
               </Link>
-            </>
-          )}
+            ) : (
+              <>
+                <Link
+                  href="/sign-in"
+                  className="hidden text-sm font-medium transition-colors sm:block"
+                  style={{ color: "rgba(255,255,255,0.55)" }}
+                >
+                  Se connecter
+                </Link>
+                <Link
+                  href="/sign-up"
+                  className="inline-flex h-8 items-center gap-1.5 rounded-xl px-4 text-sm font-semibold text-white transition-opacity hover:opacity-80"
+                  style={{ background: "#8b5cf6" }}
+                >
+                  Commencer gratuitement
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </header>
