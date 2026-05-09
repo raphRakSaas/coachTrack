@@ -9,6 +9,11 @@ export async function saveCoachProfile(formData: FormData) {
   const user = await getCurrentUser()
   if (!user) throw new Error("Unauthorized")
 
+  const coachFirstName = String(formData.get("coachFirstName") ?? "").trim()
+  const coachLastName = String(formData.get("coachLastName") ?? "").trim()
+  const nameParts = [coachFirstName, coachLastName].filter(Boolean)
+  const name = nameParts.length > 0 ? nameParts.join(" ") : null
+
   const specialty = (formData.get("specialty") as string) || null
   const bio = (formData.get("bio") as string) || null
   const yearsRaw = formData.get("yearsExperience") as string
@@ -16,7 +21,7 @@ export async function saveCoachProfile(formData: FormData) {
 
   await prisma.user.update({
     where: { id: user.id },
-    data: { specialty, bio, yearsExperience },
+    data: { name, specialty, bio, yearsExperience },
   })
 }
 
@@ -36,29 +41,6 @@ export async function createOnboardingClient(formData: FormData) {
   })
 
   return { clientId: client.id }
-}
-
-export async function logFirstSession(
-  clientId: string,
-  formData: FormData
-) {
-  const user = await getCurrentUser()
-  if (!user) throw new Error("Unauthorized")
-
-  const date = formData.get("date") as string
-  const durationRaw = formData.get("duration") as string
-  const duration = durationRaw ? parseInt(durationRaw) : null
-  const notes = (formData.get("notes") as string) || null
-
-  await prisma.session.create({
-    data: {
-      coachId: user.id,
-      clientId,
-      date: date ? new Date(date) : new Date(),
-      duration,
-      notes,
-    },
-  })
 }
 
 export async function finishOnboarding() {
