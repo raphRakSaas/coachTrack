@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next"
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "CoachTrack — Suivi clients pour coachs sportifs",
-    short_name: "CoachTrack",
+    name: "Revo — Suivi clients pour coachs sportifs",
+    short_name: "Revo",
     description:
       "Gérez vos clients, séances, programmes et performances. Pour coachs sportifs et personal trainers.",
     start_url: "/dashboard",

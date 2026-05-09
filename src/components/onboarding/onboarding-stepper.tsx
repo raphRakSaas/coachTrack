@@ -165,7 +165,7 @@ export function OnboardingStepper({ userName }: { userName: string | null }) {
                 <Sparkles className="h-7 w-7" />
               </div>
               <h1 className="mb-2 text-2xl font-bold text-zinc-900">
-                Bienvenue sur CoachTrack{firstName ? `, ${firstName}` : ""} !
+                Bienvenue sur Revo{firstName ? `, ${firstName}` : ""} !
               </h1>
               <p className="mb-8 text-sm text-zinc-500">
                 On va configurer votre espace en moins de 2 minutes. Vous aurez

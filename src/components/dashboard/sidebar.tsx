@@ -13,6 +13,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { RevoWordmark } from "@/components/auth/revo-wordmark";
 import { SECTION_ACCENTS, type Section } from "@/lib/colors";
 
 type NavItem = {
@@ -36,13 +37,8 @@ export function Sidebar() {
 
   return (
     <aside className="hidden md:flex h-screen w-60 flex-col border-r border-zinc-200 bg-white">
-      <div className="flex h-14 items-center gap-2 border-b border-zinc-200 px-5">
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 text-xs font-bold text-white">
-          CT
-        </div>
-        <span className="text-base font-bold tracking-tight text-zinc-900">
-          CoachTrack
-        </span>
+      <div className="flex h-14 items-center border-b border-zinc-200 px-5">
+        <RevoWordmark tone="light" size="sm" href="/dashboard" />
       </div>
 
       <nav className="flex flex-1 flex-col gap-0.5 p-3">
