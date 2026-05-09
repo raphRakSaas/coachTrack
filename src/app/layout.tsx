@@ -54,7 +54,12 @@ export default function RootLayout({
     <ClerkProvider localization={frFR}>
       <html lang="fr" className={`${jakarta.variable} ${syne.variable} h-full antialiased`} suppressHydrationWarning>
         <body className="min-h-full flex flex-col font-[family-name:var(--font-sans)]">
-          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            storageKey="revo-theme"
+          >
             {children}
             <CookieConsentBanner />
           </ThemeProvider>

@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { useTheme } from "next-themes";
 import { UserButton } from "@clerk/nextjs";
 import {
   LayoutDashboard,
@@ -16,6 +18,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { RevoWordmark } from "@/components/auth/revo-wordmark";
+import { ThemeToggle } from "@/components/dashboard/theme-toggle";
 import { SECTION_ACCENTS, type Section } from "@/lib/colors";
 
 type NavItem = {
@@ -38,11 +41,21 @@ const navItems: NavItem[] = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const wordmarkTone =
+    mounted && resolvedTheme === "dark" ? "dark" : "light";
 
   return (
-    <aside className="hidden md:flex h-screen w-60 flex-col border-r border-zinc-200 bg-white">
-      <div className="flex h-14 items-center border-b border-zinc-200 px-5">
-        <RevoWordmark tone="light" size="sm" href="/dashboard" />
+    <aside className="hidden md:flex h-screen w-60 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
+      <div className="flex h-14 items-center justify-between gap-2 border-b border-sidebar-border px-4">
+        <RevoWordmark tone={wordmarkTone} size="sm" href="/dashboard" />
+        <ThemeToggle />
       </div>
 
       <nav className="flex flex-1 flex-col gap-0.5 p-3">
@@ -61,13 +74,15 @@ export function Sidebar() {
                 "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                 isActive
                   ? cn(accent.activeBg, accent.activeText)
-                  : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900"
+                  : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               )}
             >
               <Icon
                 className={cn(
                   "h-4 w-4 transition-colors",
-                  isActive ? accent.icon : "text-zinc-400 group-hover:text-zinc-600"
+                  isActive
+                    ? accent.icon
+                    : "text-muted-foreground group-hover:text-foreground"
                 )}
               />
               {label}
@@ -76,7 +91,7 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="border-t border-zinc-200 p-4">
+      <div className="border-t border-sidebar-border p-4">
         <UserButton showName />
       </div>
     </aside>

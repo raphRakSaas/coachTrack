@@ -16,7 +16,7 @@ async function main() {
   try {
     const result = await ensureDemoClientsForAllCoaches()
     console.log(
-      `Coaches : ${result.coaches} · Clients démo créés cette fois : ${result.created}`
+      `Coaches : ${result.coaches} · Nouveaux clients démo : ${result.created} · Profils déjà synchronisés : ${result.synced}`
     )
   } finally {
     await prisma.$disconnect()

@@ -12,7 +12,7 @@ export default async function DashboardLayout({
   if (!user.onboardingCompleted) redirect("/onboarding")
 
   return (
-    <div className="flex h-screen bg-zinc-50">
+    <div className="flex h-screen bg-background text-foreground">
       <Sidebar />
       <main className="flex-1 overflow-y-auto">{children}</main>
     </div>

@@ -19,18 +19,10 @@ import {
   TrendingDown,
   TrendingUp,
   Minus,
-  CheckCircle2,
   Activity,
   Folder,
   FolderPlus,
-  User,
-  MapPin,
   Share2,
-  BarChart3,
-  Target,
-  Footprints,
-  Moon,
-  Zap,
 } from "lucide-react"
 import { useTransition, useState, useRef } from "react"
 import type { Prisma } from "@prisma/client"
@@ -133,9 +125,9 @@ function InfoField({
 }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <p className="text-[11px] text-zinc-400">{label}</p>
-      <p className="text-sm font-medium text-zinc-900">
-        {value ?? <span className="text-zinc-400">Non renseigné</span>}
+      <p className="text-[11px] text-muted-foreground">{label}</p>
+      <p className="text-sm font-medium text-foreground">
+        {value ?? <span className="text-muted-foreground">Non renseigné</span>}
       </p>
     </div>
   )
@@ -143,95 +135,9 @@ function InfoField({
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+    <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
       {children}
     </p>
-  )
-}
-
-function MacroRing({
-  label,
-  value,
-  goal,
-  color,
-}: {
-  label: string
-  value: number
-  goal: number
-  color: string
-}) {
-  const pct = goal > 0 ? Math.min((value / goal) * 100, 100) : 0
-  const r = 28
-  const circ = 2 * Math.PI * r
-  const dash = (pct / 100) * circ
-
-  return (
-    <div className="flex flex-col items-center gap-1">
-      <div className="relative flex h-16 w-16 items-center justify-center">
-        <svg className="absolute inset-0 -rotate-90" width="64" height="64">
-          <circle
-            cx="32"
-            cy="32"
-            r={r}
-            fill="none"
-            stroke="#f4f4f5"
-            strokeWidth="5"
-          />
-          <circle
-            cx="32"
-            cy="32"
-            r={r}
-            fill="none"
-            stroke={color}
-            strokeWidth="5"
-            strokeLinecap="round"
-            strokeDasharray={`${dash} ${circ - dash}`}
-          />
-        </svg>
-        <span className="text-xs font-bold text-zinc-900">{value}</span>
-      </div>
-      <p className="text-[10px] font-medium text-zinc-500">{label}</p>
-      <p className="text-[10px] text-zinc-400">/ {goal}</p>
-    </div>
-  )
-}
-
-function CalorieGauge({
-  value,
-  goal,
-}: {
-  value: number
-  goal: number
-}) {
-  const pct = goal > 0 ? Math.min((value / goal) * 100, 100) : 0
-  const r = 44
-  const circ = Math.PI * r
-  const dash = (pct / 100) * circ
-
-  return (
-    <div className="relative flex flex-col items-center">
-      <svg width="110" height="60" viewBox="0 0 110 65">
-        <path
-          d={`M 10 60 A ${r} ${r} 0 0 1 100 60`}
-          fill="none"
-          stroke="#f4f4f5"
-          strokeWidth="8"
-          strokeLinecap="round"
-        />
-        <path
-          d={`M 10 60 A ${r} ${r} 0 0 1 100 60`}
-          fill="none"
-          stroke="#22c55e"
-          strokeWidth="8"
-          strokeLinecap="round"
-          strokeDasharray={`${dash} ${circ - dash}`}
-        />
-      </svg>
-      <div className="absolute bottom-0 text-center">
-        <p className="text-2xl font-bold text-zinc-900">{value}</p>
-        <p className="text-xs text-zinc-400">/ {goal} kcal</p>
-      </div>
-    </div>
   )
 }
 
@@ -295,7 +201,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
 
   const weightTrendColor =
     weightDelta === null || weightDelta === 0
-      ? "text-zinc-400"
+      ? "text-muted-foreground"
       : weightDelta > 0
         ? "text-rose-500"
         : "text-emerald-500"
@@ -381,7 +287,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
   return (
     <div className="flex h-full flex-col">
       {/* ── Sticky header ── */}
-      <div className="border-b border-zinc-200 bg-white px-6 py-4">
+      <div className="border-b border-border bg-card px-6 py-4">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <ClientAvatar
@@ -392,7 +298,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
             />
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl font-bold text-zinc-900">
+                <h1 className="text-xl font-bold text-foreground">
                   {client.firstName} {client.lastName}
                 </h1>
                 {client.isDemo && (
@@ -407,20 +313,20 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                   onClick={handleToggleActive}
                   disabled={isPending || client.isDemo}
                   className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
-                    client.isActive ? "bg-emerald-500" : "bg-zinc-300"
+                    client.isActive ? "bg-emerald-500" : "bg-muted"
                   }`}
                 >
                   <span
-                    className={`inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform ${
+                    className={`inline-block h-3.5 w-3.5 rounded-full bg-card shadow transition-transform ${
                       client.isActive ? "translate-x-4" : "translate-x-1"
                     }`}
                   />
                 </button>
-                <span className="text-xs font-medium text-zinc-500">
+                <span className="text-xs font-medium text-muted-foreground">
                   {client.isActive ? "Actif" : "Inactif"}
                 </span>
               </div>
-              <p className="mt-0.5 text-sm text-zinc-500">
+              <p className="mt-0.5 text-sm text-muted-foreground">
                 <span className={SECTION_ACCENTS.clients.text + " font-medium"}>
                   {FITNESS_LEVEL_LABELS[client.fitnessLevel]}
                 </span>
@@ -438,7 +344,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
       {/* ── Tabs ── */}
       <div className="flex-1 overflow-y-auto">
         <Tabs defaultValue="apercu" className="h-full">
-          <div className="sticky top-0 z-10 border-b border-zinc-200 bg-white px-6">
+          <div className="sticky top-0 z-10 border-b border-border bg-card px-6">
             <TabsList className="h-auto rounded-none bg-transparent p-0">
               {[
                 { value: "apercu", label: "Vue d'ensemble" },
@@ -452,7 +358,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                 <TabsTrigger
                   key={tab.value}
                   value={tab.value}
-                  className="rounded-none border-b-2 border-transparent px-4 py-3 text-sm font-medium text-zinc-500 data-[state=active]:border-blue-600 data-[state=active]:text-blue-700 data-[state=active]:shadow-none"
+                  className="rounded-none border-b-2 border-transparent px-4 py-3 text-sm font-medium text-muted-foreground data-[state=active]:border-blue-600 data-[state=active]:text-blue-700 data-[state=active]:shadow-none"
                 >
                   {tab.label}
                 </TabsTrigger>
@@ -466,20 +372,20 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
           <TabsContent value="apercu" className="px-6 py-6">
             {/* KPI row */}
             <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-              <div className="rounded-xl border border-zinc-200 bg-white p-4">
-                <p className="text-xs font-semibold text-zinc-500">
+              <div className="rounded-xl border border-border bg-card p-4">
+                <p className="text-xs font-semibold text-muted-foreground">
                   Séances (30 j)
                 </p>
-                <p className="mt-1.5 text-3xl font-bold text-zinc-900">
+                <p className="mt-1.5 text-3xl font-bold text-foreground">
                   {sessions30d}
                 </p>
-                <p className="mt-0.5 text-xs text-zinc-400">
+                <p className="mt-0.5 text-xs text-muted-foreground">
                   {client.sessions.length} au total
                 </p>
               </div>
-              <div className="rounded-xl border border-zinc-200 bg-white p-4">
-                <p className="text-xs font-semibold text-zinc-500">Poids</p>
-                <p className="mt-1.5 text-3xl font-bold text-zinc-900">
+              <div className="rounded-xl border border-border bg-card p-4">
+                <p className="text-xs font-semibold text-muted-foreground">Poids</p>
+                <p className="mt-1.5 text-3xl font-bold text-foreground">
                   {latestWeight ? `${latestWeight} kg` : "—"}
                 </p>
                 <p
@@ -491,23 +397,23 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                     : `${weightDelta > 0 ? "+" : ""}${weightDelta} kg`}
                 </p>
               </div>
-              <div className="rounded-xl border border-zinc-200 bg-white p-4">
-                <p className="text-xs font-semibold text-zinc-500">
+              <div className="rounded-xl border border-border bg-card p-4">
+                <p className="text-xs font-semibold text-muted-foreground">
                   Programmes
                 </p>
-                <p className="mt-1.5 text-3xl font-bold text-zinc-900">
+                <p className="mt-1.5 text-3xl font-bold text-foreground">
                   {activeProgramsCount}
                 </p>
-                <p className="mt-0.5 text-xs text-zinc-400">
+                <p className="mt-0.5 text-xs text-muted-foreground">
                   {client.programs.length} au total
                 </p>
               </div>
-              <div className="rounded-xl border border-zinc-200 bg-white p-4">
-                <p className="text-xs font-semibold text-zinc-500">IMC</p>
-                <p className="mt-1.5 text-3xl font-bold text-zinc-900">
+              <div className="rounded-xl border border-border bg-card p-4">
+                <p className="text-xs font-semibold text-muted-foreground">IMC</p>
+                <p className="mt-1.5 text-3xl font-bold text-foreground">
                   {bmi ?? "—"}
                 </p>
-                <p className="mt-0.5 text-xs text-zinc-400">
+                <p className="mt-0.5 text-xs text-muted-foreground">
                   {bmi
                     ? bmi < 18.5
                       ? "Insuffisance pondérale"
@@ -523,34 +429,34 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
 
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               {/* Activités récentes */}
-              <div className="rounded-xl border border-zinc-200 bg-white">
-                <div className="flex items-center gap-2 border-b border-zinc-100 px-4 py-3">
+              <div className="rounded-xl border border-border bg-card">
+                <div className="flex items-center gap-2 border-b border-border px-4 py-3">
                   <CalendarDays className="h-4 w-4 text-emerald-600" />
-                  <p className="text-sm font-semibold text-zinc-900">
+                  <p className="text-sm font-semibold text-foreground">
                     Activités clients
                   </p>
                 </div>
                 {client.sessions.length === 0 ? (
-                  <p className="px-4 py-10 text-center text-xs text-zinc-400">
+                  <p className="px-4 py-10 text-center text-xs text-muted-foreground">
                     Aucune séance enregistrée
                   </p>
                 ) : (
-                  <div className="divide-y divide-zinc-50">
+                  <div className="divide-y divide-border">
                     {client.sessions.slice(0, 10).map((s) => (
                       <Link
                         key={s.id}
                         href={`/dashboard/sessions/${s.id}`}
-                        className="flex items-center justify-between px-4 py-2.5 hover:bg-zinc-50"
+                        className="flex items-center justify-between px-4 py-2.5 hover:bg-muted/60"
                       >
                         <div>
-                          <p className="text-sm font-medium text-zinc-900">
+                          <p className="text-sm font-medium text-foreground">
                             {new Date(s.date).toLocaleDateString("fr-FR", {
                               day: "2-digit",
                               month: "2-digit",
                               year: "numeric",
                             })}
                           </p>
-                          <p className="text-xs text-zinc-400">
+                          <p className="text-xs text-muted-foreground">
                             {s.duration ? `${s.duration} min` : ""}
                             {s._count.exercises > 0 &&
                               ` · ${s._count.exercises} ex.`}
@@ -569,15 +475,15 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
               </div>
 
               {/* Notes coach */}
-              <div className="rounded-xl border border-zinc-200 bg-white">
-                <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-3">
+              <div className="rounded-xl border border-border bg-card">
+                <div className="flex items-center justify-between border-b border-border px-4 py-3">
                   <div className="flex items-center gap-2">
                     <StickyNote className="h-4 w-4 text-amber-500" />
-                    <p className="text-sm font-semibold text-zinc-900">Notes</p>
+                    <p className="text-sm font-semibold text-foreground">Notes</p>
                   </div>
                   <button
                     onClick={() => setNewNoteOpen(true)}
-                    className="flex items-center gap-1 rounded-lg bg-zinc-100 px-2 py-1 text-xs font-medium text-zinc-600 hover:bg-zinc-200"
+                    className="flex items-center gap-1 rounded-lg bg-muted px-2 py-1 text-xs font-medium text-muted-foreground hover:bg-muted"
                   >
                     <Plus className="h-3 w-3" />
                     Ajouter
@@ -591,7 +497,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                       await createClientNote(client.id, fd)
                       setNewNoteOpen(false)
                     }}
-                    className="border-b border-zinc-100 px-4 py-3"
+                    className="border-b border-border px-4 py-3"
                   >
                     <textarea
                       ref={newNoteRef}
@@ -599,7 +505,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                       autoFocus
                       rows={3}
                       placeholder="Écrire une note..."
-                      className="w-full resize-none rounded-lg border border-zinc-200 bg-zinc-50 p-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
+                      className="w-full resize-none rounded-lg border border-border bg-muted/50 p-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/40"
                       required
                     />
                     <div className="mt-2 flex gap-2">
@@ -613,7 +519,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                       <button
                         type="button"
                         onClick={() => setNewNoteOpen(false)}
-                        className="flex items-center gap-1 rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-50"
+                        className="flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted/60"
                       >
                         <X className="h-3 w-3" />
                         Annuler
@@ -622,9 +528,9 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                   </form>
                 )}
 
-                <div className="max-h-96 overflow-y-auto divide-y divide-zinc-50">
+                <div className="max-h-96 overflow-y-auto divide-y divide-border">
                   {client.clientNotes.length === 0 ? (
-                    <p className="px-4 py-8 text-center text-xs text-zinc-400">
+                    <p className="px-4 py-8 text-center text-xs text-muted-foreground">
                       Aucune note. Cliquez sur &quot;Ajouter&quot; pour commencer.
                     </p>
                   ) : (
@@ -643,7 +549,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                               defaultValue={note.content}
                               autoFocus
                               rows={3}
-                              className="w-full resize-none rounded-lg border border-zinc-200 bg-zinc-50 p-2.5 text-sm text-zinc-900 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
+                              className="w-full resize-none rounded-lg border border-border bg-muted/50 p-2.5 text-sm text-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/40"
                               required
                             />
                             <div className="mt-2 flex gap-2">
@@ -657,7 +563,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                               <button
                                 type="button"
                                 onClick={() => setEditingNoteId(null)}
-                                className="flex items-center gap-1 rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600"
+                                className="flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground"
                               >
                                 <X className="h-3 w-3" />
                                 Annuler
@@ -666,7 +572,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                           </form>
                         ) : (
                           <>
-                            <p className="mb-1 text-[11px] text-zinc-400">
+                            <p className="mb-1 text-[11px] text-muted-foreground">
                               {new Date(note.createdAt).toLocaleDateString(
                                 "fr-FR",
                                 {
@@ -676,13 +582,13 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                                 }
                               )}
                             </p>
-                            <p className="whitespace-pre-wrap text-sm text-zinc-700">
+                            <p className="whitespace-pre-wrap text-sm text-foreground">
                               {note.content}
                             </p>
                             <div className="mt-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                               <button
                                 onClick={() => setEditingNoteId(note.id)}
-                                className="flex items-center gap-1 rounded px-2 py-0.5 text-[11px] text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700"
+                                className="flex items-center gap-1 rounded px-2 py-0.5 text-[11px] text-muted-foreground hover:bg-muted hover:text-foreground"
                               >
                                 <Pencil className="h-3 w-3" />
                                 Modifier
@@ -690,7 +596,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                               <button
                                 onClick={() => handleDeleteNote(note.id)}
                                 disabled={isPending}
-                                className="flex items-center gap-1 rounded px-2 py-0.5 text-[11px] text-zinc-400 hover:bg-red-50 hover:text-red-600"
+                                className="flex items-center gap-1 rounded px-2 py-0.5 text-[11px] text-muted-foreground hover:bg-red-50 hover:text-red-600"
                               >
                                 <Trash2 className="h-3 w-3" />
                                 Supprimer
@@ -707,10 +613,10 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
 
             {/* Weight chart (if measurements exist) */}
             {weightData.length > 1 && (
-              <div className="mt-6 rounded-xl border border-zinc-200 bg-white p-4">
+              <div className="mt-6 rounded-xl border border-border bg-card p-4">
                 <div className="mb-3 flex items-center gap-2">
-                  <Scale className="h-4 w-4 text-zinc-500" />
-                  <p className="text-sm font-semibold text-zinc-900">
+                  <Scale className="h-4 w-4 text-muted-foreground" />
+                  <p className="text-sm font-semibold text-foreground">
                     Évolution du poids
                   </p>
                 </div>
@@ -726,9 +632,9 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
 
               {/* Identité */}
-              <div className="rounded-xl border border-zinc-200 bg-white p-5">
+              <div className="rounded-xl border border-border bg-card p-5">
                 <SectionTitle>Identité</SectionTitle>
-                <div className="mb-4 flex items-center gap-3 border-b border-zinc-100 pb-4">
+                <div className="mb-4 flex items-center gap-3 border-b border-border pb-4">
                   <ClientAvatar
                     firstName={client.firstName}
                     lastName={client.lastName}
@@ -775,7 +681,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
               </div>
 
               {/* Profil sportif + Style de vie */}
-              <div className="rounded-xl border border-zinc-200 bg-white p-5">
+              <div className="rounded-xl border border-border bg-card p-5">
                 <SectionTitle>Profil sportif</SectionTitle>
                 <div className="mb-5 grid grid-cols-2 gap-3">
                   <InfoField
@@ -857,7 +763,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
               </div>
 
               {/* Nutrition */}
-              <div className="rounded-xl border border-zinc-200 bg-white p-5">
+              <div className="rounded-xl border border-border bg-card p-5">
                 <SectionTitle>Nutrition</SectionTitle>
                 <div className="mb-4 grid grid-cols-2 gap-3">
                   <InfoField
@@ -895,7 +801,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                 {/* Macros distribution */}
                 {client.dailyCaloriesGoal && (
                   <>
-                    <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-zinc-400">
+                    <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                       Répartition des macros
                     </p>
                     <div className="mb-3 flex gap-2">
@@ -924,9 +830,9 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                         return (
                           <div
                             key={macro.label}
-                            className="flex-1 rounded-lg border border-zinc-100 p-2.5 text-center"
+                            className="flex-1 rounded-lg border border-border p-2.5 text-center"
                           >
-                            <div className="mb-1 h-1.5 w-full rounded-full bg-zinc-100">
+                            <div className="mb-1 h-1.5 w-full rounded-full bg-muted">
                               <div
                                 className="h-1.5 rounded-full"
                                 style={{
@@ -935,13 +841,13 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                                 }}
                               />
                             </div>
-                            <p className="text-xs font-bold text-zinc-900">
+                            <p className="text-xs font-bold text-foreground">
                               {macro.pct}%
                             </p>
-                            <p className="text-[10px] text-zinc-500">
+                            <p className="text-[10px] text-muted-foreground">
                               {kcal} g
                             </p>
-                            <p className="text-[10px] text-zinc-400">
+                            <p className="text-[10px] text-muted-foreground">
                               {macro.label}
                             </p>
                           </div>
@@ -950,7 +856,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                     </div>
 
                     {/* Meal distribution */}
-                    <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-zinc-400">
+                    <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                       Calories par repas
                     </p>
                     <div className="grid grid-cols-2 gap-2">
@@ -969,10 +875,10 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                         return (
                           <div
                             key={meal.label}
-                            className="flex items-center justify-between rounded-lg border border-zinc-100 px-3 py-2"
+                            className="flex items-center justify-between rounded-lg border border-border px-3 py-2"
                           >
-                            <p className="text-xs text-zinc-700">{meal.label}</p>
-                            <p className="text-xs font-semibold text-zinc-900">
+                            <p className="text-xs text-foreground">{meal.label}</p>
+                            <p className="text-xs font-semibold text-foreground">
                               {kcal} kcal
                             </p>
                           </div>
@@ -984,7 +890,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
               </div>
 
               {/* Coordonnées */}
-              <div className="rounded-xl border border-zinc-200 bg-white p-5">
+              <div className="rounded-xl border border-border bg-card p-5">
                 <SectionTitle>Coordonnées</SectionTitle>
                 <div className="mb-5 grid grid-cols-2 gap-3">
                   <InfoField label="Entreprise" value={client.company} />
@@ -1007,7 +913,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
 
               {/* Médical */}
               {(client.injuries || client.medicalNotes) && (
-                <div className="rounded-xl border border-zinc-200 bg-white p-5 lg:col-span-2">
+                <div className="rounded-xl border border-border bg-card p-5 lg:col-span-2">
                   <SectionTitle>Médical</SectionTitle>
                   <div className="grid grid-cols-2 gap-4">
                     {client.injuries && (
@@ -1034,43 +940,43 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setCalendarWeekOffset((n) => n - 1)}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50"
+                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card hover:bg-muted/60"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </button>
-                <span className="text-sm font-medium text-zinc-700">
+                <span className="text-sm font-medium text-foreground">
                   {calWeekLabel}
                 </span>
                 <button
                   onClick={() => setCalendarWeekOffset((n) => n + 1)}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50"
+                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card hover:bg-muted/60"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </button>
               </div>
               <button
                 onClick={() => setCalendarWeekOffset(0)}
-                className="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-50"
+                className="rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted/60"
               >
                 Aujourd&apos;hui
               </button>
             </div>
 
-            <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+            <div className="overflow-hidden rounded-xl border border-border bg-card">
               {/* Day headers */}
-              <div className="grid grid-cols-7 border-b border-zinc-100">
+              <div className="grid grid-cols-7 border-b border-border">
                 {calDays.map(({ date, isToday }, idx) => (
                   <div
                     key={idx}
-                    className={`border-r border-zinc-100 px-2 py-3 text-center last:border-r-0 ${isToday ? "bg-blue-50" : ""}`}
+                    className={`border-r border-border px-2 py-3 text-center last:border-r-0 ${isToday ? "bg-blue-50" : ""}`}
                   >
                     <p
-                      className={`text-[11px] font-semibold uppercase tracking-wide ${isToday ? "text-blue-600" : "text-zinc-400"}`}
+                      className={`text-[11px] font-semibold uppercase tracking-wide ${isToday ? "text-blue-600" : "text-muted-foreground"}`}
                     >
                       {WEEKDAY_LABELS[idx]}
                     </p>
                     <p
-                      className={`mt-0.5 text-base font-bold ${isToday ? "text-blue-700" : "text-zinc-900"}`}
+                      className={`mt-0.5 text-base font-bold ${isToday ? "text-blue-700" : "text-foreground"}`}
                     >
                       {date.getDate()}
                     </p>
@@ -1078,7 +984,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                 ))}
               </div>
               {/* Events */}
-              <div className="grid grid-cols-7 divide-x divide-zinc-100">
+              <div className="grid grid-cols-7 divide-x divide-border">
                 {calDays.map(({ sessions: daySessions, isToday }, idx) => (
                   <div
                     key={idx}
@@ -1093,7 +999,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                         <p className="truncate text-[11px] font-semibold text-emerald-700">
                           Séance
                         </p>
-                        <p className="text-[10px] text-zinc-500">
+                        <p className="text-[10px] text-muted-foreground">
                           {s.duration ? `${s.duration} min` : ""}
                           {s.rpe ? ` · RPE ${s.rpe}` : ""}
                         </p>
@@ -1115,21 +1021,21 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                 <div className="mb-3 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <ClipboardList className="h-4 w-4 text-violet-600" />
-                    <h2 className="text-sm font-semibold text-zinc-900">
+                    <h2 className="text-sm font-semibold text-foreground">
                       Programmes ({client.programs.length})
                     </h2>
                   </div>
                   <Link
                     href="/dashboard/programs/new"
-                    className="flex items-center gap-1 rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-50"
+                    className="flex items-center gap-1 rounded-lg border border-border bg-card px-2 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted/60"
                   >
                     <Plus className="h-3 w-3" />
                     Nouveau
                   </Link>
                 </div>
                 {client.programs.length === 0 ? (
-                  <div className="flex flex-col items-center rounded-xl border border-dashed border-zinc-200 bg-white py-10 text-center">
-                    <p className="text-xs text-zinc-400">Aucun programme</p>
+                  <div className="flex flex-col items-center rounded-xl border border-dashed border-border bg-card py-10 text-center">
+                    <p className="text-xs text-muted-foreground">Aucun programme</p>
                     <Link
                       href="/dashboard/programs/new"
                       className="mt-2 text-xs font-medium text-violet-600 hover:underline"
@@ -1143,11 +1049,11 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                       <Link
                         key={p.id}
                         href={`/dashboard/programs/${p.id}`}
-                        className="flex items-center justify-between rounded-xl border border-zinc-200 bg-white px-4 py-3 hover:border-violet-200 hover:shadow-sm"
+                        className="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3 hover:border-violet-200 hover:shadow-sm"
                       >
                         <div>
                           <div className="flex items-center gap-2">
-                            <p className="text-sm font-semibold text-zinc-900">
+                            <p className="text-sm font-semibold text-foreground">
                               {p.name}
                             </p>
                             {p.isActive ? (
@@ -1163,7 +1069,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                               </Badge>
                             )}
                           </div>
-                          <p className="text-xs text-zinc-400">
+                          <p className="text-xs text-muted-foreground">
                             {p._count.workoutDays} jour
                             {p._count.workoutDays !== 1 ? "s" : ""} · Depuis{" "}
                             {new Date(p.startDate).toLocaleDateString("fr-FR")}
@@ -1180,14 +1086,14 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                 <div className="mb-3 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Dumbbell className="h-4 w-4 text-emerald-600" />
-                    <h2 className="text-sm font-semibold text-zinc-900">
+                    <h2 className="text-sm font-semibold text-foreground">
                       Séances ({client.sessions.length})
                     </h2>
                   </div>
                 </div>
                 {client.sessions.length === 0 ? (
-                  <div className="flex flex-col items-center rounded-xl border border-dashed border-zinc-200 bg-white py-10 text-center">
-                    <p className="text-xs text-zinc-400">Aucune séance</p>
+                  <div className="flex flex-col items-center rounded-xl border border-dashed border-border bg-card py-10 text-center">
+                    <p className="text-xs text-muted-foreground">Aucune séance</p>
                   </div>
                 ) : (
                   <div className="max-h-[520px] overflow-y-auto">
@@ -1196,17 +1102,17 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                         <Link
                           key={s.id}
                           href={`/dashboard/sessions/${s.id}`}
-                          className="flex items-center justify-between rounded-xl border border-zinc-200 bg-white px-4 py-3 hover:border-emerald-200 hover:shadow-sm"
+                          className="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3 hover:border-emerald-200 hover:shadow-sm"
                         >
                           <div>
-                            <p className="text-sm font-semibold text-zinc-900">
+                            <p className="text-sm font-semibold text-foreground">
                               {new Date(s.date).toLocaleDateString("fr-FR", {
                                 weekday: "long",
                                 day: "numeric",
                                 month: "long",
                               })}
                             </p>
-                            <p className="text-xs text-zinc-400">
+                            <p className="text-xs text-muted-foreground">
                               {s.duration ? `${s.duration} min` : ""}
                               {s.rpe ? ` · RPE ${s.rpe}` : ""}
                               {s._count.exercises > 0 &&
@@ -1232,7 +1138,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
               <div className="mb-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Scale className="h-4 w-4 text-blue-600" />
-                  <h2 className="text-sm font-semibold text-zinc-900">
+                  <h2 className="text-sm font-semibold text-foreground">
                     Mesures corporelles ({client.measurements.length})
                   </h2>
                 </div>
@@ -1245,8 +1151,8 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
               </div>
 
               {weightData.length > 0 && (
-                <div className="mb-4 rounded-xl border border-zinc-200 bg-white p-4">
-                  <p className="mb-2 text-sm font-medium text-zinc-700">
+                <div className="mb-4 rounded-xl border border-border bg-card p-4">
+                  <p className="mb-2 text-sm font-medium text-foreground">
                     Courbe de poids
                   </p>
                   <WeightChart data={weightData} />
@@ -1254,10 +1160,10 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
               )}
 
               {client.measurements.length > 0 && (
-                <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white">
+                <div className="overflow-x-auto rounded-xl border border-border bg-card">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-zinc-100 text-left">
+                      <tr className="border-b border-border text-left">
                         {[
                           "Date",
                           "Poids",
@@ -1269,39 +1175,39 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                         ].map((h) => (
                           <th
                             key={h}
-                            className="px-4 py-3 text-xs font-semibold text-zinc-500"
+                            className="px-4 py-3 text-xs font-semibold text-muted-foreground"
                           >
                             {h}
                           </th>
                         ))}
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-zinc-100">
+                    <tbody className="divide-y divide-border">
                       {client.measurements.map((m) => (
-                        <tr key={m.id} className="hover:bg-zinc-50">
-                          <td className="px-4 py-3 font-medium text-zinc-900">
+                        <tr key={m.id} className="hover:bg-muted/60">
+                          <td className="px-4 py-3 font-medium text-foreground">
                             {new Date(m.date).toLocaleDateString("fr-FR")}
                           </td>
-                          <td className="px-4 py-3 text-zinc-700">
+                          <td className="px-4 py-3 text-foreground">
                             {m.weight ? `${m.weight} kg` : "—"}
                           </td>
-                          <td className="px-4 py-3 text-zinc-700">
+                          <td className="px-4 py-3 text-foreground">
                             {m.bodyFat ? `${m.bodyFat}%` : "—"}
                           </td>
-                          <td className="px-4 py-3 text-zinc-700">
+                          <td className="px-4 py-3 text-foreground">
                             {m.muscleMass ? `${m.muscleMass} kg` : "—"}
                           </td>
-                          <td className="px-4 py-3 text-zinc-700">
+                          <td className="px-4 py-3 text-foreground">
                             {m.waist ? `${m.waist} cm` : "—"}
                           </td>
-                          <td className="px-4 py-3 text-zinc-700">
+                          <td className="px-4 py-3 text-foreground">
                             {m.hips ? `${m.hips} cm` : "—"}
                           </td>
                           <td className="px-4 py-3">
                             <button
                               onClick={() => handleDeleteMeasurement(m.id)}
                               disabled={isPending}
-                              className="rounded p-1 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-red-500 disabled:opacity-50"
+                              className="rounded p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-red-500 disabled:opacity-50"
                             >
                               <Trash2 className="h-3.5 w-3.5" />
                             </button>
@@ -1320,16 +1226,16 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
           ════════════════════════════════════ */}
           <TabsContent value="nutrition" className="px-6 py-6">
             {!client.dailyCaloriesGoal ? (
-              <div className="flex flex-col items-center rounded-xl border border-dashed border-zinc-200 bg-white py-16 text-center">
-                <Droplets className="mb-3 h-10 w-10 text-zinc-300" />
-                <p className="text-sm font-medium text-zinc-700">
+              <div className="flex flex-col items-center rounded-xl border border-dashed border-border bg-card py-16 text-center">
+                <Droplets className="mb-3 h-10 w-10 text-muted-foreground/40" />
+                <p className="text-sm font-medium text-foreground">
                   Aucun objectif nutritionnel défini
                 </p>
-                <p className="mt-1 text-xs text-zinc-400">
+                <p className="mt-1 text-xs text-muted-foreground">
                   Renseignez les objectifs caloriques dans l&apos;onglet
                   Informations.
                 </p>
-                <button className="mt-4 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50">
+                <button className="mt-4 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-muted/60">
                   Définir les objectifs
                 </button>
               </div>
@@ -1337,17 +1243,17 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
               <>
                 {/* Summary cards */}
                 <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-4">
-                  <div className="rounded-xl border border-zinc-200 bg-white p-4 text-center">
-                    <p className="text-xs font-semibold text-zinc-500">
+                  <div className="rounded-xl border border-border bg-card p-4 text-center">
+                    <p className="text-xs font-semibold text-muted-foreground">
                       Objectif calories
                     </p>
-                    <p className="mt-2 text-3xl font-bold text-zinc-900">
+                    <p className="mt-2 text-3xl font-bold text-foreground">
                       {client.dailyCaloriesGoal}
                     </p>
-                    <p className="text-xs text-zinc-400">kcal / jour</p>
+                    <p className="text-xs text-muted-foreground">kcal / jour</p>
                   </div>
-                  <div className="rounded-xl border border-zinc-200 bg-white p-4 text-center">
-                    <p className="text-xs font-semibold text-zinc-500">
+                  <div className="rounded-xl border border-border bg-card p-4 text-center">
+                    <p className="text-xs font-semibold text-muted-foreground">
                       Glucides
                     </p>
                     <p className="mt-2 text-3xl font-bold text-blue-700">
@@ -1358,12 +1264,12 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                       )}{" "}
                       g
                     </p>
-                    <p className="text-xs text-zinc-400">
+                    <p className="text-xs text-muted-foreground">
                       {client.macrosCarbsPct ?? 50}% des calories
                     </p>
                   </div>
-                  <div className="rounded-xl border border-zinc-200 bg-white p-4 text-center">
-                    <p className="text-xs font-semibold text-zinc-500">
+                  <div className="rounded-xl border border-border bg-card p-4 text-center">
+                    <p className="text-xs font-semibold text-muted-foreground">
                       Protéines
                     </p>
                     <p className="mt-2 text-3xl font-bold text-emerald-700">
@@ -1374,12 +1280,12 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                       )}{" "}
                       g
                     </p>
-                    <p className="text-xs text-zinc-400">
+                    <p className="text-xs text-muted-foreground">
                       {client.macrosProteinsPct ?? 20}% des calories
                     </p>
                   </div>
-                  <div className="rounded-xl border border-zinc-200 bg-white p-4 text-center">
-                    <p className="text-xs font-semibold text-zinc-500">
+                  <div className="rounded-xl border border-border bg-card p-4 text-center">
+                    <p className="text-xs font-semibold text-muted-foreground">
                       Lipides
                     </p>
                     <p className="mt-2 text-3xl font-bold text-amber-700">
@@ -1390,15 +1296,15 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                       )}{" "}
                       g
                     </p>
-                    <p className="text-xs text-zinc-400">
+                    <p className="text-xs text-muted-foreground">
                       {client.macrosFatsPct ?? 30}% des calories
                     </p>
                   </div>
                 </div>
 
                 {/* Macro bars */}
-                <div className="mb-6 rounded-xl border border-zinc-200 bg-white p-5">
-                  <p className="mb-4 text-sm font-semibold text-zinc-900">
+                <div className="mb-6 rounded-xl border border-border bg-card p-5">
+                  <p className="mb-4 text-sm font-semibold text-foreground">
                     Répartition des macronutriments
                   </p>
                   <div className="space-y-3">
@@ -1424,19 +1330,19 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                     ].map((macro) => (
                       <div key={macro.label}>
                         <div className="mb-1 flex items-center justify-between">
-                          <p className="text-sm font-medium text-zinc-700">
+                          <p className="text-sm font-medium text-foreground">
                             {macro.label}
                           </p>
                           <div className="flex items-center gap-2">
-                            <span className="text-xs text-zinc-400">
+                            <span className="text-xs text-muted-foreground">
                               {macro.recommen}
                             </span>
-                            <span className="text-sm font-bold text-zinc-900">
+                            <span className="text-sm font-bold text-foreground">
                               {macro.pct}%
                             </span>
                           </div>
                         </div>
-                        <div className="h-2.5 w-full rounded-full bg-zinc-100">
+                        <div className="h-2.5 w-full rounded-full bg-muted">
                           <div
                             className={`h-2.5 rounded-full ${macro.color}`}
                             style={{ width: `${macro.pct}%` }}
@@ -1448,8 +1354,8 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                 </div>
 
                 {/* Meal distribution */}
-                <div className="rounded-xl border border-zinc-200 bg-white p-5">
-                  <p className="mb-4 text-sm font-semibold text-zinc-900">
+                <div className="rounded-xl border border-border bg-card p-5">
+                  <p className="mb-4 text-sm font-semibold text-foreground">
                     Calories par repas
                   </p>
                   <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -1481,18 +1387,18 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                       return (
                         <div
                           key={meal.label}
-                          className="rounded-xl border border-zinc-100 bg-zinc-50 p-3 text-center"
+                          className="rounded-xl border border-border bg-muted/50 p-3 text-center"
                         >
-                          <p className="text-xs font-semibold text-zinc-700">
+                          <p className="text-xs font-semibold text-foreground">
                             {meal.label}
                           </p>
-                          <p className="mt-2 text-xl font-bold text-zinc-900">
+                          <p className="mt-2 text-xl font-bold text-foreground">
                             {meal.pct}%
                           </p>
-                          <p className="text-sm font-medium text-zinc-600">
+                          <p className="text-sm font-medium text-muted-foreground">
                             {kcal} kcal / jour
                           </p>
-                          <p className="mt-1 text-[10px] text-zinc-400">
+                          <p className="mt-1 text-[10px] text-muted-foreground">
                             {meal.recommen}
                           </p>
                         </div>
@@ -1503,15 +1409,15 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
 
                 {/* Hydration */}
                 {client.dailyWaterGoal && (
-                  <div className="mt-4 flex items-center gap-4 rounded-xl border border-zinc-200 bg-white p-4">
+                  <div className="mt-4 flex items-center gap-4 rounded-xl border border-border bg-card p-4">
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50">
                       <Droplets className="h-5 w-5 text-sky-600" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-zinc-900">
+                      <p className="text-sm font-semibold text-foreground">
                         Hydratation journalière
                       </p>
-                      <p className="text-xs text-zinc-400">
+                      <p className="text-xs text-muted-foreground">
                         Objectif : {client.dailyWaterGoal} L / jour
                       </p>
                     </div>
@@ -1529,7 +1435,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
           ════════════════════════════════════ */}
           <TabsContent value="suivi" className="px-6 py-6">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-base font-semibold text-zinc-900">
+              <h2 className="text-base font-semibold text-foreground">
                 Suivis en cours
               </h2>
               <button
@@ -1543,8 +1449,8 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
 
             {/* New tracking item form */}
             {showTrackingForm && (
-              <div className="mb-4 rounded-xl border border-zinc-200 bg-white p-4">
-                <p className="mb-3 text-sm font-semibold text-zinc-900">
+              <div className="mb-4 rounded-xl border border-border bg-card p-4">
+                <p className="mb-3 text-sm font-semibold text-foreground">
                   Nouveau suivi
                 </p>
                 <form
@@ -1556,13 +1462,13 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                 >
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="mb-1 block text-xs font-medium text-zinc-700">
+                      <label className="mb-1 block text-xs font-medium text-foreground">
                         Type
                       </label>
                       <select
                         name="type"
                         required
-                        className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
+                        className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/40"
                       >
                         <option value="BILAN">Bilan</option>
                         <option value="HABITUDE">Habitude</option>
@@ -1571,12 +1477,12 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                       </select>
                     </div>
                     <div>
-                      <label className="mb-1 block text-xs font-medium text-zinc-700">
+                      <label className="mb-1 block text-xs font-medium text-foreground">
                         Fréquence
                       </label>
                       <select
                         name="frequency"
-                        className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
+                        className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/40"
                       >
                         <option value="">Non définie</option>
                         <option value="daily">Quotidienne</option>
@@ -1587,24 +1493,24 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                     </div>
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-zinc-700">
+                    <label className="mb-1 block text-xs font-medium text-foreground">
                       Nom *
                     </label>
                     <input
                       name="name"
                       required
                       placeholder="Bilan de forme, Boire 2L d'eau..."
-                      className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
+                      className="w-full rounded-lg border border-border bg-muted/50 px-3 py-2 text-sm text-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/40"
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-zinc-700">
+                    <label className="mb-1 block text-xs font-medium text-foreground">
                       Description
                     </label>
                     <textarea
                       name="description"
                       rows={2}
-                      className="w-full resize-none rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
+                      className="w-full resize-none rounded-lg border border-border bg-muted/50 px-3 py-2 text-sm text-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/40"
                     />
                   </div>
                   <div className="flex gap-2">
@@ -1617,7 +1523,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                     <button
                       type="button"
                       onClick={() => setShowTrackingForm(false)}
-                      className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-50"
+                      className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted/60"
                     >
                       Annuler
                     </button>
@@ -1648,12 +1554,12 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
             </div>
 
             {client.trackingItems.length === 0 ? (
-              <div className="flex flex-col items-center rounded-xl border border-dashed border-zinc-200 bg-white py-16 text-center">
-                <Activity className="mb-3 h-10 w-10 text-zinc-300" />
-                <p className="text-sm font-medium text-zinc-700">
+              <div className="flex flex-col items-center rounded-xl border border-dashed border-border bg-card py-16 text-center">
+                <Activity className="mb-3 h-10 w-10 text-muted-foreground/40" />
+                <p className="text-sm font-medium text-foreground">
                   Aucun suivi configuré
                 </p>
-                <p className="mt-1 text-xs text-zinc-400">
+                <p className="mt-1 text-xs text-muted-foreground">
                   Ajoutez des bilans, habitudes ou questionnaires pour ce
                   client.
                 </p>
@@ -1671,7 +1577,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                   return (
                     <div
                       key={item.id}
-                      className="group flex items-start justify-between rounded-xl border border-zinc-200 bg-white px-4 py-3"
+                      className="group flex items-start justify-between rounded-xl border border-border bg-card px-4 py-3"
                     >
                       <div className="flex items-start gap-3">
                         <span
@@ -1680,15 +1586,15 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                           {TRACKING_TYPE_LABELS[item.type]}
                         </span>
                         <div>
-                          <p className="text-sm font-semibold text-zinc-900">
+                          <p className="text-sm font-semibold text-foreground">
                             {item.name}
                           </p>
                           {item.description && (
-                            <p className="text-xs text-zinc-500">
+                            <p className="text-xs text-muted-foreground">
                               {item.description}
                             </p>
                           )}
-                          <p className="mt-0.5 text-xs text-zinc-400">
+                          <p className="mt-0.5 text-xs text-muted-foreground">
                             {item.frequency
                               ? freqLabels[item.frequency] ?? item.frequency
                               : "Fréquence non définie"}
@@ -1700,7 +1606,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                       <button
                         onClick={() => handleDeleteTracking(item.id)}
                         disabled={isPending}
-                        className="mt-0.5 rounded p-1.5 text-zinc-300 opacity-0 transition-all hover:bg-red-50 hover:text-red-500 group-hover:opacity-100 disabled:opacity-50"
+                        className="mt-0.5 rounded p-1.5 text-muted-foreground/40 opacity-0 transition-all hover:bg-red-50 hover:text-red-500 group-hover:opacity-100 disabled:opacity-50"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
@@ -1717,13 +1623,13 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
           <TabsContent value="partage" className="px-6 py-6">
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Share2 className="h-4 w-4 text-zinc-500" />
-                <h2 className="text-base font-semibold text-zinc-900">
+                <Share2 className="h-4 w-4 text-muted-foreground" />
+                <h2 className="text-base font-semibold text-foreground">
                   Partage
                 </h2>
               </div>
               <div className="flex items-center gap-2">
-                <button className="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-50">
+                <button className="flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted/60">
                   <FolderPlus className="h-4 w-4" />
                   Nouveau dossier
                 </button>
@@ -1738,20 +1644,20 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
               <div className="relative flex-1">
                 <input
                   placeholder="Rechercher un fichier ou dossier..."
-                  className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
+                  className="w-full rounded-lg border border-border bg-muted/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/40"
                 />
               </div>
-              <button className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-50">
+              <button className="rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted/60">
                 Tous
               </button>
             </div>
 
-            <div className="flex flex-col items-center rounded-xl border border-dashed border-zinc-200 bg-white py-16 text-center">
-              <Folder className="mb-3 h-10 w-10 text-zinc-300" />
-              <p className="text-sm font-medium text-zinc-700">
+            <div className="flex flex-col items-center rounded-xl border border-dashed border-border bg-card py-16 text-center">
+              <Folder className="mb-3 h-10 w-10 text-muted-foreground/40" />
+              <p className="text-sm font-medium text-foreground">
                 Aucun fichier ou dossier partagé avec ce client
               </p>
-              <p className="mt-1 text-xs text-zinc-400">
+              <p className="mt-1 text-xs text-muted-foreground">
                 Partagez des fichiers depuis le Drive pour qu&apos;ils
                 apparaissent ici.
               </p>

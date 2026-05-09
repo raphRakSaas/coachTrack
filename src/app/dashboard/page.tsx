@@ -296,10 +296,10 @@ export default async function DashboardPage() {
       </div>
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900">
+          <h1 className="text-2xl font-bold text-foreground">
             {welcomeTitle}
           </h1>
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm text-muted-foreground">
             Tableau de bord · Suivi de votre activité
           </p>
         </div>
@@ -331,14 +331,14 @@ export default async function DashboardPage() {
           />
         </div>
         <div className="grid gap-6">
-          <div className="rounded-2xl border border-zinc-200 bg-white p-5">
+          <div className="rounded-2xl border border-border bg-card p-5">
             <p className="text-xs font-medium text-muted-foreground">
               Activité semaine
             </p>
-            <p className="mt-2 text-3xl font-bold text-zinc-900">
+            <p className="mt-2 text-3xl font-bold text-foreground">
               {sessionsThisWeek}
             </p>
-            <p className="mt-1 text-xs text-zinc-500">
+            <p className="mt-1 text-xs text-muted-foreground">
               {weekDelta >= 0 ? "+" : ""}
               {weekDelta}% vs semaine dernière
             </p>
@@ -349,14 +349,14 @@ export default async function DashboardPage() {
               Voir les séances
             </Link>
           </div>
-          <div className="rounded-2xl border border-zinc-200 bg-white p-5">
+          <div className="rounded-2xl border border-border bg-card p-5">
             <p className="text-xs font-medium text-muted-foreground">
               Programmes actifs
             </p>
-            <p className="mt-2 text-3xl font-bold text-zinc-900">
+            <p className="mt-2 text-3xl font-bold text-foreground">
               {activeProgramsCount}
             </p>
-            <p className="mt-1 text-xs text-zinc-500">
+            <p className="mt-1 text-xs text-muted-foreground">
               Bibliothèque personnalisée: {customExercisesCount} exercices
             </p>
             <Link
@@ -374,21 +374,21 @@ export default async function DashboardPage() {
       </div>
 
       <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="rounded-xl border border-zinc-200 bg-white p-5 lg:col-span-2">
+        <div className="rounded-xl border border-border bg-card p-5 lg:col-span-2">
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-zinc-900">
+            <h2 className="text-sm font-semibold text-foreground">
               Sessions (30 derniers jours)
             </h2>
-            <p className="text-xs text-zinc-400">
+            <p className="text-xs text-muted-foreground">
               {sessionsLast30Days.length} séance{sessionsLast30Days.length !== 1 ? "s" : ""}
             </p>
           </div>
           <Sessions30dChart data={sessions30} />
         </div>
 
-        <div className="rounded-xl border border-zinc-200 bg-white p-5">
+        <div className="rounded-xl border border-border bg-card p-5">
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-zinc-900">
+            <h2 className="text-sm font-semibold text-foreground">
               Répartition (jours)
             </h2>
           </div>
@@ -396,9 +396,9 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      <div className="mt-6 rounded-xl border border-zinc-200 bg-white p-5">
+      <div className="mt-6 rounded-xl border border-border bg-card p-5">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-zinc-900">
+          <h2 className="text-sm font-semibold text-foreground">
             Sessions (6 mois)
           </h2>
         </div>
@@ -407,15 +407,15 @@ export default async function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Activity sparkline */}
-        <div className="rounded-xl border border-zinc-200 bg-white p-5 lg:col-span-2">
+        <div className="rounded-xl border border-border bg-card p-5 lg:col-span-2">
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Activity className="h-4 w-4 text-emerald-600" />
-              <h2 className="text-sm font-semibold text-zinc-900">
+              <h2 className="text-sm font-semibold text-foreground">
                 Activité 14 jours
               </h2>
             </div>
-            <p className="text-xs text-zinc-400">
+            <p className="text-xs text-muted-foreground">
               {sessionsForSparkline.length} séance{sessionsForSparkline.length !== 1 ? "s" : ""}
             </p>
           </div>
@@ -423,20 +423,20 @@ export default async function DashboardPage() {
         </div>
 
         {/* Top clients */}
-        <div className="rounded-xl border border-zinc-200 bg-white p-5">
+        <div className="rounded-xl border border-border bg-card p-5">
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-zinc-900">
+            <h2 className="text-sm font-semibold text-foreground">
               Top clients
             </h2>
             <Link
               href="/dashboard/clients"
-              className="text-xs font-medium text-zinc-500 hover:text-zinc-900"
+              className="text-xs font-medium text-muted-foreground hover:text-foreground"
             >
               Tous
             </Link>
           </div>
           {topClients.length === 0 ? (
-            <p className="py-6 text-center text-xs text-zinc-400">
+            <p className="py-6 text-center text-xs text-muted-foreground">
               Aucun client actif
             </p>
           ) : (
@@ -445,17 +445,17 @@ export default async function DashboardPage() {
                 <li key={c.id}>
                   <Link
                     href={`/dashboard/clients/${c.id}`}
-                    className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 hover:bg-zinc-50"
+                    className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 hover:bg-muted/60"
                   >
                     <ClientAvatar
                       firstName={c.firstName}
                       lastName={c.lastName}
                       size="sm"
                     />
-                    <span className="flex-1 truncate text-sm font-medium text-zinc-900">
+                    <span className="flex-1 truncate text-sm font-medium text-foreground">
                       {c.firstName} {c.lastName}
                     </span>
-                    <span className="text-xs font-semibold text-zinc-500">
+                    <span className="text-xs font-semibold text-muted-foreground">
                       {c._count.sessions}
                     </span>
                   </Link>
@@ -467,25 +467,25 @@ export default async function DashboardPage() {
       </div>
 
       {/* Recent sessions */}
-      <div className="mt-6 rounded-xl border border-zinc-200 bg-white p-5">
+      <div className="mt-6 rounded-xl border border-border bg-card p-5">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-zinc-900">
+          <h2 className="text-sm font-semibold text-foreground">
             Séances récentes
           </h2>
           <Link
             href="/dashboard/sessions"
-            className="text-xs font-medium text-zinc-500 hover:text-zinc-900"
+            className="text-xs font-medium text-muted-foreground hover:text-foreground"
           >
             Tout voir →
           </Link>
         </div>
         {recentSessions.length === 0 ? (
           <div className="flex flex-col items-center py-10 text-center">
-            <CalendarCheck className="mb-3 h-10 w-10 text-zinc-300" />
-            <p className="text-sm font-medium text-zinc-500">
+            <CalendarCheck className="mb-3 h-10 w-10 text-muted-foreground/40" />
+            <p className="text-sm font-medium text-muted-foreground">
               Aucune séance enregistrée
             </p>
-            <p className="mt-1 text-xs text-zinc-400">
+            <p className="mt-1 text-xs text-muted-foreground">
               Commencez par ajouter un client, puis créez sa première séance.
             </p>
             <Link
@@ -496,12 +496,12 @@ export default async function DashboardPage() {
             </Link>
           </div>
         ) : (
-          <ul className="divide-y divide-zinc-100">
+          <ul className="divide-y divide-border">
             {recentSessions.map((s) => (
               <li key={s.id}>
                 <Link
                   href={`/dashboard/sessions/${s.id}`}
-                  className="flex items-center gap-3 py-2.5 hover:bg-zinc-50/50"
+                  className="flex items-center gap-3 py-2.5 hover:bg-muted/60/50"
                 >
                   <ClientAvatar
                     firstName={s.client.firstName}
@@ -509,10 +509,10 @@ export default async function DashboardPage() {
                     size="sm"
                   />
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-zinc-900">
+                    <p className="text-sm font-medium text-foreground">
                       {s.client.firstName} {s.client.lastName}
                     </p>
-                    <p className="text-xs text-zinc-500">
+                    <p className="text-xs text-muted-foreground">
                       {new Date(s.date).toLocaleDateString("fr-FR", {
                         weekday: "long",
                         day: "numeric",
@@ -521,7 +521,7 @@ export default async function DashboardPage() {
                     </p>
                   </div>
                   {s.duration && (
-                    <span className="text-xs font-medium text-zinc-400">
+                    <span className="text-xs font-medium text-muted-foreground">
                       {s.duration} min
                     </span>
                   )}

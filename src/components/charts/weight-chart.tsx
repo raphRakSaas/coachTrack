@@ -25,7 +25,7 @@ export function WeightChart({ data }: { data: DataPoint[] }) {
 
   if (chartData.length < 2) {
     return (
-      <div className="flex h-40 items-center justify-center text-sm text-zinc-400">
+      <div className="flex h-40 items-center justify-center text-sm text-muted-foreground">
         Ajoutez au moins 2 mesures pour voir l&apos;évolution du poids.
       </div>
     )
@@ -34,12 +34,24 @@ export function WeightChart({ data }: { data: DataPoint[] }) {
   return (
     <ResponsiveContainer width="100%" height={220}>
       <LineChart data={chartData} margin={{ top: 4, right: 8, bottom: 0, left: -16 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#f4f4f5" />
-        <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-        <YAxis tick={{ fontSize: 11 }} domain={["auto", "auto"]} />
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+        <XAxis
+          dataKey="date"
+          tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+        />
+        <YAxis
+          tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+          domain={["auto", "auto"]}
+        />
         <Tooltip
           formatter={(value) => [`${value} kg`, "Poids"]}
-          contentStyle={{ fontSize: 12 }}
+          contentStyle={{
+            fontSize: 12,
+            backgroundColor: "var(--card)",
+            color: "var(--foreground)",
+            border: "1px solid var(--border)",
+            borderRadius: "8px",
+          }}
         />
         <Line
           type="monotone"
