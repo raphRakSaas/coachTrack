@@ -289,30 +289,39 @@ export function OnboardingStepper({
               )}
 
               {step === 3 && (
-                <div className="text-center">
-                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-emerald-200/80 bg-emerald-50 dark:border-emerald-900/60 dark:bg-emerald-950/40">
-                    <Check
-                      className="h-7 w-7 text-emerald-600 dark:text-emerald-400"
-                      strokeWidth={2.5}
+                <div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:gap-10 sm:pb-1">
+                  <div className="relative mx-auto h-40 w-40 shrink-0 sm:mx-0 sm:h-44 sm:w-44">
+                    <Image
+                      src="/revo-mascot-celebrate.png"
+                      alt=""
+                      fill
+                      sizes="176px"
+                      className="object-contain object-center drop-shadow-md dark:brightness-[0.98]"
+                      priority
                     />
                   </div>
-                  <h2 className="font-[family-name:var(--font-display)] text-xl font-bold text-zinc-900 dark:text-zinc-50">
-                    C&apos;est prêt
-                  </h2>
-                  <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-                    {createdClientId
-                      ? `${clientFirstName} ${clientLastName} est dans vos clients.`
-                      : "Ajoutez un client quand vous voulez depuis le menu."}
-                  </p>
-                  <Button
-                    onClick={handleFinish}
-                    size="lg"
-                    disabled={isPending}
-                    className="mt-8 w-full bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-600 dark:hover:bg-indigo-500"
-                  >
-                    Ouvrir le tableau de bord
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
+                  <div className="flex min-w-0 flex-1 flex-col text-center sm:pr-4 sm:text-left">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-400 dark:text-zinc-500">
+                      Terminé
+                    </p>
+                    <h2 className="mt-2 font-[family-name:var(--font-display)] text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+                      À vous de jouer
+                    </h2>
+                    <p className="mt-3 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                      {createdClientId
+                        ? `${clientFirstName} ${clientLastName} est déjà dans vos clients.`
+                        : "Ajoutez votre premier client depuis l&apos;onglet Clients quand vous voulez."}
+                    </p>
+                    <Button
+                      onClick={handleFinish}
+                      size="lg"
+                      disabled={isPending}
+                      className="mt-8 w-full max-w-md self-center bg-indigo-600 hover:bg-indigo-700 sm:mt-10 sm:w-fit sm:max-w-none sm:self-start dark:bg-indigo-600 dark:hover:bg-indigo-500"
+                    >
+                      Ouvrir le tableau de bord
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>
