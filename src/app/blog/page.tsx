@@ -9,6 +9,84 @@ export const metadata: Metadata = {
   description: "Guides, conseils et stratégies pour développer votre activité de coaching sportif.",
 };
 
+/** Illustration graphique — progression (sans emoji), couleurs charte */
+function FeaturedProgressIllustration() {
+  const baseline = 92;
+  const barW = 16;
+  const gap = 22;
+  const startX = 16;
+  const heights = [22, 28, 26, 34, 38, 44, 52, 58];
+  const tops = heights.map((height, index) => ({
+    cx: startX + index * gap + barW / 2,
+    cy: baseline - height - 4,
+  }));
+  const linePath = tops
+    .map((point, index) => `${index === 0 ? "M" : "L"} ${point.cx} ${point.cy}`)
+    .join(" ");
+  const areaPath = `${linePath} L ${tops[tops.length - 1]!.cx} ${baseline} L ${tops[0]!.cx} ${baseline} Z`;
+
+  return (
+    <svg
+      viewBox="0 0 200 100"
+      className="h-auto w-full max-w-[260px]"
+      role="img"
+      aria-label="Schéma illustrant une progression dans le temps"
+    >
+      <defs>
+        <linearGradient id="blog-progress-area" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor="var(--m-accent)" stopOpacity="0.28" />
+          <stop offset="100%" stopColor="var(--m-accent)" stopOpacity="0" />
+        </linearGradient>
+        <linearGradient id="blog-progress-bar" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor="var(--m-accent-mid)" stopOpacity="0.95" />
+          <stop offset="100%" stopColor="var(--m-accent)" stopOpacity="0.75" />
+        </linearGradient>
+      </defs>
+      {/* repères discrets */}
+      <line
+        x1="12"
+        y1={baseline}
+        x2="192"
+        y2={baseline}
+        stroke="var(--m-border)"
+        strokeWidth="1"
+      />
+      {heights.map((height, index) => (
+        <rect
+          key={index}
+          x={startX + index * gap}
+          y={baseline - height}
+          width={barW}
+          height={height}
+          rx="4"
+          fill="url(#blog-progress-bar)"
+          opacity={0.25 + index * 0.09}
+        />
+      ))}
+      <path d={areaPath} fill="url(#blog-progress-area)" />
+      <path
+        d={linePath}
+        fill="none"
+        stroke="var(--m-accent)"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {tops.map((point) => (
+        <circle
+          key={`${point.cx}-${point.cy}`}
+          cx={point.cx}
+          cy={point.cy}
+          r="3.5"
+          fill="var(--m-bg-card)"
+          stroke="var(--m-accent)"
+          strokeWidth="2"
+        />
+      ))}
+    </svg>
+  );
+}
+
 const ARTICLES = [
   {
     tag: "Fidélisation",
@@ -139,12 +217,19 @@ export default function BlogPage() {
                     Lire l&apos;article <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>
-                {/* Illustration placeholder */}
-                <div className="hidden lg:flex items-center justify-center rounded-2xl p-8" style={{ background: "var(--m-bg-section)", minHeight: "200px" }}>
-                  <div className="text-center">
-                    <div className="text-6xl mb-3">📈</div>
-                    <p className="text-sm font-medium" style={{ color: "var(--m-text-muted)" }}>Progression client</p>
-                  </div>
+                {/* Illustration graphique */}
+                <div
+                  className="hidden flex-col items-center justify-center rounded-2xl border p-8 lg:flex"
+                  style={{
+                    background: "var(--m-bg-section)",
+                    borderColor: "var(--m-border)",
+                    minHeight: "200px",
+                  }}
+                >
+                  <FeaturedProgressIllustration />
+                  <p className="mt-5 text-center text-sm font-medium" style={{ color: "var(--m-text-muted)" }}>
+                    Progression client
+                  </p>
                 </div>
               </div>
             </div>
