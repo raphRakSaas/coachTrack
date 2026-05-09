@@ -4,6 +4,7 @@ import { ClipboardList, Plus, Trash2, Users } from "lucide-react"
 
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser } from "@/lib/auth"
+import { ensureDemoProgramForCoach } from "@/lib/demo-client"
 import { SECTION_ACCENTS } from "@/lib/colors"
 import { buttonVariants } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -27,6 +28,8 @@ export default async function ProgramsPage({
 
   const user = await getCurrentUser()
   if (!user) redirect("/sign-in")
+
+  await ensureDemoProgramForCoach(user.id)
 
   const accent = SECTION_ACCENTS.programs
 
@@ -187,6 +190,21 @@ export default async function ProgramsPage({
               ? "Ce client n'a pas encore de programme."
               : "Créez un programme d'entraînement personnalisé pour un client."}
           </p>
+          {process.env.NODE_ENV === "development" &&
+            !clientId &&
+            allPrograms.length === 0 && (
+              <p className="mt-3 max-w-md text-xs text-muted-foreground">
+                En local, le programme d’exemple (Marie Dupont) nécessite des{" "}
+                <strong className="font-medium text-foreground">
+                  exercices globaux
+                </strong>{" "}
+                en base. Lancez{" "}
+                <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">
+                  npx prisma db seed
+                </code>{" "}
+                puis rechargez cette page.
+              </p>
+            )}
           <Link
             href="/dashboard/programs/new"
             className={

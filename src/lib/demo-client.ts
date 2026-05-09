@@ -15,8 +15,13 @@ export const DEMO_CLIENT_PROFILE = {
   firstName: "Marie",
   lastName: "Dupont",
   notes:
-    "Client fictif pour explorer Revo avec des exemples complets : profil, nutrition, suivi, séances et mesures.",
+    "Client fictif pour explorer Revo avec des exemples complets : profil, programme, nutrition, suivi, séances et mesures.",
 } as const
+
+/** Programme d’exemple lié au client démo (exercices globaux du seed). */
+const DEMO_PROGRAM_NAME = "Démo · Force 3 jours (Marie)"
+const DEMO_PROGRAM_DESCRIPTION =
+  "Programme fictif pour explorer Revo : jambes, tirage, poussée — séries et charges d’exemple."
 
 /** Email et téléphone factices (aucune utilisation réelle). */
 const DEMO_CONTACT = {
@@ -267,11 +272,172 @@ function fullDemoClientUpdateData(): Prisma.ClientUpdateInput {
   }
 }
 
+type DemoProgramWorkoutDayPayload = {
+  dayNumber: number
+  name: string
+  exercises: {
+    create: Array<{
+      exerciseId: string
+      sets: number
+      reps: string
+      weight: number | null
+      restTime: number | null
+      order: number
+    }>
+  }
+}
+
+/**
+ * Si le catalogue nominatif est incomplet (seed Prisma pas exécuté ou noms différents),
+ * répartit jusqu’à 9 exercices globaux sur 3 journées pour garder une démo utilisable.
+ */
+async function buildFallbackDemoWorkoutDays(
+  tx: Prisma.TransactionClient
+): Promise<DemoProgramWorkoutDayPayload[]> {
+  const pool = await tx.exercise.findMany({
+    where: { isGlobal: true },
+    orderBy: { name: "asc" },
+    take: 9,
+    select: { id: true, name: true },
+  })
+
+  if (pool.length === 0) return []
+
+  const dayLabels = [
+    "Séance 1",
+    "Séance 2",
+    "Séance 3",
+  ] as const
+
+  const numDays = Math.min(3, pool.length)
+  const chunkSize = Math.ceil(pool.length / numDays)
+
+  const days: DemoProgramWorkoutDayPayload[] = []
+
+  for (let dayIndex = 0; dayIndex < numDays; dayIndex++) {
+    const slice = pool.slice(
+      dayIndex * chunkSize,
+      dayIndex * chunkSize + chunkSize
+    )
+    if (slice.length === 0) continue
+
+    days.push({
+      dayNumber: dayIndex + 1,
+      name: dayLabels[dayIndex] ?? `Jour ${dayIndex + 1}`,
+      exercises: {
+        create: slice.map((exerciseRow, orderIndex) => ({
+          exerciseId: exerciseRow.id,
+          sets: 3,
+          reps: "10",
+          weight: null as number | null,
+          restTime: 90,
+          order: orderIndex,
+        })),
+      },
+    })
+  }
+
+  return days
+}
+
+/**
+ * Crée un programme multi-jours pour la démo (exercices globaux du seed, par nom si possible).
+ * Repli : tout exercice global disponible (après `npx prisma db seed`), réparti sur 3 séances.
+ */
+async function seedDemoProgram(
+  tx: Prisma.TransactionClient,
+  clientId: string,
+  coachId: string
+) {
+  const catalog = [
+    { dayNumber: 1, dayName: "Jambes & postérieur", rows: [
+      { exerciseName: "Squat", sets: 4, reps: "10", weight: 42.5, restTime: 120 },
+      { exerciseName: "Presse à cuisses", sets: 3, reps: "12", weight: 65, restTime: 90 },
+      { exerciseName: "Leg curl", sets: 3, reps: "12", weight: 32.5, restTime: 75 },
+    ]},
+    { dayNumber: 2, dayName: "Dos & épaules arrière", rows: [
+      { exerciseName: "Tirage vertical", sets: 4, reps: "10", weight: 45, restTime: 90 },
+      { exerciseName: "Rowing barre", sets: 4, reps: "10", weight: 40, restTime: 90 },
+      { exerciseName: "Face pull", sets: 3, reps: "15", weight: 22.5, restTime: 60 },
+    ]},
+    { dayNumber: 3, dayName: "Pectoraux & triceps", rows: [
+      { exerciseName: "Développé couché", sets: 4, reps: "8", weight: 40, restTime: 120 },
+      { exerciseName: "Écarté haltères", sets: 3, reps: "12", weight: 10, restTime: 75 },
+      { exerciseName: "Extensions à la poulie", sets: 3, reps: "12", weight: 25, restTime: 60 },
+    ]},
+  ] as const
+
+  const namesNeeded = [
+    ...new Set(
+      catalog.flatMap((section) => section.rows.map((row) => row.exerciseName))
+    ),
+  ]
+
+  const exercisesFound = await tx.exercise.findMany({
+    where: { isGlobal: true, name: { in: namesNeeded } },
+    select: { id: true, name: true },
+  })
+
+  const exerciseIdByName = new Map(
+    exercisesFound.map((exerciseRow) => [exerciseRow.name, exerciseRow.id])
+  )
+
+  let workoutDaysPayload: DemoProgramWorkoutDayPayload[] = catalog
+    .map((section) => {
+      const exercisesPayload = section.rows
+        .map((row, orderIndex) => {
+          const exerciseId = exerciseIdByName.get(row.exerciseName)
+          if (!exerciseId) return null
+          return {
+            exerciseId,
+            sets: row.sets,
+            reps: row.reps,
+            weight: row.weight,
+            restTime: row.restTime,
+            order: orderIndex,
+          }
+        })
+        .filter(
+          (item): item is NonNullable<typeof item> => item !== null
+        )
+
+      if (exercisesPayload.length === 0) return null
+
+      return {
+        dayNumber: section.dayNumber,
+        name: section.dayName,
+        exercises: { create: exercisesPayload },
+      }
+    })
+    .filter(
+      (item): item is NonNullable<typeof item> => item !== null
+    )
+
+  if (workoutDaysPayload.length === 0) {
+    workoutDaysPayload = await buildFallbackDemoWorkoutDays(tx)
+  }
+
+  if (workoutDaysPayload.length === 0) return
+
+  await tx.program.create({
+    data: {
+      coachId,
+      clientId,
+      name: DEMO_PROGRAM_NAME,
+      description: DEMO_PROGRAM_DESCRIPTION,
+      isActive: true,
+      startDate: daysAgo(56),
+      workoutDays: { create: workoutDaysPayload },
+    },
+  })
+}
+
 async function replaceDemoRelatedData(
   tx: Prisma.TransactionClient,
   clientId: string,
   coachId: string
 ) {
+  await tx.program.deleteMany({ where: { clientId } })
   await tx.session.deleteMany({ where: { clientId } })
   await tx.bodyMeasurement.deleteMany({ where: { clientId } })
   await tx.clientNote.deleteMany({ where: { clientId } })
@@ -455,10 +621,12 @@ async function replaceDemoRelatedData(
     },
   ]
   await tx.trackingItem.createMany({ data: tracking })
+
+  await seedDemoProgram(tx, clientId, coachId)
 }
 
 /**
- * Données démo complètes : profil, mesures, séances, notes, suivis.
+ * Données démo complètes : profil, mesures, séances, programme, notes, suivis.
  * Idempotent : remplace les sous-ressources du client démo par le jeu canonique.
  */
 export async function syncDemoClientFullSeed(clientId: string, coachId: string) {
@@ -490,6 +658,32 @@ export async function ensureDemoClientForCoach(coachId: string): Promise<void> {
   }
 
   await syncDemoClientFullSeed(existing.id, coachId)
+}
+
+/**
+ * Rattrapage pour la liste Programmes : sans webhook Clerk ou sans seed au bon moment,
+ * le client démo peut exister sans programme (aucun exercice global au premier sync).
+ * Recrée uniquement le programme si le client démo n’en a aucun — sans réécraser séances / notes.
+ */
+export async function ensureDemoProgramForCoach(coachId: string): Promise<void> {
+  const demoClient = await prisma.client.findFirst({
+    where: { coachId, isDemo: true },
+    select: { id: true },
+  })
+
+  if (!demoClient) {
+    await ensureDemoClientForCoach(coachId)
+    return
+  }
+
+  const programCount = await prisma.program.count({
+    where: { clientId: demoClient.id },
+  })
+  if (programCount > 0) return
+
+  await prisma.$transaction(async (transaction) => {
+    await seedDemoProgram(transaction, demoClient.id, coachId)
+  })
 }
 
 /** Rattrapage : tous les coaches reçoivent / mettent à jour le client démo complet. */
