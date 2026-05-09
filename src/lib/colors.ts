@@ -1,7 +1,17 @@
 // Section accents — one Tailwind palette per major area.
 // Use the static class name strings (Tailwind needs to see them at compile time).
 
-export type Section = "dashboard" | "clients" | "sessions" | "programs" | "exercises" | "settings" | "prospects" | "calendar"
+export type Section =
+  | "dashboard"
+  | "clients"
+  | "sessions"
+  | "programs"
+  | "exercises"
+  | "settings"
+  | "prospects"
+  | "calendar"
+  | "tracking"
+  | "nutrition"
 
 export const SECTION_ACCENTS: Record<
   Section,
@@ -122,6 +132,32 @@ export const SECTION_ACCENTS: Record<
     activeBg: "bg-teal-50 dark:bg-teal-950/50",
     activeText: "text-teal-700 dark:text-teal-300",
     hex: "#0d9488",
+  },
+  tracking: {
+    text: "text-rose-700",
+    textMuted: "text-rose-500",
+    bg: "bg-rose-600",
+    bgSoft: "bg-rose-50",
+    border: "border-rose-200",
+    ring: "ring-rose-500/30",
+    icon: "text-rose-600",
+    badge: "bg-rose-100 text-rose-700",
+    activeBg: "bg-rose-50 dark:bg-rose-950/45",
+    activeText: "text-rose-700 dark:text-rose-300",
+    hex: "#e11d48",
+  },
+  nutrition: {
+    text: "text-lime-800",
+    textMuted: "text-lime-600",
+    bg: "bg-lime-600",
+    bgSoft: "bg-lime-50",
+    border: "border-lime-200",
+    ring: "ring-lime-500/30",
+    icon: "text-lime-700",
+    badge: "bg-lime-100 text-lime-900",
+    activeBg: "bg-lime-50 dark:bg-lime-950/40",
+    activeText: "text-lime-900 dark:text-lime-200",
+    hex: "#65a30d",
   },
 }
 

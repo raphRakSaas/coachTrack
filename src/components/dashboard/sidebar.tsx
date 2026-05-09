@@ -14,6 +14,8 @@ import {
   Settings,
   UserSearch,
   CalendarDays,
+  Activity,
+  UtensilsCrossed,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -35,6 +37,8 @@ const navItems: NavItem[] = [
   { label: "Calendrier", href: "/dashboard/calendar", icon: CalendarDays, section: "calendar" },
   { label: "Séances", href: "/dashboard/sessions", icon: CalendarCheck, section: "sessions" },
   { label: "Programmes", href: "/dashboard/programs", icon: ClipboardList, section: "programs" },
+  { label: "Suivi", href: "/dashboard/suivi", icon: Activity, section: "tracking" },
+  { label: "Nutrition", href: "/dashboard/nutrition", icon: UtensilsCrossed, section: "nutrition" },
   { label: "Exercices", href: "/dashboard/exercises", icon: Dumbbell, section: "exercises" },
   { label: "Paramètres", href: "/dashboard/settings", icon: Settings, section: "settings" },
 ];
