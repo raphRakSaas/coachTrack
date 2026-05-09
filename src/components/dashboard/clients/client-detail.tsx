@@ -24,7 +24,7 @@ import {
   FolderPlus,
   Share2,
 } from "lucide-react"
-import { useTransition, useState, useRef } from "react"
+import { useTransition, useState, useRef, useMemo } from "react"
 import type { Prisma } from "@prisma/client"
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
@@ -33,6 +33,7 @@ import { Badge } from "@/components/ui/badge"
 import { MeasurementSheet } from "./measurement-sheet"
 import { EditClientSheet } from "./edit-client-sheet"
 import { WeightChart } from "@/components/charts/weight-chart"
+import { BodyPainMap } from "@/components/dashboard/clients/body-pain-map"
 import {
   deleteMeasurement,
   createClientNote,
@@ -58,6 +59,8 @@ type ClientWithRelations = Prisma.ClientGetPayload<{
     programs: { include: { _count: { select: { workoutDays: true } } } }
     clientNotes: true
     trackingItems: true
+    painNotes: { select: { regionKey: true, note: true } }
+    nutritionDayLogs: true
   }
 }>
 
@@ -206,6 +209,16 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
         ? "text-rose-500"
         : "text-emerald-500"
 
+  const nutritionLast7Days = useMemo(() => {
+    if (!client.nutritionDayLogs?.length) return []
+    return [...client.nutritionDayLogs]
+      .sort(
+        (logA, logB) =>
+          new Date(logB.date).getTime() - new Date(logA.date).getTime()
+      )
+      .slice(0, 7)
+  }, [client.nutritionDayLogs])
+
   // ── Calendar (client-specific) ────────────────────────────────────────────
 
   const getMonday = (date: Date) => {
@@ -341,6 +354,37 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
         </div>
       </div>
 
+      {client.isDemo &&
+        (client.sessions.length < 10 ||
+          client.nutritionDayLogs.length < 5 ||
+          client.trackingItems.length < 5) && (
+          <div className="border-b border-amber-500/35 bg-amber-500/10 px-6 py-3 dark:bg-amber-500/15">
+            <div className="text-sm text-amber-950 dark:text-amber-50">
+              <p>
+                <span className="font-semibold">
+                  Exemple incomplet pour ce client fictif.
+                </span>{" "}
+                Assurez-vous d’avoir sélectionné le client avec le badge « Démo
+                » dans la liste (et pas un autre homonyme), puis actualisez la
+                page.
+              </p>
+              <p className="mt-1.5 text-xs text-amber-900/85 dark:text-amber-100/75">
+                Si rien ne change après actualisation, réessayez plus tard ou
+                contactez le support.
+              </p>
+              {process.env.NODE_ENV === "development" && (
+                <p className="mt-2 rounded-md border border-amber-800/20 bg-amber-100/50 px-2 py-1.5 font-mono text-[11px] text-amber-950 dark:border-amber-400/25 dark:bg-amber-950/40 dark:text-amber-100">
+                  Développement : à la racine du projet,{" "}
+                  <code className="rounded bg-amber-200/80 px-1 dark:bg-amber-900/80">
+                    npx tsx scripts/backfill-demo-clients.ts
+                  </code>{" "}
+                  puis rechargez.
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
       {/* ── Tabs ── */}
       <div className="flex-1 overflow-y-auto">
         <Tabs defaultValue="apercu" className="h-full">
@@ -442,7 +486,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                   </p>
                 ) : (
                   <div className="divide-y divide-border">
-                    {client.sessions.slice(0, 10).map((s) => (
+                    {client.sessions.slice(0, 14).map((s) => (
                       <Link
                         key={s.id}
                         href={`/dashboard/sessions/${s.id}`}
@@ -474,140 +518,148 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                 )}
               </div>
 
-              {/* Notes coach */}
-              <div className="rounded-xl border border-border bg-card">
-                <div className="flex items-center justify-between border-b border-border px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <StickyNote className="h-4 w-4 text-amber-500" />
-                    <p className="text-sm font-semibold text-foreground">Notes</p>
+              <BodyPainMap
+                clientId={client.id}
+                isDemo={client.isDemo}
+                painNotes={client.painNotes}
+              />
+            </div>
+
+            {/* Notes coach — pleine largeur */}
+            <div className="mt-6 rounded-xl border border-border bg-card">
+              <div className="flex items-center justify-between border-b border-border px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <StickyNote className="h-4 w-4 text-amber-500" />
+                  <p className="text-sm font-semibold text-foreground">Notes</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setNewNoteOpen(true)}
+                  className="flex items-center gap-1 rounded-lg bg-muted px-2 py-1 text-xs font-medium text-muted-foreground hover:bg-muted"
+                >
+                  <Plus className="h-3 w-3" />
+                  Ajouter
+                </button>
+              </div>
+
+              {newNoteOpen && (
+                <form
+                  action={async (fd) => {
+                    await createClientNote(client.id, fd)
+                    setNewNoteOpen(false)
+                  }}
+                  className="border-b border-border px-4 py-3"
+                >
+                  <textarea
+                    ref={newNoteRef}
+                    name="content"
+                    autoFocus
+                    rows={3}
+                    placeholder="Écrire une note..."
+                    className="w-full resize-none rounded-lg border border-border bg-muted/50 p-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/40"
+                    required
+                  />
+                  <div className="mt-2 flex gap-2">
+                    <button
+                      type="submit"
+                      className="flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700"
+                    >
+                      <Check className="h-3 w-3" />
+                      Enregistrer
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setNewNoteOpen(false)}
+                      className="flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted/60"
+                    >
+                      <X className="h-3 w-3" />
+                      Annuler
+                    </button>
                   </div>
-                  <button
-                    onClick={() => setNewNoteOpen(true)}
-                    className="flex items-center gap-1 rounded-lg bg-muted px-2 py-1 text-xs font-medium text-muted-foreground hover:bg-muted"
-                  >
-                    <Plus className="h-3 w-3" />
-                    Ajouter
-                  </button>
-                </div>
+                </form>
+              )}
 
-                {/* New note form */}
-                {newNoteOpen && (
-                  <form
-                    action={async (fd) => {
-                      await createClientNote(client.id, fd)
-                      setNewNoteOpen(false)
-                    }}
-                    className="border-b border-border px-4 py-3"
-                  >
-                    <textarea
-                      ref={newNoteRef}
-                      name="content"
-                      autoFocus
-                      rows={3}
-                      placeholder="Écrire une note..."
-                      className="w-full resize-none rounded-lg border border-border bg-muted/50 p-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/40"
-                      required
-                    />
-                    <div className="mt-2 flex gap-2">
-                      <button
-                        type="submit"
-                        className="flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700"
-                      >
-                        <Check className="h-3 w-3" />
-                        Enregistrer
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setNewNoteOpen(false)}
-                        className="flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted/60"
-                      >
-                        <X className="h-3 w-3" />
-                        Annuler
-                      </button>
+              <div className="max-h-96 overflow-y-auto divide-y divide-border">
+                {client.clientNotes.length === 0 ? (
+                  <p className="px-4 py-8 text-center text-xs text-muted-foreground">
+                    Aucune note. Cliquez sur &quot;Ajouter&quot; pour commencer.
+                  </p>
+                ) : (
+                  client.clientNotes.map((note) => (
+                    <div key={note.id} className="group px-4 py-3">
+                      {editingNoteId === note.id ? (
+                        <form
+                          action={async (fd) => {
+                            await updateClientNote(note.id, client.id, fd)
+                            setEditingNoteId(null)
+                          }}
+                        >
+                          <textarea
+                            ref={editNoteRef}
+                            name="content"
+                            defaultValue={note.content}
+                            autoFocus
+                            rows={3}
+                            className="w-full resize-none rounded-lg border border-border bg-muted/50 p-2.5 text-sm text-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/40"
+                            required
+                          />
+                          <div className="mt-2 flex gap-2">
+                            <button
+                              type="submit"
+                              className="flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white"
+                            >
+                              <Check className="h-3 w-3" />
+                              Sauvegarder
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setEditingNoteId(null)}
+                              className="flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground"
+                            >
+                              <X className="h-3 w-3" />
+                              Annuler
+                            </button>
+                          </div>
+                        </form>
+                      ) : (
+                        <>
+                          <p className="mb-1 text-[11px] text-muted-foreground">
+                            {new Date(note.createdAt).toLocaleDateString(
+                              "fr-FR",
+                              {
+                                day: "numeric",
+                                month: "long",
+                                year: "numeric",
+                              }
+                            )}
+                          </p>
+                          <p className="whitespace-pre-wrap text-sm text-foreground">
+                            {note.content}
+                          </p>
+                          <div className="mt-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                            <button
+                              type="button"
+                              onClick={() => setEditingNoteId(note.id)}
+                              className="flex items-center gap-1 rounded px-2 py-0.5 text-[11px] text-muted-foreground hover:bg-muted hover:text-foreground"
+                            >
+                              <Pencil className="h-3 w-3" />
+                              Modifier
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteNote(note.id)}
+                              disabled={isPending}
+                              className="flex items-center gap-1 rounded px-2 py-0.5 text-[11px] text-muted-foreground hover:bg-red-50 hover:text-red-600"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                              Supprimer
+                            </button>
+                          </div>
+                        </>
+                      )}
                     </div>
-                  </form>
+                  ))
                 )}
-
-                <div className="max-h-96 overflow-y-auto divide-y divide-border">
-                  {client.clientNotes.length === 0 ? (
-                    <p className="px-4 py-8 text-center text-xs text-muted-foreground">
-                      Aucune note. Cliquez sur &quot;Ajouter&quot; pour commencer.
-                    </p>
-                  ) : (
-                    client.clientNotes.map((note) => (
-                      <div key={note.id} className="group px-4 py-3">
-                        {editingNoteId === note.id ? (
-                          <form
-                            action={async (fd) => {
-                              await updateClientNote(note.id, client.id, fd)
-                              setEditingNoteId(null)
-                            }}
-                          >
-                            <textarea
-                              ref={editNoteRef}
-                              name="content"
-                              defaultValue={note.content}
-                              autoFocus
-                              rows={3}
-                              className="w-full resize-none rounded-lg border border-border bg-muted/50 p-2.5 text-sm text-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/40"
-                              required
-                            />
-                            <div className="mt-2 flex gap-2">
-                              <button
-                                type="submit"
-                                className="flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white"
-                              >
-                                <Check className="h-3 w-3" />
-                                Sauvegarder
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setEditingNoteId(null)}
-                                className="flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground"
-                              >
-                                <X className="h-3 w-3" />
-                                Annuler
-                              </button>
-                            </div>
-                          </form>
-                        ) : (
-                          <>
-                            <p className="mb-1 text-[11px] text-muted-foreground">
-                              {new Date(note.createdAt).toLocaleDateString(
-                                "fr-FR",
-                                {
-                                  day: "numeric",
-                                  month: "long",
-                                  year: "numeric",
-                                }
-                              )}
-                            </p>
-                            <p className="whitespace-pre-wrap text-sm text-foreground">
-                              {note.content}
-                            </p>
-                            <div className="mt-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                              <button
-                                onClick={() => setEditingNoteId(note.id)}
-                                className="flex items-center gap-1 rounded px-2 py-0.5 text-[11px] text-muted-foreground hover:bg-muted hover:text-foreground"
-                              >
-                                <Pencil className="h-3 w-3" />
-                                Modifier
-                              </button>
-                              <button
-                                onClick={() => handleDeleteNote(note.id)}
-                                disabled={isPending}
-                                className="flex items-center gap-1 rounded px-2 py-0.5 text-[11px] text-muted-foreground hover:bg-red-50 hover:text-red-600"
-                              >
-                                <Trash2 className="h-3 w-3" />
-                                Supprimer
-                              </button>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    ))
-                  )}
-                </div>
               </div>
             </div>
 
@@ -1407,11 +1459,72 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                   </div>
                 </div>
 
+                {/* Journal nutrition récent */}
+                {nutritionLast7Days.length > 0 && (
+                  <div className="mb-6 rounded-xl border border-border bg-card p-5">
+                    <p className="mb-4 text-sm font-semibold text-foreground">
+                      Aperçu des jours enregistrés (les plus récents)
+                    </p>
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-7">
+                      {nutritionLast7Days.map((log) => {
+                        const dateLabel = new Date(log.date).toLocaleDateString(
+                          "fr-FR",
+                          {
+                            weekday: "short",
+                            day: "numeric",
+                            month: "short",
+                          }
+                        )
+                        const goal = client.dailyCaloriesGoal ?? 2000
+                        const pct = Math.min(
+                          Math.round((log.caloriesConsumed / goal) * 100),
+                          100
+                        )
+                        return (
+                          <div
+                            key={log.id}
+                            className="flex flex-col rounded-lg border border-border bg-muted/30 p-3 text-center"
+                          >
+                            <p className="text-[10px] font-medium uppercase text-muted-foreground">
+                              {dateLabel}
+                            </p>
+                            <p className="mt-1 text-lg font-bold text-foreground">
+                              {log.caloriesConsumed}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground">
+                              kcal · {pct}% objectif
+                            </p>
+                            <div className="mt-2 space-y-0.5 text-[10px] text-muted-foreground">
+                              <p>P {Math.round(log.proteinG ?? 0)} g</p>
+                              <p>G {Math.round(log.carbsG ?? 0)} g</p>
+                              <p>L {Math.round(log.fatG ?? 0)} g</p>
+                              {log.waterL != null && (
+                                <p className="text-sky-600 dark:text-sky-400">
+                                  Eau {log.waterL.toFixed(1)} L
+                                </p>
+                              )}
+                            </div>
+                            {(log.breakfastKcal != null ||
+                              log.lunchKcal != null) && (
+                              <div className="mt-2 border-t border-border pt-2 text-[9px] leading-tight text-muted-foreground">
+                                <p>P.Dej {log.breakfastKcal ?? "—"}</p>
+                                <p>Dej {log.lunchKcal ?? "—"}</p>
+                                <p>Dîn {log.dinnerKcal ?? "—"}</p>
+                                <p>Coll {log.snackKcal ?? "—"}</p>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 {/* Hydration */}
                 {client.dailyWaterGoal && (
                   <div className="mt-4 flex items-center gap-4 rounded-xl border border-border bg-card p-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50">
-                      <Droplets className="h-5 w-5 text-sky-600" />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-500/15 dark:bg-sky-400/20">
+                      <Droplets className="h-5 w-5 text-sky-600 dark:text-sky-400" />
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-foreground">

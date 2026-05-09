@@ -19,7 +19,7 @@ export default async function ClientDetailPage({
       measurements: { orderBy: { date: "desc" } },
       sessions: {
         orderBy: { date: "desc" },
-        take: 50,
+        take: 120,
         include: {
           _count: { select: { exercises: true } },
         },
@@ -32,6 +32,11 @@ export default async function ClientDetailPage({
       },
       clientNotes: { orderBy: { createdAt: "desc" } },
       trackingItems: { orderBy: { createdAt: "asc" } },
+      painNotes: { select: { regionKey: true, note: true } },
+      nutritionDayLogs: {
+        orderBy: { date: "desc" },
+        take: 28,
+      },
     },
   })
 

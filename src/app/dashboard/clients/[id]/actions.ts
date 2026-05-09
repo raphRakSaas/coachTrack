@@ -274,3 +274,47 @@ export async function toggleActiveClient(id: string, isActive: boolean) {
   revalidatePath(`/dashboard/clients/${id}`)
   revalidatePath("/dashboard/clients")
 }
+
+// ─── CARTE DOULEURS (zones — données sensibles) ───────────────────────────────
+
+export async function upsertClientPainNote(
+  clientId: string,
+  regionKey: string,
+  note: string
+) {
+  const user = await getCurrentUser()
+  if (!user) throw new Error("Unauthorized")
+
+  const client = await prisma.client.findFirst({
+    where: { id: clientId, coachId: user.id },
+    select: { isDemo: true },
+  })
+  if (!client) throw new Error("Client introuvable")
+  if (client.isDemo) {
+    throw new Error(
+      "La carte des douleurs ne peut pas être enregistrée pour le client de démonstration."
+    )
+  }
+
+  const trimmed = note.trim()
+  if (!trimmed) {
+    await prisma.clientPainNote.deleteMany({
+      where: { clientId, regionKey },
+    })
+  } else {
+    await prisma.clientPainNote.upsert({
+      where: {
+        clientId_regionKey: { clientId, regionKey },
+      },
+      create: {
+        clientId,
+        coachId: user.id,
+        regionKey,
+        note: trimmed,
+      },
+      update: { note: trimmed },
+    })
+  }
+
+  revalidatePath(`/dashboard/clients/${clientId}`)
+}

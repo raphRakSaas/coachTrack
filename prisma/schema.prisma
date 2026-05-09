@@ -20,14 +20,16 @@ model User {
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 
-  clients       Client[]
-  programs      Program[]
-  sessions      Session[]
-  exercises     Exercise[]
-  subscription  Subscription?
-  measurements  BodyMeasurement[]
-  clientNotes   ClientNote[]
-  trackingItems TrackingItem[]
+  clients             Client[]
+  programs            Program[]
+  sessions            Session[]
+  exercises           Exercise[]
+  subscription        Subscription?
+  measurements        BodyMeasurement[]
+  clientNotes         ClientNote[]
+  trackingItems       TrackingItem[]
+  clientPainNotes     ClientPainNote[]
+  nutritionDayLogs    NutritionDayLog[]
 }
 
 // ─── CLIENT ──────────────────────────────────────────────────────────────────
@@ -185,10 +187,59 @@ model Client {
   programs      Program[]
   sessions      Session[]
   measurements  BodyMeasurement[]
-  clientNotes   ClientNote[]
-  trackingItems TrackingItem[]
+  clientNotes        ClientNote[]
+  trackingItems      TrackingItem[]
+  painNotes          ClientPainNote[]
+  nutritionDayLogs   NutritionDayLog[]
 
   @@index([coachId, isDemo])
+}
+
+// ─── DOULEURS (zones musculaires — données potentiellement sensibles) ────────
+
+model ClientPainNote {
+  id        String   @id @default(cuid())
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  coachId   String
+  coach     User     @relation(fields: [coachId], references: [id], onDelete: Cascade)
+
+  regionKey String
+  note      String   @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([clientId, regionKey])
+  @@index([coachId])
+}
+
+// ─── JOURNAL NUTRITION QUOTIDIEN (récap coach / client) ──────────────────────
+
+model NutritionDayLog {
+  id               String   @id @default(cuid())
+  clientId         String
+  client           Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  coachId          String
+  coach            User     @relation(fields: [coachId], references: [id], onDelete: Cascade)
+
+  /// Jour civil (sans heure significative — stockage à midi UTC recommandé côté app)
+  date             DateTime @db.Date
+  caloriesConsumed Int
+  proteinG         Float?
+  carbsG           Float?
+  fatG             Float?
+  waterL           Float?
+  breakfastKcal    Int?
+  lunchKcal        Int?
+  dinnerKcal       Int?
+  snackKcal        Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([clientId, date])
+  @@index([clientId])
 }
 
 // ─── NOTES CLIENT ─────────────────────────────────────────────────────────────

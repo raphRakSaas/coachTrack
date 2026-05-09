@@ -32,19 +32,82 @@ function daysAgo(days: number): Date {
   return date
 }
 
-function weeksAgoMondayWeekSessionOffsets(): { daysAgo: number; duration: number; rpe: number; mood: number; energy: number; notes: string }[] {
-  return [
-    { daysAgo: 4, duration: 50, rpe: 7, mood: 4, energy: 4, notes: "Full body — accent dos et posture." },
-    { daysAgo: 7, duration: 45, rpe: 6, mood: 5, energy: 4, notes: "Mobilité hanche + gainage." },
-    { daysAgo: 11, duration: 55, rpe: 8, mood: 4, energy: 3, notes: "Jambes — progression squat léger." },
-    { daysAgo: 14, duration: 48, rpe: 7, mood: 4, energy: 4, notes: "Haut du corps — tirages + rowing." },
-    { daysAgo: 18, duration: 40, rpe: 6, mood: 5, energy: 5, notes: "Cardio modéré + étirements." },
-    { daysAgo: 21, duration: 52, rpe: 7, mood: 4, energy: 4, notes: "Pattern hip hinge + fessiers." },
-    { daysAgo: 25, duration: 46, rpe: 6, mood: 4, energy: 4, notes: "Volume modéré, focus technique." },
-    { daysAgo: 28, duration: 50, rpe: 7, mood: 5, energy: 4, notes: "Circuit léger fin de semaine." },
-    { daysAgo: 35, duration: 45, rpe: 6, mood: 4, energy: 3, notes: "Séance récupération active." },
-    { daysAgo: 42, duration: 50, rpe: 7, mood: 4, energy: 4, notes: "Première séance du programme démo." },
+/** ~28 séances étalées sur ~3 mois (données fictives). */
+function buildDemoSessions(): {
+  daysAgo: number
+  duration: number
+  rpe: number
+  mood: number
+  energy: number
+  notes: string
+}[] {
+  const templates = [
+    "Full body — accent dos et posture.",
+    "Mobilité hanche + gainage.",
+    "Jambes — squat et fentes guidées.",
+    "Haut du corps — tirages et rowing.",
+    "Cardio modéré + étirements.",
+    "Hip hinge + renforcement fessiers.",
+    "Volume modéré, focus technique.",
+    "Circuit léger fin de semaine.",
+    "Récupération active — mobilité thoracique.",
+    "Split tirage / poussée.",
+    "Marche inclinée + core.",
+    "Conditionnement léger métabolique.",
   ]
+  const offsets = [
+    2, 4, 7, 9, 11, 14, 16, 18, 21, 23, 25, 28, 31, 34, 37, 40, 43, 46, 49,
+    52, 56, 60, 65, 70, 76, 82, 88, 95,
+  ]
+  return offsets.map((daysAgo, index) => ({
+    daysAgo,
+    duration: 40 + (index % 6) * 3,
+    rpe: 5 + (index % 5),
+    mood: 3 + (index % 3),
+    energy: 3 + (index % 3),
+    notes: templates[index % templates.length]!,
+  }))
+}
+
+/** Jour civil stable pour `@db.Date` (midi UTC). */
+function calendarDateDaysAgo(days: number): Date {
+  const date = new Date()
+  date.setUTCDate(date.getUTCDate() - days)
+  date.setUTCHours(12, 0, 0, 0)
+  return date
+}
+
+function demoNutritionDayLogs(
+  clientId: string,
+  coachId: string
+): Prisma.NutritionDayLogCreateManyInput[] {
+  const rows: Prisma.NutritionDayLogCreateManyInput[] = []
+  for (let index = 0; index < 21; index++) {
+    const breakfast = 380 + (index * 17) % 140
+    const lunch = 620 + (index * 23) % 220
+    const dinner = 520 + (index * 31) % 180
+    const snack = 90 + (index * 11) % 80
+    const caloriesConsumed = breakfast + lunch + dinner + snack
+    const proteinG = 62 + (index % 18)
+    const carbsG = 130 + (index % 40)
+    const fatG = 52 + (index % 15)
+    const waterL = 1.6 + (index % 10) * 0.09
+    rows.push({
+      clientId,
+      coachId,
+      date: calendarDateDaysAgo(index),
+      caloriesConsumed,
+      proteinG,
+      carbsG,
+      fatG,
+      waterL,
+      breakfastKcal: breakfast,
+      lunchKcal: lunch,
+      dinnerKcal: dinner,
+      snackKcal: snack,
+    })
+  }
+  return rows
 }
 
 function demoMeasurements(clientId: string, coachId: string): Prisma.BodyMeasurementCreateManyInput[] {
@@ -213,12 +276,14 @@ async function replaceDemoRelatedData(
   await tx.bodyMeasurement.deleteMany({ where: { clientId } })
   await tx.clientNote.deleteMany({ where: { clientId } })
   await tx.trackingItem.deleteMany({ where: { clientId } })
+  await tx.clientPainNote.deleteMany({ where: { clientId } })
+  await tx.nutritionDayLog.deleteMany({ where: { clientId } })
 
   await tx.bodyMeasurement.createMany({
     data: demoMeasurements(clientId, coachId),
   })
 
-  const sessionRows = weeksAgoMondayWeekSessionOffsets().map((session) => ({
+  const sessionRows = buildDemoSessions().map((session) => ({
     coachId,
     clientId,
     date: daysAgo(session.daysAgo),
@@ -229,6 +294,10 @@ async function replaceDemoRelatedData(
     energy: session.energy,
   }))
   await tx.session.createMany({ data: sessionRows })
+
+  await tx.nutritionDayLog.createMany({
+    data: demoNutritionDayLogs(clientId, coachId),
+  })
 
   const notes: Prisma.ClientNoteCreateManyInput[] = [
     {
@@ -299,6 +368,72 @@ async function replaceDemoRelatedData(
       frequency: "daily",
       isActive: true,
       lastAnsweredAt: daysAgo(2),
+    },
+    {
+      clientId,
+      coachId,
+      type: TrackingItemType.MESURE,
+      name: "Tour de taille hebdomadaire",
+      description: "Même jour, même horaire, debout.",
+      frequency: "weekly",
+      isActive: true,
+      lastAnsweredAt: daysAgo(5),
+    },
+    {
+      clientId,
+      coachId,
+      type: TrackingItemType.BILAN,
+      name: "Bilan nutrition — semaine type",
+      description: "Photo des repas + sensation de satiété.",
+      frequency: "weekly",
+      isActive: true,
+      lastAnsweredAt: daysAgo(10),
+    },
+    {
+      clientId,
+      coachId,
+      type: TrackingItemType.QUESTIONNAIRE,
+      name: "Qualité du sommeil (PSQI simplifié)",
+      frequency: "monthly",
+      isActive: true,
+      lastAnsweredAt: daysAgo(20),
+    },
+    {
+      clientId,
+      coachId,
+      type: TrackingItemType.HABITUDE,
+      name: "30 g de protéines au petit-déjeuner",
+      frequency: "daily",
+      isActive: true,
+      lastAnsweredAt: daysAgo(1),
+    },
+    {
+      clientId,
+      coachId,
+      type: TrackingItemType.HABITUDE,
+      name: "2 portions de légumes au déjeuner",
+      frequency: "daily",
+      isActive: true,
+      lastAnsweredAt: daysAgo(1),
+    },
+    {
+      clientId,
+      coachId,
+      type: TrackingItemType.HABITUDE,
+      name: "Limite écrans après 21 h",
+      frequency: "daily",
+      isActive: true,
+      lastAnsweredAt: daysAgo(3),
+    },
+    {
+      clientId,
+      coachId,
+      type: TrackingItemType.MESURE,
+      name: "Photos progression (mensuel)",
+      description: "Face / profil / dos.",
+      frequency: "monthly",
+      isActive: true,
+      lastAnsweredAt: daysAgo(30),
     },
   ]
   await tx.trackingItem.createMany({ data: tracking })
