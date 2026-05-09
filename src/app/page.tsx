@@ -1,225 +1,23 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import {
-  ArrowRight,
-  Check,
-  Star,
-  MessageSquare,
-  FileSpreadsheet,
-  BookOpen,
-} from "lucide-react";
+import Image from "next/image";
+import { ArrowRight, Check, Star, ChevronRight } from "lucide-react";
 import { Nav } from "@/components/marketing/nav";
+import { GlassStatCard } from "@/components/marketing/glass-stat-card";
+import { AnimateIn, StaggerChildren, StaggerItem } from "@/components/marketing/animate-in";
 
-// ─── Inline SVG illustrations ──────────────────────────────────────────────
-
-function IllustrationAnalytics() {
+// ─── Highlight wrapper for editorial key words ────────────────────────────
+function Accent({ children }: { children: React.ReactNode }) {
   return (
-    <svg viewBox="0 0 120 60" fill="none" className="w-full max-w-[160px]">
-      <rect x="0" y="40" width="16" height="20" rx="3" fill="rgba(139,92,246,0.3)" />
-      <rect x="22" y="28" width="16" height="32" rx="3" fill="rgba(139,92,246,0.45)" />
-      <rect x="44" y="18" width="16" height="42" rx="3" fill="rgba(139,92,246,0.6)" />
-      <rect x="66" y="10" width="16" height="50" rx="3" fill="rgba(139,92,246,0.75)" />
-      <rect x="88" y="4" width="16" height="56" rx="3" fill="#8b5cf6" />
-      <polyline
-        points="8,40 30,28 52,18 74,10 96,4"
-        stroke="#a78bfa"
-        strokeWidth="1.5"
-        strokeDasharray="3 2"
-        opacity="0.6"
-      />
-    </svg>
+    <em
+      className="not-italic font-[family-name:var(--font-display)]"
+      style={{ color: "var(--m-accent)" }}
+    >
+      {children}
+    </em>
   );
 }
-
-function IllustrationClients() {
-  return (
-    <svg viewBox="0 0 100 60" fill="none" className="w-full max-w-[140px]">
-      {[
-        { cx: 18, cy: 22 },
-        { cx: 50, cy: 15 },
-        { cx: 82, cy: 22 },
-      ].map(({ cx, cy }, i) => (
-        <g key={i}>
-          <circle cx={cx} cy={cy} r="10" fill="rgba(34,197,94,0.2)" stroke="rgba(34,197,94,0.5)" strokeWidth="1.5" />
-          <circle cx={cx} cy={cy - 3} r="4" fill="rgba(34,197,94,0.6)" />
-          <path
-            d={`M${cx - 8} ${cy + 10} Q${cx} ${cy + 4} ${cx + 8} ${cy + 10}`}
-            stroke="rgba(34,197,94,0.5)"
-            strokeWidth="1.5"
-            fill="none"
-          />
-        </g>
-      ))}
-      <line x1="28" y1="22" x2="40" y2="18" stroke="rgba(34,197,94,0.3)" strokeWidth="1" strokeDasharray="3 2" />
-      <line x1="60" y1="18" x2="72" y2="22" stroke="rgba(34,197,94,0.3)" strokeWidth="1" strokeDasharray="3 2" />
-      <rect x="8" y="44" width="84" height="1" rx="0.5" fill="rgba(255,255,255,0.06)" />
-      <rect x="20" y="48" width="60" height="8" rx="4" fill="rgba(34,197,94,0.1)" stroke="rgba(34,197,94,0.2)" strokeWidth="1" />
-      <text x="50" y="55" textAnchor="middle" fill="rgba(34,197,94,0.7)" fontSize="5" fontFamily="monospace">12 clients actifs</text>
-    </svg>
-  );
-}
-
-function IllustrationSessions() {
-  const days = ["L", "M", "M", "J", "V", "S", "D"];
-  const filled = [true, true, false, true, true, false, false];
-  return (
-    <svg viewBox="0 0 110 60" fill="none" className="w-full max-w-[150px]">
-      <rect x="2" y="2" width="106" height="56" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
-      {days.map((day, i) => (
-        <g key={i}>
-          <text
-            x={10 + i * 14}
-            y="16"
-            fill="rgba(255,255,255,0.3)"
-            fontSize="5"
-            textAnchor="middle"
-            fontFamily="monospace"
-          >
-            {day}
-          </text>
-          {filled[i] ? (
-            <rect
-              x={4 + i * 14}
-              y="22"
-              width="12"
-              height="28"
-              rx="3"
-              fill="rgba(139,92,246,0.6)"
-              stroke="rgba(139,92,246,0.8)"
-              strokeWidth="0.5"
-            />
-          ) : (
-            <rect
-              x={4 + i * 14}
-              y="22"
-              width="12"
-              height="28"
-              rx="3"
-              fill="rgba(255,255,255,0.04)"
-              stroke="rgba(255,255,255,0.06)"
-              strokeWidth="0.5"
-            />
-          )}
-        </g>
-      ))}
-    </svg>
-  );
-}
-
-function IllustrationProgrammes() {
-  return (
-    <svg viewBox="0 0 120 70" fill="none" className="w-full max-w-[160px]">
-      {[
-        { y: 6, w: 110, label: "Squat — 4×8 @ 80kg", accent: "#8b5cf6" },
-        { y: 24, w: 90, label: "Développé couché — 3×10", accent: "#7c3aed" },
-        { y: 42, w: 75, label: "Tractions — 3×max", accent: "#6d28d9" },
-      ].map(({ y, w, label, accent }, i) => (
-        <g key={i}>
-          <rect x="0" y={y} width={w} height="14" rx="4" fill={`${accent}22`} stroke={`${accent}55`} strokeWidth="1" />
-          <rect x="0" y={y} width="4" height="14" rx="2" fill={accent} />
-          <text x="10" y={y + 9} fill="rgba(255,255,255,0.6)" fontSize="5" fontFamily="monospace">{label}</text>
-        </g>
-      ))}
-      <circle cx="110" cy="60" r="8" fill="rgba(139,92,246,0.2)" stroke="rgba(139,92,246,0.4)" strokeWidth="1" />
-      <text x="110" y="63" textAnchor="middle" fill="#a78bfa" fontSize="7">+</text>
-    </svg>
-  );
-}
-
-function IllustrationExercices() {
-  return (
-    <svg viewBox="0 0 100 50" fill="none" className="w-full max-w-[140px]">
-      {/* Dumbbell */}
-      <rect x="5" y="21" width="12" height="8" rx="3" fill="rgba(251,191,36,0.4)" stroke="rgba(251,191,36,0.6)" strokeWidth="1" />
-      <rect x="17" y="18" width="8" height="14" rx="2" fill="rgba(251,191,36,0.6)" stroke="rgba(251,191,36,0.8)" strokeWidth="1" />
-      <rect x="25" y="23" width="50" height="4" rx="2" fill="rgba(251,191,36,0.3)" />
-      <rect x="75" y="18" width="8" height="14" rx="2" fill="rgba(251,191,36,0.6)" stroke="rgba(251,191,36,0.8)" strokeWidth="1" />
-      <rect x="83" y="21" width="12" height="8" rx="3" fill="rgba(251,191,36,0.4)" stroke="rgba(251,191,36,0.6)" strokeWidth="1" />
-      {/* Tag labels */}
-      <rect x="5" y="37" width="28" height="8" rx="3" fill="rgba(251,191,36,0.1)" stroke="rgba(251,191,36,0.2)" strokeWidth="0.5" />
-      <rect x="38" y="37" width="20" height="8" rx="3" fill="rgba(251,191,36,0.1)" stroke="rgba(251,191,36,0.2)" strokeWidth="0.5" />
-      <rect x="63" y="37" width="32" height="8" rx="3" fill="rgba(251,191,36,0.1)" stroke="rgba(251,191,36,0.2)" strokeWidth="0.5" />
-      <text x="19" y="43" textAnchor="middle" fill="rgba(251,191,36,0.6)" fontSize="4">Poitrine</text>
-      <text x="48" y="43" textAnchor="middle" fill="rgba(251,191,36,0.6)" fontSize="4">Dos</text>
-      <text x="79" y="43" textAnchor="middle" fill="rgba(251,191,36,0.6)" fontSize="4">Jambes</text>
-    </svg>
-  );
-}
-
-function IllustrationPaiements() {
-  return (
-    <svg viewBox="0 0 110 60" fill="none" className="w-full max-w-[150px]">
-      <rect x="0" y="8" width="110" height="44" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-      <rect x="0" y="8" width="110" height="16" rx="8" fill="rgba(16,185,129,0.15)" />
-      <rect x="0" y="16" width="110" height="8" fill="rgba(16,185,129,0.15)" />
-      <circle cx="14" cy="38" r="7" fill="rgba(16,185,129,0.3)" stroke="rgba(16,185,129,0.5)" strokeWidth="1" />
-      <circle cx="22" cy="38" r="7" fill="rgba(16,185,129,0.5)" stroke="rgba(16,185,129,0.7)" strokeWidth="1" />
-      <rect x="40" y="34" width="55" height="4" rx="2" fill="rgba(255,255,255,0.1)" />
-      <rect x="40" y="42" width="35" height="4" rx="2" fill="rgba(255,255,255,0.06)" />
-      <text x="55" y="16" textAnchor="middle" fill="rgba(16,185,129,0.8)" fontSize="5" fontFamily="monospace">29 € / mois</text>
-    </svg>
-  );
-}
-
-// ─── Feature cards data ────────────────────────────────────────────────────
-
-const features = [
-  {
-    tag: "Statistiques",
-    title: "Chaque progrès, visible en un coup d'œil",
-    description:
-      "Courbes de charge, records personnels, volume hebdomadaire. Vos clients voient leur évolution en temps réel — et ça les fait rester.",
-    colSpan: "lg:col-span-2",
-    accentColor: "#8b5cf6",
-    Illustration: IllustrationAnalytics,
-  },
-  {
-    tag: "Clients",
-    title: "Tous vos clients au même endroit",
-    description:
-      "Profil complet, objectifs, historique et programmes actifs. Accès en 10 secondes chrono.",
-    colSpan: "lg:col-span-1",
-    accentColor: "#22c55e",
-    Illustration: IllustrationClients,
-  },
-  {
-    tag: "Séances",
-    title: "Enregistrez une séance en moins de 2 min",
-    description:
-      "Interface rapide, pensée pour le terrain. Exercices, séries, poids — sans friction.",
-    colSpan: "lg:col-span-1",
-    accentColor: "#8b5cf6",
-    Illustration: IllustrationSessions,
-  },
-  {
-    tag: "Programmes",
-    title: "Créez et réutilisez vos programmes",
-    description:
-      "Construisez des plans d'entraînement structurés, assignez-les à vos clients, suivez leur exécution.",
-    colSpan: "lg:col-span-2",
-    accentColor: "#7c3aed",
-    Illustration: IllustrationProgrammes,
-  },
-  {
-    tag: "Exercices",
-    title: "Une bibliothèque complète et personnalisable",
-    description:
-      "Accédez à des centaines d'exercices globaux ou créez les vôtres. Organisés par muscle, matériel et difficulté.",
-    colSpan: "lg:col-span-1",
-    accentColor: "#fbbf24",
-    Illustration: IllustrationExercices,
-  },
-  {
-    tag: "Paiements",
-    title: "Gérez vos abonnements sereinement",
-    description:
-      "Plan FREE pour démarrer, plan Pro pour scaler. Aucune mauvaise surprise — juste de la clarté.",
-    colSpan: "lg:col-span-2",
-    accentColor: "#10b981",
-    Illustration: IllustrationPaiements,
-  },
-] as const;
 
 // ─── Page ─────────────────────────────────────────────────────────────────
 
@@ -228,681 +26,567 @@ export default async function LandingPage() {
   if (userId) redirect("/dashboard");
 
   return (
-    <div
-      className="min-h-screen overflow-x-hidden text-white"
-      style={{ background: "#070c14" }}
-    >
+    <div className="min-h-screen overflow-x-hidden" style={{ background: "var(--m-bg)", color: "var(--m-text)" }}>
       <Nav />
 
-      {/* ── HERO ───────────────────────────────────────────────────── */}
-      <section className="relative flex min-h-screen items-center px-6 pt-28 pb-20">
-        {/* Gradient mesh background */}
+      {/* ── HERO ─────────────────────────────────────────────────────────── */}
+      <section className="relative min-h-screen overflow-x-hidden px-6 pt-32 pb-28">
+        {/* Glow background */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div
-            className="absolute -top-40 -left-40 h-[600px] w-[600px] rounded-full opacity-30"
-            style={{
-              background:
-                "radial-gradient(circle, rgba(139,92,246,0.4) 0%, transparent 70%)",
-              filter: "blur(60px)",
-            }}
-          />
-          <div
-            className="absolute top-1/4 right-0 h-[500px] w-[500px] rounded-full opacity-20"
-            style={{
-              background:
-                "radial-gradient(circle, rgba(34,197,94,0.3) 0%, transparent 70%)",
-              filter: "blur(80px)",
-            }}
-          />
-          <div
-            className="absolute bottom-0 left-1/3 h-[400px] w-[400px] rounded-full opacity-15"
-            style={{
-              background:
-                "radial-gradient(circle, rgba(124,58,237,0.4) 0%, transparent 70%)",
-              filter: "blur(60px)",
-            }}
-          />
-          {/* Subtle grid */}
-          <div
-            className="absolute inset-0 opacity-[0.03]"
-            style={{
-              backgroundImage:
-                "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)",
-              backgroundSize: "60px 60px",
-            }}
-          />
+          <div className="absolute -top-20 left-0 h-[700px] w-[700px] rounded-full opacity-60"
+            style={{ background: "radial-gradient(circle, var(--m-glow-primary) 0%, transparent 65%)", filter: "blur(70px)" }} />
+          <div className="absolute top-1/2 right-0 h-[500px] w-[500px] rounded-full opacity-40"
+            style={{ background: "radial-gradient(circle, var(--m-glow-secondary) 0%, transparent 70%)", filter: "blur(80px)" }} />
+          <div className="revo-grain" aria-hidden />
         </div>
 
-        <div className="relative z-10 mx-auto w-full max-w-6xl">
-          <div className="max-w-3xl">
-            {/* Eyebrow */}
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-1.5"
-              style={{ borderColor: "rgba(139,92,246,0.3)", background: "rgba(139,92,246,0.1)" }}
-            >
-              <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ background: "#8b5cf6" }} />
-              <span className="text-sm font-medium" style={{ color: "#a78bfa" }}>
-                La plateforme pour coachs sportifs professionnels
-              </span>
-            </div>
+        <div className="relative z-10 mx-auto max-w-7xl">
+          <div className="grid items-center gap-4 lg:grid-cols-[1fr_480px]">
 
-            {/* Headline */}
-            <h1
-              className="text-6xl font-[family-name:var(--font-display)] font-bold leading-[1.05] tracking-tight lg:text-7xl"
-            >
-              Gérez moins.
-              <br />
-              <span
-                style={{
-                  background: "linear-gradient(135deg, #8b5cf6 0%, #a78bfa 40%, #22c55e 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}
-              >
-                Coachez plus.
-              </span>
-              <br />
-              Fidélisez davantage.
-            </h1>
+            {/* Text column */}
+            <div className="max-w-2xl">
+              <p className="revo-fade-up max-w-md text-sm leading-snug" style={{ color: "var(--m-text-muted)" }}>
+                <span className="font-semibold" style={{ color: "var(--m-accent)" }}>Revo</span>
+                {" "}— pour les coachs qui veulent arrêter de jongler entre WhatsApp, Excel et le carnet.
+              </p>
 
-            <p
-              className="mt-6 max-w-xl text-xl leading-relaxed"
-              style={{ color: "rgba(255,255,255,0.55)" }}
-            >
-              Revo centralise vos clients, programmes, séances et statistiques.
-              Fini WhatsApp et les carnets illisibles — vos clients voient leurs
-              progrès, et ils restent.
-            </p>
+              <h1 className="revo-fade-up anim-delay-100 mt-6 font-[family-name:var(--font-display)] font-bold leading-[0.97] tracking-tight"
+                style={{ fontSize: "clamp(3rem, 6.5vw, 5rem)" }}>
+                Gérez moins.
+                <br />
+                <span style={{ color: "var(--m-accent)" }}>Coachez plus.</span>
+                <br />
+                <span style={{ color: "var(--m-text-muted)" }}>Fidélisez davantage.</span>
+              </h1>
 
-            <div className="mt-10 flex flex-wrap items-center gap-4">
-              <Link
-                href="/sign-up"
-                className="inline-flex items-center gap-2 rounded-xl px-7 py-3.5 text-base font-semibold text-white shadow-lg transition-all hover:opacity-90"
-                style={{
-                  background: "linear-gradient(135deg, #7c3aed, #8b5cf6)",
-                  boxShadow: "0 8px 32px rgba(139,92,246,0.35)",
-                }}
-              >
-                Créer mon compte coach
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                href="#fonctionnalites"
-                className="inline-flex items-center gap-2 rounded-xl border px-7 py-3.5 text-base font-semibold transition-all hover:opacity-80"
-                style={{
-                  borderColor: "rgba(255,255,255,0.12)",
-                  background: "rgba(255,255,255,0.05)",
-                  color: "rgba(255,255,255,0.75)",
-                }}
-              >
-                Découvrir les fonctionnalités
-              </Link>
-            </div>
+              <p className="revo-fade-up anim-delay-200 mt-7 max-w-lg text-[1.05rem] leading-[1.65]" style={{ color: "var(--m-text-muted)" }}>
+                Un seul endroit pour vos clients, vos programmes et vos séances.
+                Quand la progression est visible, les gens reviennent — point.
+              </p>
 
-            <p className="mt-5 text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>
-              Gratuit pour commencer · Sans carte bancaire · Opérationnel en 2 min
-            </p>
-          </div>
-
-          {/* Floating stat cards */}
-          <div className="absolute bottom-16 right-6 hidden flex-col gap-3 lg:flex">
-            <div
-              className="flex items-center gap-4 rounded-2xl border px-5 py-4"
-              style={{
-                background: "rgba(255,255,255,0.04)",
-                borderColor: "rgba(255,255,255,0.08)",
-                backdropFilter: "blur(12px)",
-              }}
-            >
-              <span className="text-2xl font-[family-name:var(--font-display)] font-bold" style={{ color: "#a78bfa" }}>
-                +34%
-              </span>
-              <div>
-                <p className="text-sm font-semibold text-white">Rétention clients</p>
-                <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
-                  vs suivi sur WhatsApp
-                </p>
+              {/* CTAs */}
+              <div className="revo-fade-up anim-delay-300 mt-9 flex flex-wrap items-center gap-4">
+                <Link href="/sign-up"
+                  className="inline-flex items-center gap-2 rounded-xl px-7 py-3.5 text-base font-semibold text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  style={{ background: "linear-gradient(135deg, var(--m-accent), var(--m-accent-mid))", boxShadow: "0 8px 32px var(--m-glow-primary)" }}>
+                  Créer mon compte coach
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link href="/fonctionnalites"
+                  className="inline-flex items-center gap-1.5 text-base font-medium transition-opacity hover:opacity-70"
+                  style={{ color: "var(--m-text-muted)" }}>
+                  Voir les fonctionnalités
+                  <ChevronRight className="h-4 w-4" />
+                </Link>
               </div>
-            </div>
-            <div
-              className="flex items-center gap-3 rounded-2xl border px-5 py-4"
-              style={{
-                background: "rgba(255,255,255,0.04)",
-                borderColor: "rgba(255,255,255,0.08)",
-                backdropFilter: "blur(12px)",
-              }}
-            >
-              <div className="flex -space-x-2">
-                {["#8b5cf6", "#22c55e", "#f59e0b"].map((color) => (
-                  <div
-                    key={color}
-                    className="h-7 w-7 rounded-full border-2"
-                    style={{ background: color, borderColor: "#070c14" }}
-                  />
+
+              <p className="revo-fade-up anim-delay-400 mt-5 text-xs" style={{ color: "var(--m-text-faint)" }}>
+                Gratuit pour commencer · Sans carte bancaire · Opérationnel en 2 min
+              </p>
+
+              {/* Stats mobile — sur desktop elles sont sur la mascotte */}
+              <div className="revo-fade-up anim-delay-500 mt-10 flex flex-wrap gap-3 border-t pt-8 lg:hidden" style={{ borderColor: "var(--m-border)" }}>
+                {[
+                  { val: "+34%", sub: "vs chaos WhatsApp", label: "Rétention" },
+                  { val: "30 min", sub: "/ semaine", label: "Temps gagné" },
+                  { val: "320+", sub: "coachs", label: "Sur Revo" },
+                ].map(({ val, sub, label }) => (
+                  <div key={label} className="revo-glass min-w-[140px] flex-1 px-4 py-3">
+                    <p className="revo-glass-label">{label}</p>
+                    <p className="revo-glass-value text-2xl">{val}</p>
+                    <p className="revo-glass-sub text-[11px]">{sub}</p>
+                  </div>
                 ))}
               </div>
-              <div>
-                <p className="text-sm font-semibold text-white">Clients fidélisés</p>
-                <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
-                  Ils voient leurs progrès
-                </p>
-              </div>
             </div>
-            <div
-              className="flex items-center gap-4 rounded-2xl border px-5 py-4"
-              style={{
-                background: "rgba(34,197,94,0.06)",
-                borderColor: "rgba(34,197,94,0.15)",
-                backdropFilter: "blur(12px)",
-              }}
-            >
-              <span className="text-2xl font-[family-name:var(--font-display)] font-bold" style={{ color: "#22c55e" }}>
-                30 min
-              </span>
-              <div>
-                <p className="text-sm font-semibold text-white">Économisées / semaine</p>
-                <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
-                  en tâches administratives
-                </p>
-              </div>
+
+            {/* Mascotte + cartes vitrées superposées */}
+            <div className="relative mx-auto hidden min-h-[480px] w-full max-w-[520px] lg:block">
+              <Image
+                src="/revo-mascot-green.png"
+                alt="Revo mascotte"
+                width={520}
+                height={520}
+                className="relative z-0 mx-auto object-contain revo-float revo-fade-in anim-delay-300 drop-shadow-[0_25px_60px_rgba(0,0,0,0.25)]"
+                priority
+              />
+              <GlassStatCard
+                className="absolute left-[13%] top-[10%] z-10 w-[min(235px,54%)]"
+                straddle="left"
+                rotateDeg={-2.5}
+              >
+                <p className="revo-glass-label">Rétention</p>
+                <p className="revo-glass-value text-3xl">+34%</p>
+                <p className="revo-glass-sub mt-0.5">vs suivi WhatsApp / carnet</p>
+              </GlassStatCard>
+              <GlassStatCard
+                className="absolute right-[13%] top-[38%] z-10 w-[min(215px,50%)]"
+                straddle="right"
+                rotateDeg={3}
+              >
+                <p className="revo-glass-label">Admin</p>
+                <p className="revo-glass-value text-3xl">30 min</p>
+                <p className="revo-glass-sub mt-0.5">économisées par semaine</p>
+              </GlassStatCard>
+              <GlassStatCard
+                className="absolute bottom-[12%] left-1/2 z-10 w-[min(260px,62%)]"
+                straddle="bottom-center"
+                rotateDeg={-1}
+              >
+                <div className="mb-2 flex items-center gap-2">
+                  <div className="flex -space-x-2">
+                    {["#059669", "#0d9488", "#6366f1"].map((hex) => (
+                      <span key={hex} className="h-7 w-7 rounded-full border-2 border-white/90 shadow-sm dark:border-slate-700" style={{ background: hex }} />
+                    ))}
+                  </div>
+                  <span className="text-xs font-semibold text-[var(--revo-glass-muted)]">Coachs actifs</span>
+                </div>
+                <p className="revo-glass-value-neutral text-2xl">320+</p>
+                <p className="revo-glass-sub">sur la plateforme</p>
+              </GlassStatCard>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── SOCIAL PROOF STRIP ─────────────────────────────────────── */}
-      <div
-        className="border-y px-6 py-5"
-        style={{
-          borderColor: "rgba(255,255,255,0.06)",
-          background: "rgba(255,255,255,0.02)",
-        }}
-      >
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-6 overflow-hidden">
-          <p className="text-sm whitespace-nowrap" style={{ color: "rgba(255,255,255,0.35)" }}>
-            Rejoignez les coachs qui font confiance à Revo
-          </p>
-          <div className="flex items-center gap-8">
-            {[
-              { label: "Clients gérés", value: "2 400+" },
-              { label: "Séances enregistrées", value: "18 000+" },
-              { label: "Coachs actifs", value: "320+" },
-            ].map(({ label, value }) => (
-              <div key={label} className="text-center">
-                <p className="text-base font-[family-name:var(--font-display)] font-bold text-white">
-                  {value}
-                </p>
-                <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
-                  {label}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* ── PROBLEM ────────────────────────────────────────────────── */}
-      <section id="probleme" className="px-6 py-28">
+      {/* ── PROBLEM — Editorial numbered list ────────────────────────────── */}
+      <section className="px-6 py-24" style={{ borderTop: "1px solid var(--m-border)" }}>
         <div className="mx-auto max-w-5xl">
-          <div className="mb-16 text-center">
-            <p
-              className="mb-3 text-sm font-semibold uppercase tracking-widest"
-              style={{ color: "#8b5cf6" }}
-            >
-              Soyons honnêtes
-            </p>
-            <h2 className="text-5xl font-[family-name:var(--font-display)] font-bold tracking-tight">
-              Tu te reconnais ?
+          <AnimateIn>
+            <p className="text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "var(--m-accent)" }}>Le constat</p>
+            <h2 className="mt-4 font-[family-name:var(--font-display)] text-5xl font-bold tracking-tight" style={{ color: "var(--m-text)" }}>
+              Tu te reconnais<br />dans l&apos;un de ces scénarios ?
             </h2>
-          </div>
+          </AnimateIn>
 
-          <div className="grid gap-5 sm:grid-cols-3">
+          <div className="mt-16 space-y-0">
             {[
               {
-                icon: MessageSquare,
+                num: "01",
                 title: "Le suivi sur WhatsApp",
-                description:
-                  "Tes notes de séance sont éparpillées dans des conversations. Retrouver ce qu'a fait un client il y a 3 semaines prend 10 minutes.",
-                accent: "#ef4444",
+                desc: "Tes notes de séance sont éparpillées dans des conversations. Retrouver ce qu'a fait un client il y a trois semaines prend dix minutes.",
               },
               {
-                icon: FileSpreadsheet,
+                num: "02",
                 title: "Le tableau Excel ingérable",
-                description:
-                  "Illisible au 5ème client. Tu as arrêté de le mettre à jour. Et ton client ne voit toujours pas ses résultats.",
-                accent: "#f97316",
+                desc: "Illisible au cinquième client. Tu as arrêté de le mettre à jour. Et ton client ne voit toujours pas sa progression.",
               },
               {
-                icon: BookOpen,
+                num: "03",
                 title: "Le carnet papier",
-                description:
-                  "Pratique sur le moment, inutile à distance. Impossible de montrer une courbe de progression. Ton client repart sans voir ses progrès.",
-                accent: "#eab308",
+                desc: "Pratique sur le moment, inutile à distance. Impossible de montrer une courbe de progression — ton client repart sans preuve de ses efforts.",
               },
-            ].map(({ icon: Icon, title, description, accent }) => (
-              <div
-                key={title}
-                className="rounded-3xl border p-7"
-                style={{
-                  background: "rgba(255,255,255,0.03)",
-                  borderColor: "rgba(255,255,255,0.07)",
-                }}
-              >
-                <div
-                  className="mb-5 inline-flex h-10 w-10 items-center justify-center rounded-xl"
-                  style={{ background: `${accent}18` }}
-                >
-                  <Icon className="h-5 w-5" style={{ color: accent }} strokeWidth={1.5} />
+            ].map(({ num, title, desc }) => (
+              <AnimateIn key={num} direction="left">
+                <div className="grid grid-cols-[80px_1fr] gap-8 border-b py-10 sm:grid-cols-[120px_1fr]"
+                  style={{ borderColor: "var(--m-border)" }}>
+                  <span className="font-[family-name:var(--font-display)] text-6xl font-bold leading-none sm:text-7xl"
+                    style={{ color: "var(--m-text-faint)", opacity: 0.35 }}>
+                    {num}
+                  </span>
+                  <div className="flex flex-col justify-center">
+                    <h3 className="text-xl font-bold" style={{ color: "var(--m-text)" }}>{title}</h3>
+                    <p className="mt-2 max-w-2xl text-base leading-relaxed" style={{ color: "var(--m-text-muted)" }}>{desc}</p>
+                  </div>
                 </div>
-                <h3 className="mb-2 text-base font-bold text-white">{title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
-                  {description}
-                </p>
-              </div>
+              </AnimateIn>
             ))}
           </div>
 
-          <div
-            className="mt-10 rounded-3xl border px-10 py-8 text-center"
-            style={{
-              background: "rgba(139,92,246,0.06)",
-              borderColor: "rgba(139,92,246,0.2)",
-            }}
-          >
-            <p className="text-xl font-bold text-white">
-              Le vrai problème : tes clients ne{" "}
-              <span style={{ color: "#a78bfa" }}>voient pas</span> leurs progrès.
+          {/* Conclusion punchy */}
+          <AnimateIn delay={0.2} className="mt-14">
+            <p className="max-w-3xl text-2xl font-semibold leading-relaxed" style={{ color: "var(--m-text)" }}>
+              Quand un client ne <Accent>voit pas</Accent> ses progrès, il doute, il décroche, il annule.
+              Pas parce que tu es un mauvais coach — parce qu&apos;il n&apos;a pas de preuves.
             </p>
-            <p className="mt-3 text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
-              Quand un client ne perçoit pas son évolution, il doute, il décroche, il annule. Pas parce que
-              tu es un mauvais coach — parce qu&apos;il n&apos;a pas de preuves de ses efforts.
-            </p>
+          </AnimateIn>
+        </div>
+      </section>
+
+      {/* ── BREAK — Coaching mascot + Quote ────────────────────────────── */}
+      <section className="overflow-x-hidden" style={{ background: "var(--m-bg-section)" }}>
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="grid items-center gap-12 lg:grid-cols-2">
+            <AnimateIn direction="left">
+              <div className="relative mx-auto max-w-[460px]">
+                <Image
+                  src="/revo-mascot-coach.png"
+                  alt="Coach Revo"
+                  width={460}
+                  height={460}
+                  className="relative z-0 mx-auto object-contain revo-float drop-shadow-2xl"
+                />
+                <GlassStatCard
+                  className="absolute right-[11%] top-[11%] z-10 hidden w-[min(218px,54%)] sm:block"
+                  straddle="right"
+                  rotateDeg={2.5}
+                >
+                  <p className="revo-glass-label">Séances planifiées</p>
+                  <p className="revo-glass-value text-2xl">127</p>
+                  <p className="revo-glass-sub">cette semaine (exemple)</p>
+                </GlassStatCard>
+                <GlassStatCard
+                  className="absolute left-[11%] bottom-[22%] z-10 hidden w-[min(225px,56%)] sm:block"
+                  straddle="left"
+                  rotateDeg={-2}
+                >
+                  <p className="revo-glass-label">Clients suivis</p>
+                  <p className="revo-glass-value-neutral text-2xl">24</p>
+                  <p className="revo-glass-sub">profils à jour</p>
+                </GlassStatCard>
+              </div>
+            </AnimateIn>
+            <AnimateIn direction="right">
+              <p className="text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "var(--m-accent)" }}>La solution</p>
+              <h2 className="mt-4 font-[family-name:var(--font-display)] text-4xl font-bold leading-tight tracking-tight sm:text-5xl" style={{ color: "var(--m-text)" }}>
+                Revo rend chaque progrès{" "}
+                <Accent>visible</Accent>
+                {" "}en temps réel.
+              </h2>
+              <p className="mt-5 text-lg leading-relaxed" style={{ color: "var(--m-text-muted)" }}>
+                Chaque séance enregistrée, chaque record noté. Votre client voit qu&apos;il soulève
+                20% de plus qu&apos;il y a deux mois. Cette preuve concrète, c&apos;est ce qui le fait revenir.
+              </p>
+              <div className="mt-8 space-y-3">
+                {[
+                  "Courbes de charge et records personnels automatiques",
+                  "Programmes structurés assignés à chaque client",
+                  "Séances enregistrées en moins de 2 minutes",
+                  "Tout centralisé — fini les carnets et tableaux Excel",
+                ].map((point) => (
+                  <div key={point} className="flex items-start gap-3">
+                    <Check className="mt-0.5 h-4 w-4 flex-shrink-0" style={{ color: "var(--m-accent)" }} strokeWidth={2.5} />
+                    <p className="text-sm leading-relaxed" style={{ color: "var(--m-text-muted)" }}>{point}</p>
+                  </div>
+                ))}
+              </div>
+              <Link href="/fonctionnalites"
+                className="mt-8 inline-flex items-center gap-2 text-sm font-semibold transition-opacity hover:opacity-70"
+                style={{ color: "var(--m-accent)" }}>
+                Voir toutes les fonctionnalités <ChevronRight className="h-4 w-4" />
+              </Link>
+            </AnimateIn>
           </div>
         </div>
       </section>
 
-      {/* ── FEATURES BENTO ─────────────────────────────────────────── */}
-      <section id="fonctionnalites" className="px-6 py-28">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-16">
-            <p
-              className="mb-3 text-sm font-semibold uppercase tracking-widest"
-              style={{ color: "#8b5cf6" }}
-            >
-              Fonctionnalités
-            </p>
-            <h2 className="max-w-2xl text-5xl font-[family-name:var(--font-display)] font-bold tracking-tight">
-              Tout ce qu&apos;il vous faut,
-              <br />
-              au même endroit.
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-            {features.map(({ tag, title, description, colSpan, accentColor, Illustration }) => (
-              <div
-                key={tag}
-                className={`${colSpan} rounded-3xl border p-7 transition-all hover:border-opacity-50`}
-                style={{
-                  background: "rgba(255,255,255,0.03)",
-                  borderColor: "rgba(255,255,255,0.07)",
-                }}
-              >
-                <span
-                  className="mb-4 inline-block rounded-full px-3 py-1 text-xs font-semibold"
-                  style={{
-                    background: `${accentColor}18`,
-                    color: accentColor,
-                  }}
-                >
-                  {tag}
-                </span>
-                <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
-                  {description}
-                </p>
-                <div className="mt-6">
-                  <Illustration />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── HOW IT WORKS ───────────────────────────────────────────── */}
-      <section id="comment" className="px-6 py-28">
-        <div
-          className="mx-auto max-w-5xl rounded-3xl border px-10 py-16"
-          style={{
-            background: "rgba(255,255,255,0.02)",
-            borderColor: "rgba(255,255,255,0.07)",
-          }}
-        >
-          <div className="mb-16 text-center">
-            <p
-              className="mb-3 text-sm font-semibold uppercase tracking-widest"
-              style={{ color: "#8b5cf6" }}
-            >
-              Comment ça marche
-            </p>
-            <h2 className="text-5xl font-[family-name:var(--font-display)] font-bold tracking-tight">
-              Opérationnel en 3 étapes.
-            </h2>
-          </div>
-
-          <div className="relative grid gap-10 sm:grid-cols-3">
-            <div
-              className="absolute top-7 left-[16.5%] right-[16.5%] hidden h-px sm:block"
-              style={{
-                background:
-                  "linear-gradient(90deg, transparent, rgba(139,92,246,0.3), rgba(139,92,246,0.3), transparent)",
-              }}
-            />
-            {[
-              {
-                number: "01",
-                title: "Créez votre compte",
-                description: "2 minutes. Gratuit. Sans carte bancaire. Vous êtes opérationnel immédiatement.",
-              },
-              {
-                number: "02",
-                title: "Ajoutez votre premier client",
-                description: "Prénom, objectif, niveau. L'onboarding vous guide pas à pas dès l'inscription.",
-              },
-              {
-                number: "03",
-                title: "Enregistrez la première séance",
-                description: "Exercices, séries, poids. Votre client voit ses résultats dès la fin de la séance.",
-              },
-            ].map(({ number, title, description }) => (
-              <div key={number} className="relative text-center">
-                <div
-                  className="relative z-10 mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border text-lg font-[family-name:var(--font-display)] font-bold"
-                  style={{
-                    background: "rgba(139,92,246,0.1)",
-                    borderColor: "rgba(139,92,246,0.3)",
-                    color: "#a78bfa",
-                  }}
-                >
-                  {number}
-                </div>
-                <h3 className="text-base font-bold text-white">{title}</h3>
-                <p className="mt-2 text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
-                  {description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── TESTIMONIALS ───────────────────────────────────────────── */}
-      <section className="px-6 py-28">
+      {/* ── KEY FEATURES — Editorial rows ────────────────────────────────── */}
+      <section id="fonctionnalites" className="px-6 py-24">
         <div className="mx-auto max-w-5xl">
-          <div className="mb-16 text-center">
-            <p
-              className="mb-3 text-sm font-semibold uppercase tracking-widest"
-              style={{ color: "#8b5cf6" }}
-            >
-              Témoignages
-            </p>
-            <h2 className="text-5xl font-[family-name:var(--font-display)] font-bold tracking-tight">
-              Ils ont fait le saut.
-            </h2>
-          </div>
+          <AnimateIn>
+            <p className="text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "var(--m-accent)" }}>Fonctionnalités</p>
+          </AnimateIn>
 
-          <div className="grid gap-5 sm:grid-cols-2">
+          {/* Feature 1 */}
+          <AnimateIn className="mt-20 grid items-center gap-12 border-b pb-20 lg:grid-cols-2" style={{ borderColor: "var(--m-border)" }}>
+            <div>
+              <p className="font-[family-name:var(--font-display)] text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--m-text-faint)" }}>
+                Gestion clients
+              </p>
+              <h2 className="mt-4 font-[family-name:var(--font-display)] text-4xl font-bold tracking-tight leading-tight" style={{ color: "var(--m-text)" }}>
+                Tous vos clients,<br />
+                <Accent>en 10 secondes</Accent>.
+              </h2>
+              <p className="mt-4 text-base leading-relaxed" style={{ color: "var(--m-text-muted)" }}>
+                Profil complet, objectifs, historique de séances et programmes actifs.
+                Plus de "attends je cherche" devant votre client.
+              </p>
+            </div>
+            {/* Mini UI mockup */}
+            <div className="rounded-2xl border p-6" style={{ background: "var(--m-bg-card)", borderColor: "var(--m-border)" }}>
+              <p className="mb-4 text-xs font-bold uppercase tracking-widest" style={{ color: "var(--m-text-faint)" }}>Vos clients</p>
+              {[
+                { name: "Marc Dupont", sessions: 18, prog: "Push/Pull/Legs" },
+                { name: "Sophie R.", sessions: 31, prog: "Full body x3" },
+                { name: "Thomas B.", sessions: 9, prog: "Débutant" },
+              ].map(({ name, sessions, prog }) => (
+                <div key={name} className="mb-3 flex items-center gap-3 rounded-xl px-4 py-3"
+                  style={{ background: "var(--m-bg-section)" }}>
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                    style={{ background: "linear-gradient(135deg, var(--m-accent), var(--m-accent-mid))" }}>
+                    {name[0]}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold truncate" style={{ color: "var(--m-text)" }}>{name}</p>
+                    <p className="text-xs truncate" style={{ color: "var(--m-text-faint)" }}>{prog}</p>
+                  </div>
+                  <span className="text-xs font-bold" style={{ color: "var(--m-accent)" }}>{sessions} séances</span>
+                </div>
+              ))}
+            </div>
+          </AnimateIn>
+
+          {/* Feature 2 */}
+          <AnimateIn className="mt-20 grid items-center gap-12 border-b pb-20 lg:grid-cols-2" style={{ borderColor: "var(--m-border)" }}>
+            {/* Mini chart */}
+            <div className="order-last lg:order-first rounded-2xl border p-6" style={{ background: "var(--m-bg-card)", borderColor: "var(--m-border)" }}>
+              <p className="mb-2 text-xs font-bold uppercase tracking-widest" style={{ color: "var(--m-text-faint)" }}>Squat — Progression 3 mois</p>
+              <div className="flex items-end gap-1.5 h-28 mt-4">
+                {[60, 65, 65, 70, 72, 75, 75, 80, 82, 85, 92, 100].map((val, i) => (
+                  <div key={i} className="flex-1 rounded-sm transition-all"
+                    style={{ height: `${(val / 100) * 100}%`, background: `rgba(34,197,94,${0.25 + i * 0.06})` }} />
+                ))}
+              </div>
+              <div className="mt-4 flex items-center justify-between">
+                <span className="text-xs" style={{ color: "var(--m-text-faint)" }}>Mars</span>
+                <div className="rounded-full px-3 py-1 text-xs font-bold" style={{ background: "rgba(34,197,94,0.15)", color: "var(--m-accent)" }}>
+                  +67% en 3 mois
+                </div>
+                <span className="text-xs" style={{ color: "var(--m-text-faint)" }}>Mai</span>
+              </div>
+            </div>
+            <div>
+              <p className="font-[family-name:var(--font-display)] text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--m-text-faint)" }}>
+                Statistiques
+              </p>
+              <h2 className="mt-4 font-[family-name:var(--font-display)] text-4xl font-bold tracking-tight leading-tight" style={{ color: "var(--m-text)" }}>
+                Chaque progrès,<br />
+                <Accent>visible</Accent>{" "}et partageable.
+              </h2>
+              <p className="mt-4 text-base leading-relaxed" style={{ color: "var(--m-text-muted)" }}>
+                Courbes de charge, records personnels, volume hebdomadaire.
+                Montrez à vos clients des preuves concrètes — c&apos;est ce qui les fait rester.
+              </p>
+            </div>
+          </AnimateIn>
+
+          {/* Feature 3 */}
+          <AnimateIn className="mt-20 grid items-center gap-12 lg:grid-cols-2" style={{ borderColor: "var(--m-border)" }}>
+            <div>
+              <p className="font-[family-name:var(--font-display)] text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--m-text-faint)" }}>
+                Séances
+              </p>
+              <h2 className="mt-4 font-[family-name:var(--font-display)] text-4xl font-bold tracking-tight leading-tight" style={{ color: "var(--m-text)" }}>
+                Enregistrée en{" "}
+                <Accent>2 minutes</Accent>.<br />Chrono.
+              </h2>
+              <p className="mt-4 text-base leading-relaxed" style={{ color: "var(--m-text-muted)" }}>
+                Interface pensée pour le terrain. Exercices, séries, poids — sans friction.
+                Pendant ou juste après la séance, tout est sauvegardé en quelques taps.
+              </p>
+              <Link href="/fonctionnalites" className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold transition-opacity hover:opacity-70"
+                style={{ color: "var(--m-accent)" }}>
+                Voir toutes les fonctionnalités <ChevronRight className="h-4 w-4" />
+              </Link>
+            </div>
+            <div className="rounded-2xl border p-6" style={{ background: "var(--m-bg-card)", borderColor: "var(--m-border)" }}>
+              <p className="mb-4 text-xs font-bold uppercase tracking-widest" style={{ color: "var(--m-text-faint)" }}>Séance · Lundi 6 mai</p>
+              {[
+                { exercise: "Squat", sets: "4×8", weight: "100 kg", pr: true },
+                { exercise: "Leg press", sets: "3×12", weight: "160 kg", pr: false },
+                { exercise: "Fentes marchées", sets: "3×10", weight: "20 kg", pr: false },
+              ].map(({ exercise, sets, weight, pr }) => (
+                <div key={exercise} className="mb-3 flex items-center justify-between rounded-xl px-4 py-3"
+                  style={{ background: "var(--m-bg-section)" }}>
+                  <div>
+                    <p className="text-sm font-semibold" style={{ color: "var(--m-text)" }}>{exercise}</p>
+                    <p className="text-xs" style={{ color: "var(--m-text-faint)" }}>{sets} · {weight}</p>
+                  </div>
+                  {pr && (
+                    <div className="rounded-full px-2 py-0.5 text-xs font-bold" style={{ background: "rgba(34,197,94,0.15)", color: "var(--m-accent)" }}>
+                      Record perso
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </AnimateIn>
+        </div>
+      </section>
+
+      {/* ── TESTIMONIALS — No card boxes, just quotes ─────────────────────── */}
+      <section className="px-6 py-24" style={{ background: "var(--m-bg-section)" }}>
+        <div className="mx-auto max-w-5xl">
+          <AnimateIn>
+            <p className="text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "var(--m-accent)" }}>Témoignages</p>
+          </AnimateIn>
+
+          <StaggerChildren className="mt-12 grid gap-16 lg:grid-cols-2">
             {[
               {
-                quote:
-                  "Avant Revo, je perdais 30 min par client juste à retrouver ses anciens programmes. Maintenant j'arrive en séance, j'ouvre l'appli, tout est là. Deux clients ont pris un abonnement annuel après avoir vu leurs courbes.",
-                name: "Marc L.",
-                role: "Personal trainer indépendant · 18 clients actifs",
-                initial: "M",
-                accent: "#8b5cf6",
+                quote: "Avant Revo, je perdais 30 min par client juste à retrouver ses anciens programmes. Maintenant tout est là. Deux clients ont pris un abonnement annuel après avoir vu leurs courbes.",
+                name: "Marc L.", role: "Personal trainer · 18 clients actifs",
               },
               {
-                quote:
-                  "J'avais essayé 4 applications différentes. Revo est la seule qui comprend vraiment le workflow d'un coach. La bibliothèque d'exercices + les programmes + le suivi client — tout est cohérent.",
-                name: "Sophie R.",
-                role: "Coach sportif en salle · 31 clients",
-                initial: "S",
-                accent: "#22c55e",
+                quote: "J'avais essayé 4 applications différentes. Revo est la seule qui comprend vraiment le workflow d'un coach. La bibliothèque d'exercices, les programmes, le suivi — tout est cohérent.",
+                name: "Sophie R.", role: "Coach sportif en salle · 31 clients",
               },
-            ].map(({ quote, name, role, initial, accent }) => (
-              <div
-                key={name}
-                className="rounded-3xl border p-8"
-                style={{
-                  background: "rgba(255,255,255,0.03)",
-                  borderColor: "rgba(255,255,255,0.07)",
-                }}
-              >
-                <div className="mb-5 flex gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
-                  ))}
+            ].map(({ quote, name, role }) => (
+              <StaggerItem key={name}>
+                <div className="flex gap-1 mb-4">
+                  {[...Array(5)].map((_, i) => <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />)}
                 </div>
-                <blockquote
-                  className="text-base leading-relaxed"
-                  style={{ color: "rgba(255,255,255,0.7)" }}
-                >
-                  &ldquo;{quote}&rdquo;
+                {/* Large opening quote mark */}
+                <p className="font-[family-name:var(--font-display)] text-6xl font-bold leading-none -mb-3" style={{ color: "var(--m-accent)", opacity: 0.4 }}>&ldquo;</p>
+                <blockquote className="text-lg leading-relaxed font-medium" style={{ color: "var(--m-text)" }}>
+                  {quote}
                 </blockquote>
                 <div className="mt-6 flex items-center gap-3">
-                  <div
-                    className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white"
-                    style={{ background: `${accent}30`, border: `1.5px solid ${accent}50` }}
-                  >
-                    {initial}
+                  <div className="h-10 w-10 rounded-full flex items-center justify-center text-sm font-bold text-white"
+                    style={{ background: "linear-gradient(135deg, var(--m-accent), var(--m-accent-mid))" }}>
+                    {name[0]}
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-white">{name}</p>
-                    <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
-                      {role}
-                    </p>
+                    <p className="text-sm font-bold" style={{ color: "var(--m-text)" }}>{name}</p>
+                    <p className="text-xs" style={{ color: "var(--m-text-faint)" }}>{role}</p>
                   </div>
                 </div>
-              </div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerChildren>
         </div>
       </section>
 
-      {/* ── PRICING ────────────────────────────────────────────────── */}
-      <section id="tarifs" className="px-6 py-28">
+      {/* ── PRICING ──────────────────────────────────────────────────────── */}
+      <section id="tarifs" className="px-6 py-24">
         <div className="mx-auto max-w-4xl">
-          <div className="mb-16 text-center">
-            <p
-              className="mb-3 text-sm font-semibold uppercase tracking-widest"
-              style={{ color: "#8b5cf6" }}
-            >
-              Tarifs
-            </p>
-            <h2 className="text-5xl font-[family-name:var(--font-display)] font-bold tracking-tight">
-              Commencez sans risque.
+          <AnimateIn>
+            <p className="text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "var(--m-accent)" }}>Tarifs</p>
+            <h2 className="mt-4 font-[family-name:var(--font-display)] text-5xl font-bold tracking-tight" style={{ color: "var(--m-text)" }}>
+              Commencez <Accent>sans risque</Accent>.
             </h2>
-            <p className="mt-4 text-lg" style={{ color: "rgba(255,255,255,0.45)" }}>
-              Gratuit pour démarrer. Payant seulement quand vous en avez vraiment besoin.
+            <p className="mt-4 text-lg" style={{ color: "var(--m-text-muted)" }}>
+              Gratuit pour démarrer. Payant seulement quand vous êtes prêt.
             </p>
-          </div>
+          </AnimateIn>
 
-          <div className="mx-auto grid max-w-2xl grid-cols-1 gap-5 sm:grid-cols-2">
-            {/* Free */}
-            <div
-              className="rounded-3xl border p-8"
-              style={{
-                background: "rgba(255,255,255,0.03)",
-                borderColor: "rgba(255,255,255,0.08)",
-              }}
-            >
-              <p
-                className="text-xs font-bold uppercase tracking-widest"
-                style={{ color: "rgba(255,255,255,0.35)" }}
-              >
-                Gratuit
-              </p>
-              <div className="mt-5 flex items-baseline gap-1">
-                <span className="text-5xl font-[family-name:var(--font-display)] font-bold text-white">
-                  0 €
-                </span>
-                <span className="text-sm" style={{ color: "rgba(255,255,255,0.35)" }}>
-                  / mois
-                </span>
+          <StaggerChildren className="mt-12 mx-auto grid max-w-2xl grid-cols-1 gap-5 sm:grid-cols-2">
+            <StaggerItem>
+              <div className="h-full rounded-2xl border p-8" style={{ background: "var(--m-bg-card)", borderColor: "var(--m-border)" }}>
+                <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--m-text-faint)" }}>Gratuit</p>
+                <div className="mt-4 flex items-baseline gap-1">
+                  <span className="font-[family-name:var(--font-display)] text-5xl font-bold" style={{ color: "var(--m-text)" }}>0 €</span>
+                  <span className="text-sm" style={{ color: "var(--m-text-faint)" }}>/ mois</span>
+                </div>
+                <p className="mt-2 text-sm" style={{ color: "var(--m-text-muted)" }}>Pour découvrir sans risque.</p>
+                <ul className="mt-8 space-y-3">
+                  {["Jusqu'à 5 clients", "Séances illimitées", "Bibliothèque d'exercices", "Support par email"].map((feat) => (
+                    <li key={feat} className="flex items-center gap-3 text-sm" style={{ color: "var(--m-text-muted)" }}>
+                      <Check className="h-4 w-4 shrink-0" style={{ color: "var(--m-accent)" }} strokeWidth={2.5} />
+                      {feat}
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/sign-up" className="mt-8 flex h-11 w-full items-center justify-center rounded-xl border text-sm font-semibold transition-all hover:opacity-70"
+                  style={{ borderColor: "var(--m-border)", color: "var(--m-text)" }}>
+                  Créer mon compte gratuit
+                </Link>
               </div>
-              <p className="mt-2 text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>
-                Parfait pour démarrer et tester.
-              </p>
-              <ul className="mt-8 space-y-3.5">
-                {[
-                  "Jusqu'à 5 clients",
-                  "Séances illimitées",
-                  "Bibliothèque d'exercices",
-                  "Support par email",
-                ].map((feat) => (
-                  <li key={feat} className="flex items-center gap-3 text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>
-                    <Check className="h-4 w-4 flex-shrink-0" style={{ color: "#8b5cf6" }} strokeWidth={2.5} />
-                    {feat}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/sign-up"
-                className="mt-8 flex h-11 w-full items-center justify-center rounded-xl border text-sm font-semibold transition-all hover:opacity-70"
-                style={{
-                  borderColor: "rgba(255,255,255,0.12)",
-                  color: "rgba(255,255,255,0.7)",
-                }}
-              >
-                Créer mon compte gratuit
-              </Link>
-            </div>
+            </StaggerItem>
 
-            {/* Pro */}
-            <div
-              className="relative rounded-3xl border p-8"
-              style={{
-                background: "rgba(139,92,246,0.08)",
-                borderColor: "rgba(139,92,246,0.3)",
-                boxShadow: "0 0 60px rgba(139,92,246,0.08)",
-              }}
-            >
-              <div
-                className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-4 py-1 text-xs font-bold text-white"
-                style={{ background: "linear-gradient(135deg, #7c3aed, #8b5cf6)" }}
-              >
-                Recommandé
+            <StaggerItem>
+              <div className="relative h-full rounded-2xl border p-8"
+                style={{ background: "rgba(34,197,94,0.06)", borderColor: "rgba(34,197,94,0.35)", boxShadow: "0 0 60px rgba(34,197,94,0.08)" }}>
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-4 py-1 text-xs font-bold text-white"
+                  style={{ background: "linear-gradient(135deg, var(--m-accent), var(--m-accent-mid))" }}>
+                  Recommandé
+                </div>
+                <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--m-accent)" }}>Pro</p>
+                <div className="mt-4 flex items-baseline gap-1">
+                  <span className="font-[family-name:var(--font-display)] text-5xl font-bold" style={{ color: "var(--m-text)" }}>29 €</span>
+                  <span className="text-sm" style={{ color: "var(--m-text-faint)" }}>/ mois</span>
+                </div>
+                <p className="mt-2 text-sm" style={{ color: "var(--m-text-muted)" }}>Pour les coachs qui vivent de leur activité.</p>
+                <ul className="mt-8 space-y-3">
+                  {["Clients illimités", "Programmes avancés", "Courbes de progression", "Statistiques détaillées", "Support prioritaire"].map((feat) => (
+                    <li key={feat} className="flex items-center gap-3 text-sm" style={{ color: "var(--m-text)" }}>
+                      <Check className="h-4 w-4 shrink-0" style={{ color: "var(--m-accent)" }} strokeWidth={2.5} />
+                      {feat}
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/sign-up" className="mt-8 flex h-11 w-full items-center justify-center rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
+                  style={{ background: "linear-gradient(135deg, var(--m-accent), var(--m-accent-mid))", boxShadow: "0 4px 20px rgba(34,197,94,0.3)" }}>
+                  Essayer Pro gratuitement
+                </Link>
               </div>
-              <p
-                className="text-xs font-bold uppercase tracking-widest"
-                style={{ color: "#a78bfa" }}
-              >
-                Pro
+            </StaggerItem>
+          </StaggerChildren>
+
+          <AnimateIn delay={0.2} className="mt-6 text-center">
+            <Link href="/tarifs" className="inline-flex items-center gap-1.5 text-sm font-medium transition-opacity hover:opacity-70"
+              style={{ color: "var(--m-accent)" }}>
+              Voir la comparaison complète <ChevronRight className="h-4 w-4" />
+            </Link>
+          </AnimateIn>
+        </div>
+      </section>
+
+      {/* ── FINAL CTA — Celebrate mascot ─────────────────────────────────── */}
+      <section className="overflow-x-hidden px-6 py-24" style={{ background: "var(--m-bg-section)" }}>
+        <div className="mx-auto max-w-6xl">
+          <div className="grid items-center gap-12 lg:grid-cols-[1fr_380px]">
+            <AnimateIn direction="left">
+              <p className="text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "var(--m-accent)" }}>Rejoignez Revo</p>
+              <h2 className="mt-4 font-[family-name:var(--font-display)] text-5xl font-bold leading-tight tracking-tight" style={{ color: "var(--m-text)" }}>
+                Votre prochain client mérite mieux qu&apos;un carnet.
+              </h2>
+              <p className="mt-5 text-lg" style={{ color: "var(--m-text-muted)" }}>
+                Rejoignez les coachs qui ont arrêté de bricoler et commencé à
+                <strong style={{ color: "var(--m-text)", fontWeight: 600 }}> professionnaliser leur suivi.</strong>
               </p>
-              <div className="mt-5 flex items-baseline gap-1">
-                <span className="text-5xl font-[family-name:var(--font-display)] font-bold text-white">
-                  29 €
-                </span>
-                <span className="text-sm" style={{ color: "rgba(255,255,255,0.35)" }}>
-                  / mois
-                </span>
+              <div className="mt-10 flex flex-wrap items-center gap-4">
+                <Link href="/sign-up"
+                  className="inline-flex items-center gap-2 rounded-xl px-8 py-4 text-base font-bold text-white transition-all hover:scale-[1.02]"
+                  style={{ background: "linear-gradient(135deg, var(--m-accent), var(--m-accent-mid))", boxShadow: "0 8px 40px rgba(34,197,94,0.3)" }}>
+                  Créer mon compte — c&apos;est gratuit
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
-              <p className="mt-2 text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>
-                Pour les coachs qui vivent de leur activité.
-              </p>
-              <ul className="mt-8 space-y-3.5">
-                {[
-                  "Clients illimités",
-                  "Programmes avancés",
-                  "Courbes de progression",
-                  "Statistiques détaillées",
-                  "Support prioritaire",
-                ].map((feat) => (
-                  <li key={feat} className="flex items-center gap-3 text-sm text-white">
-                    <Check className="h-4 w-4 flex-shrink-0" style={{ color: "#a78bfa" }} strokeWidth={2.5} />
-                    {feat}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/sign-up"
-                className="mt-8 flex h-11 w-full items-center justify-center rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
-                style={{
-                  background: "linear-gradient(135deg, #7c3aed, #8b5cf6)",
-                  boxShadow: "0 4px 20px rgba(139,92,246,0.3)",
-                }}
-              >
-                Essayer Pro gratuitement
-              </Link>
-            </div>
+              <p className="mt-4 text-sm" style={{ color: "var(--m-text-faint)" }}>Sans carte bancaire · Sans engagement</p>
+            </AnimateIn>
+
+            <AnimateIn direction="right" className="relative hidden min-h-[400px] items-center justify-center lg:flex">
+              <div className="relative mx-auto w-full max-w-[400px]">
+                <Image
+                  src="/revo-mascot-celebrate.png"
+                  alt="Mascotte Revo en célébration"
+                  width={400}
+                  height={400}
+                  className="relative z-0 mx-auto object-contain revo-float drop-shadow-2xl"
+                />
+                <GlassStatCard
+                  className="absolute right-[11%] top-[13%] z-10 w-[min(208px,54%)]"
+                  straddle="right"
+                  rotateDeg={2}
+                >
+                  <p className="revo-glass-label">Record perso</p>
+                  <p className="revo-glass-value text-xl leading-snug">Squat · 100 kg</p>
+                  <p className="revo-glass-sub">détecté auto après séance</p>
+                </GlassStatCard>
+                <GlassStatCard
+                  className="absolute left-[11%] bottom-[17%] z-10 w-[min(228px,56%)]"
+                  straddle="left"
+                  rotateDeg={-2.5}
+                >
+                  <p className="revo-glass-label">Objectif client</p>
+                  <p className="revo-glass-value text-2xl">82%</p>
+                  <p className="revo-glass-sub">du programme bouclé</p>
+                </GlassStatCard>
+              </div>
+            </AnimateIn>
           </div>
         </div>
       </section>
 
-      {/* ── FINAL CTA ──────────────────────────────────────────────── */}
-      <section className="px-6 py-28">
-        <div
-          className="mx-auto max-w-4xl rounded-3xl border px-10 py-16 text-center"
-          style={{
-            background: "linear-gradient(135deg, rgba(124,58,237,0.15) 0%, rgba(139,92,246,0.08) 100%)",
-            borderColor: "rgba(139,92,246,0.25)",
-          }}
-        >
-          <h2 className="text-5xl font-[family-name:var(--font-display)] font-bold tracking-tight">
-            Votre prochain client
-            <br />
-            mérite mieux qu&apos;un carnet.
-          </h2>
-          <p className="mt-5 text-lg" style={{ color: "rgba(255,255,255,0.5)" }}>
-            Rejoignez les coachs qui ont arrêté de bricoler
-            <br />
-            et commencé à professionnaliser leur suivi.
-          </p>
-          <Link
-            href="/sign-up"
-            className="mt-10 inline-flex items-center gap-2 rounded-xl px-8 py-4 text-base font-bold text-white transition-all hover:opacity-90"
-            style={{
-              background: "linear-gradient(135deg, #7c3aed, #8b5cf6)",
-              boxShadow: "0 8px 40px rgba(139,92,246,0.35)",
-            }}
-          >
-            Créer mon compte coach — c&apos;est gratuit
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-          <p className="mt-4 text-sm" style={{ color: "rgba(255,255,255,0.25)" }}>
-            Sans carte bancaire · Sans engagement
-          </p>
-        </div>
-      </section>
-
-      {/* ── FOOTER ─────────────────────────────────────────────────── */}
-      <footer
-        className="border-t px-6 py-10"
-        style={{ borderColor: "rgba(255,255,255,0.06)" }}
-      >
+      {/* ── FOOTER ───────────────────────────────────────────────────────── */}
+      <footer className="border-t px-6 py-10" style={{ borderColor: "var(--m-border)" }}>
         <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-6 sm:flex-row">
           <div className="flex items-center gap-1.5">
-            <span className="font-[family-name:var(--font-display)] text-base font-bold text-white">
-              Revo
-            </span>
-            <span
-              className="h-1.5 w-1.5 rounded-full"
-              style={{ background: "#8b5cf6" }}
-            />
+            <span className="font-[family-name:var(--font-display)] text-base font-bold" style={{ color: "var(--m-text)" }}>Revo</span>
+            <span className="h-1.5 w-1.5 rounded-full" style={{ background: "var(--m-accent)" }} />
           </div>
-          <p className="text-xs" style={{ color: "rgba(255,255,255,0.2)" }}>
-            © 2026 Revo. Tous droits réservés.
-          </p>
-          <div className="flex gap-6">
-            {["Confidentialité", "CGU", "Contact"].map((link) => (
-              <Link
-                key={link}
-                href="#"
-                className="text-xs transition-colors hover:text-white"
-                style={{ color: "rgba(255,255,255,0.25)" }}
-              >
-                {link}
+          <p className="text-xs" style={{ color: "var(--m-text-faint)" }}>© 2026 Revo. Tous droits réservés.</p>
+          <div className="flex flex-wrap gap-6">
+            {[
+              { href: "/fonctionnalites", label: "Fonctionnalités" },
+              { href: "/tarifs", label: "Tarifs" },
+              { href: "/blog", label: "Blog" },
+              { href: "#", label: "CGU" },
+              { href: "#", label: "Confidentialité" },
+            ].map(({ href, label }) => (
+              <Link key={label} href={href} className="text-xs transition-opacity hover:opacity-70" style={{ color: "var(--m-text-faint)" }}>
+                {label}
               </Link>
             ))}
           </div>

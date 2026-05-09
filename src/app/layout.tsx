@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans, Syne } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { frFR } from "@clerk/localizations";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -50,11 +51,11 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider localization={frFR}>
-      <html lang="fr" className={`${jakarta.variable} ${syne.variable} h-full antialiased`}>
-        <body
-          className="min-h-full flex flex-col font-[family-name:var(--font-sans)]"
-        >
-          {children}
+      <html lang="fr" className={`${jakarta.variable} ${syne.variable} h-full antialiased`} suppressHydrationWarning>
+        <body className="min-h-full flex flex-col font-[family-name:var(--font-sans)]">
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+            {children}
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>
