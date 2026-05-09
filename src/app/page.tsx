@@ -102,14 +102,17 @@ export default async function LandingPage() {
 
             {/* Mascotte + cartes vitrées superposées */}
             <div className="relative mx-auto hidden min-h-[480px] w-full max-w-[520px] lg:block">
-              <Image
-                src="/revo-mascot-green.png"
-                alt="Revo mascotte"
-                width={520}
-                height={520}
-                className="relative z-0 mx-auto object-contain revo-float revo-fade-in anim-delay-300 drop-shadow-[0_25px_60px_rgba(0,0,0,0.25)]"
-                priority
-              />
+              <div className="revo-float revo-fade-in anim-delay-300 relative z-0 mx-auto max-w-[520px] overflow-hidden rounded-3xl border shadow-lg"
+                style={{ borderColor: "var(--m-border)", boxShadow: "0 20px 50px rgba(0,0,0,0.12)" }}>
+                <Image
+                  src="/revo-mascot-green.png"
+                  alt="Revo mascotte"
+                  width={520}
+                  height={520}
+                  className="relative z-0 mx-auto h-auto w-full object-contain drop-shadow-[0_25px_60px_rgba(0,0,0,0.25)]"
+                  priority
+                />
+              </div>
               <GlassStatCard
                 className="absolute left-[13%] top-[10%] z-10 w-[min(235px,54%)]"
                 straddle="left"
@@ -209,13 +212,16 @@ export default async function LandingPage() {
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <AnimateIn direction="left">
               <div className="relative mx-auto max-w-[460px]">
-                <Image
-                  src="/revo-mascot-coach.png"
-                  alt="Coach Revo"
-                  width={460}
-                  height={460}
-                  className="relative z-0 mx-auto object-contain revo-float drop-shadow-2xl"
-                />
+                <div className="revo-float relative z-0 mx-auto overflow-hidden rounded-3xl border shadow-lg"
+                  style={{ borderColor: "var(--m-border)", boxShadow: "0 16px 40px rgba(0,0,0,0.1)" }}>
+                  <Image
+                    src="/revo-mascot-coach.png"
+                    alt="Coach Revo"
+                    width={460}
+                    height={460}
+                    className="relative z-0 mx-auto h-auto w-full object-contain drop-shadow-2xl"
+                  />
+                </div>
                 <GlassStatCard
                   className="absolute right-[11%] top-[11%] z-10 hidden w-[min(218px,54%)] sm:block"
                   straddle="right"
@@ -538,13 +544,16 @@ export default async function LandingPage() {
 
             <AnimateIn direction="right" className="relative hidden min-h-[400px] items-center justify-center lg:flex">
               <div className="relative mx-auto w-full max-w-[400px]">
-                <Image
-                  src="/revo-mascot-celebrate.png"
-                  alt="Mascotte Revo en célébration"
-                  width={400}
-                  height={400}
-                  className="relative z-0 mx-auto object-contain revo-float drop-shadow-2xl"
-                />
+                <div className="revo-float relative z-0 mx-auto overflow-hidden rounded-3xl border shadow-lg"
+                  style={{ borderColor: "var(--m-border)", boxShadow: "0 16px 40px rgba(0,0,0,0.1)" }}>
+                  <Image
+                    src="/revo-mascot-celebrate.png"
+                    alt="Mascotte Revo en célébration"
+                    width={400}
+                    height={400}
+                    className="relative z-0 mx-auto h-auto w-full object-contain drop-shadow-2xl"
+                  />
+                </div>
                 <GlassStatCard
                   className="absolute right-[11%] top-[13%] z-10 w-[min(208px,54%)]"
                   straddle="right"
