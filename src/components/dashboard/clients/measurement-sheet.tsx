@@ -16,17 +16,31 @@ import {
 } from "@/components/ui/sheet"
 import { addMeasurement } from "@/app/dashboard/clients/[id]/actions"
 
-export function MeasurementSheet({ clientId }: { clientId: string }) {
+export function MeasurementSheet({
+  clientId,
+  hasRecordedSensitiveConsent,
+}: {
+  clientId: string
+  hasRecordedSensitiveConsent: boolean
+}) {
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const [formError, setFormError] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
   const today = new Date().toISOString().split("T")[0]
 
   function handleSubmit(formData: FormData) {
+    setFormError(null)
     startTransition(async () => {
-      await addMeasurement(clientId, formData)
-      formRef.current?.reset()
-      setOpen(false)
+      try {
+        await addMeasurement(clientId, formData)
+        formRef.current?.reset()
+        setOpen(false)
+      } catch (err) {
+        setFormError(
+          err instanceof Error ? err.message : "Une erreur est survenue."
+        )
+      }
     })
   }
 
@@ -49,6 +63,40 @@ export function MeasurementSheet({ clientId }: { clientId: string }) {
             <Label htmlFor="date">Date</Label>
             <Input id="date" name="date" type="date" defaultValue={today} />
           </div>
+          <p className="text-xs leading-relaxed text-zinc-500">
+            Les mensurations et le poids peuvent constituer des données
+            personnelles sensibles. Ne les enregistrez qu&apos;avec un fondement
+            légal adapté.{" "}
+            <a
+              href="/confidentialite"
+              target="_blank"
+              rel="noreferrer"
+              className="font-medium text-violet-600 underline underline-offset-2"
+            >
+              Politique de confidentialité
+            </a>
+          </p>
+          {!hasRecordedSensitiveConsent ? (
+            <label className="flex cursor-pointer items-start gap-2 text-xs leading-snug text-zinc-700">
+              <input
+                type="checkbox"
+                name="measurementConsent"
+                className="mt-0.5 h-4 w-4 shrink-0"
+              />
+              <span>
+                Je confirme disposer d&apos;un fondement légal pour enregistrer
+                ces données sur ce client (obligatoire pour la première saisie).
+              </span>
+            </label>
+          ) : (
+            <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-900">
+              Fondement légal déjà enregistré pour les données sensibles de ce
+              client.
+            </p>
+          )}
+          {formError ? (
+            <p className="text-xs font-medium text-red-600">{formError}</p>
+          ) : null}
 
           <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
             Corps

@@ -49,6 +49,7 @@ type ClientInput = {
   goalDeadline: Date | string | null
   injuries: string | null
   medicalNotes: string | null
+  sensitiveDataConsentAt: Date | string | null
   isActive: boolean
 }
 
@@ -60,6 +61,7 @@ function isoDate(d: Date | string | null) {
 export function EditClientSheet({ client }: { client: ClientInput }) {
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const [formError, setFormError] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
 
   const [gender, setGender] = useState<string>(client.gender ?? "")
@@ -71,6 +73,7 @@ export function EditClientSheet({ client }: { client: ClientInput }) {
   const [isActive, setIsActive] = useState(client.isActive)
 
   function handleSubmit(formData: FormData) {
+    setFormError(null)
     if (gender) formData.set("gender", gender)
     formData.set("fitnessLevel", fitnessLevel)
     if (goalType) formData.set("goalType", goalType)
@@ -78,10 +81,24 @@ export function EditClientSheet({ client }: { client: ClientInput }) {
     formData.set("isActive", isActive ? "true" : "false")
 
     startTransition(async () => {
-      await updateClient(client.id, formData)
-      setOpen(false)
+      try {
+        await updateClient(client.id, formData)
+        setOpen(false)
+      } catch (err) {
+        setFormError(
+          err instanceof Error ? err.message : "Une erreur est survenue."
+        )
+      }
     })
   }
+
+  const consentRecordedAt = client.sensitiveDataConsentAt
+    ? new Date(client.sensitiveDataConsentAt).toLocaleDateString("fr-FR", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
+    : null
 
   const selectedCountry = COUNTRY_CODES.find((c) => c.code === countryCode)
   const selectedGender = gender ? GENDER_LABELS[gender] : undefined
@@ -292,6 +309,21 @@ export function EditClientSheet({ client }: { client: ClientInput }) {
           <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
             Médical
           </p>
+          <p className="text-xs leading-relaxed text-zinc-500">
+            Ces champs peuvent constituer des données de santé (RGPD). Ne les
+            renseignez que si votre client en est informé et que vous disposez
+            d&apos;un fondement légal (notamment consentement explicite si
+            nécessaire). Voir la{" "}
+            <a
+              href="/confidentialite"
+              target="_blank"
+              rel="noreferrer"
+              className="font-medium text-violet-600 underline underline-offset-2"
+            >
+              politique de confidentialité
+            </a>
+            .
+          </p>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="injuries">Blessures</Label>
             <Textarea
@@ -310,6 +342,28 @@ export function EditClientSheet({ client }: { client: ClientInput }) {
               rows={2}
             />
           </div>
+          {consentRecordedAt ? (
+            <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-900">
+              Fondement légal pour les données sensibles enregistré le{" "}
+              {consentRecordedAt}.
+            </p>
+          ) : (
+            <label className="flex cursor-pointer items-start gap-2 text-xs leading-snug text-zinc-700">
+              <input
+                type="checkbox"
+                name="sensitiveDataConsent"
+                className="mt-0.5 h-4 w-4 shrink-0"
+              />
+              <span>
+                Je confirme disposer d&apos;un fondement légal pour traiter les
+                données sensibles ci-dessus (obligatoire si ces champs sont
+                renseignés).
+              </span>
+            </label>
+          )}
+          {formError ? (
+            <p className="text-xs font-medium text-red-600">{formError}</p>
+          ) : null}
 
           <label className="flex items-center gap-2 text-sm text-zinc-700">
             <input

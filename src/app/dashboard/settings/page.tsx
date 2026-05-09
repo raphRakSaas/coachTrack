@@ -4,6 +4,7 @@ import { Settings as SettingsIcon, ExternalLink } from "lucide-react"
 import { getCurrentUser } from "@/lib/auth"
 import { SECTION_ACCENTS } from "@/lib/colors"
 import { SettingsForm } from "@/components/dashboard/settings/settings-form"
+import { PrivacyDataCard } from "@/components/dashboard/settings/privacy-data-card"
 
 export default async function SettingsPage() {
   const user = await getCurrentUser()
@@ -29,7 +30,7 @@ export default async function SettingsPage() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Form */}
-        <div className="lg:col-span-2">
+        <div className="flex flex-col gap-6 lg:col-span-2">
           <div className="rounded-xl border border-zinc-200 bg-white p-6">
             <h2 className="mb-1 text-base font-semibold text-zinc-900">
               Profil de coach
@@ -46,6 +47,7 @@ export default async function SettingsPage() {
               }}
             />
           </div>
+          <PrivacyDataCard />
         </div>
 
         {/* Side info */}

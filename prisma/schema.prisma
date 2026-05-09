@@ -83,6 +83,9 @@ model Client {
   injuries     String?
   medicalNotes String?
 
+  /// Horodatage : le coach confirme une base légale explicite pour ces données sensibles (voir politique de confidentialité).
+  sensitiveDataConsentAt DateTime?
+
   // Administratif
   contractStart DateTime?
   hourlyRate    Float?

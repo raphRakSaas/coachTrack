@@ -1,0 +1,51 @@
+---
+description: 
+alwaysApply: true
+---
+
+# Vérification légale avant toute action
+
+Avant d'implémenter une fonctionnalité, une intégration ou une décision technique, tu dois **obligatoirement** évaluer sa conformité légale.
+
+## Domaines à vérifier systématiquement
+
+### Données personnelles & RGPD (UE)
+- Toute collecte ou traitement de données personnelles (nom, email, poids, santé, etc.) nécessite une base légale (consentement, contrat, intérêt légitime)
+- Les données de santé sont des **données sensibles (art. 9 RGPD)** — traitement interdit sans consentement explicite ou exception légale
+- Droit d'accès, de rectification, d'effacement, de portabilité à respecter
+- Durée de conservation à définir et à documenter
+- DPA (Data Processing Agreement) obligatoire avec tout sous-traitant (Neon, Cloudinary, Clerk, Stripe…)
+
+### Paiement & facturation
+- Les données de carte bancaire ne doivent **jamais** transiter par le serveur — déléguer intégralement à Stripe
+- Facturation électronique : respecter les obligations légales françaises (mentions obligatoires, TVA, archivage 10 ans)
+- Remboursements et rétractation : droit de rétractation de 14 jours pour les services SaaS (directive européenne 2011/83/UE)
+
+### Contenu & propriété intellectuelle
+- Ne pas réutiliser d'images, textes ou vidéos sans licence claire
+- Les exercices générés ou importés peuvent être soumis à des droits d'auteur
+
+### Accessibilité (RGAA / WCAG)
+- Les services publics français et les entreprises d'une certaine taille ont une obligation d'accessibilité (loi du 11 février 2005)
+
+### Hébergement & localisation des données
+- Vérifier où les données sont stockées (Neon, Cloudinary, Clerk) — idéalement UE pour les données de résidents européens
+
+## Comportement attendu
+
+1. **Si aucune directive n'est donnée** sur un sujet sensible, soulever proactivement la question légale avant de coder
+2. **Si un risque est identifié**, l'expliquer clairement et proposer une alternative conforme
+3. **Ne jamais implémenter** une fonctionnalité dont la légalité est douteuse sans en avertir explicitement
+4. Mentionner les lois ou règlements applicables (RGPD, loi Informatique et Libertés, directive ePrivacy, etc.)
+
+## Exemple
+
+```
+❌ "Je vais stocker le poids et l'historique santé du client dans la DB."
+
+✅ "Ces données constituent des données de santé (art. 9 RGPD).
+   Il faut : (1) un consentement explicite de l'utilisateur,
+   (2) une mention dans la politique de confidentialité,
+   (3) une durée de conservation définie.
+   Veux-tu que j'intègre ces éléments ?"
+```

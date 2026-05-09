@@ -337,7 +337,12 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
             <h2 className="text-base font-semibold text-zinc-900">
               Évolution corporelle
             </h2>
-            <MeasurementSheet clientId={client.id} />
+            <MeasurementSheet
+              clientId={client.id}
+              hasRecordedSensitiveConsent={Boolean(
+                client.sensitiveDataConsentAt
+              )}
+            />
           </div>
 
           {weightData.length > 0 && (

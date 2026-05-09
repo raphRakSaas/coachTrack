@@ -34,6 +34,7 @@ import {
 export function ClientSheet() {
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const [formError, setFormError] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
 
   const [gender, setGender] = useState<string>("")
@@ -42,19 +43,26 @@ export function ClientSheet() {
   const [countryCode, setCountryCode] = useState<string>("+33")
 
   function handleSubmit(formData: FormData) {
+    setFormError(null)
     if (gender) formData.set("gender", gender)
     formData.set("fitnessLevel", fitnessLevel)
     if (goalType) formData.set("goalType", goalType)
     formData.set("phoneCountryCode", countryCode)
 
     startTransition(async () => {
-      await createClient(formData)
-      formRef.current?.reset()
-      setGender("")
-      setFitnessLevel("BEGINNER")
-      setGoalType("")
-      setCountryCode("+33")
-      setOpen(false)
+      try {
+        await createClient(formData)
+        formRef.current?.reset()
+        setGender("")
+        setFitnessLevel("BEGINNER")
+        setGoalType("")
+        setCountryCode("+33")
+        setOpen(false)
+      } catch (err) {
+        setFormError(
+          err instanceof Error ? err.message : "Une erreur est survenue."
+        )
+      }
     })
   }
 
@@ -220,6 +228,46 @@ export function ClientSheet() {
               rows={2}
             />
           </div>
+
+          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+            Médical (optionnel)
+          </p>
+          <p className="text-xs leading-relaxed text-zinc-500">
+            Ne renseignez ces champs que si nécessaire et avec un fondement
+            légal (voir{" "}
+            <a
+              href="/confidentialite"
+              target="_blank"
+              rel="noreferrer"
+              className="font-medium text-violet-600 underline underline-offset-2"
+            >
+              politique de confidentialité
+            </a>
+            ).
+          </p>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="injuries">Blessures</Label>
+            <Textarea id="injuries" name="injuries" rows={2} />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="medicalNotes">Notes médicales</Label>
+            <Textarea id="medicalNotes" name="medicalNotes" rows={2} />
+          </div>
+          <label className="flex cursor-pointer items-start gap-2 text-xs leading-snug text-zinc-700">
+            <input
+              type="checkbox"
+              name="sensitiveDataConsent"
+              className="mt-0.5 h-4 w-4 shrink-0"
+            />
+            <span>
+              Je confirme disposer d&apos;un fondement légal pour traiter les
+              données sensibles ci-dessus (obligatoire si ces champs sont
+              renseignés).
+            </span>
+          </label>
+          {formError ? (
+            <p className="text-xs font-medium text-red-600">{formError}</p>
+          ) : null}
 
           <SheetFooter>
             <Button type="submit" disabled={isPending} className="w-full">

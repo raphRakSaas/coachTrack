@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Clock, Tag } from "lucide-react";
 import { Nav } from "@/components/marketing/nav";
+import { MarketingFooter } from "@/components/marketing/marketing-footer";
 import { AnimateIn, StaggerChildren, StaggerItem } from "@/components/marketing/animate-in";
 
 export const metadata: Metadata = {
@@ -273,6 +274,9 @@ export default function BlogPage() {
               <p className="mt-2 text-sm" style={{ color: "var(--m-text-muted)" }}>
                 Un email par semaine avec nos meilleurs conseils coaching. Pas de spam.
               </p>
+              <p className="mt-2 text-xs" style={{ color: "var(--m-text-faint)" }}>
+                Inscription newsletter non active pour le moment — aucune donnée n&apos;est enregistrée.
+              </p>
               <div className="mt-6 flex flex-col sm:flex-row gap-3 max-w-sm mx-auto">
                 <input
                   type="email"
@@ -292,9 +296,7 @@ export default function BlogPage() {
         </div>
       </section>
 
-      <footer className="border-t px-6 py-8 text-center" style={{ borderColor: "var(--m-border)" }}>
-        <p className="text-xs" style={{ color: "var(--m-text-faint)" }}>© 2026 Revo. Tous droits réservés.</p>
-      </footer>
+      <MarketingFooter variant="compact" />
     </div>
   );
 }

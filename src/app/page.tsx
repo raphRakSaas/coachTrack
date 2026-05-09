@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Check, Star, ChevronRight } from "lucide-react";
 import { Nav } from "@/components/marketing/nav";
+import { MarketingFooter } from "@/components/marketing/marketing-footer";
 import { GlassStatCard } from "@/components/marketing/glass-stat-card";
 import { AnimateIn, StaggerChildren, StaggerItem } from "@/components/marketing/animate-in";
 
@@ -578,29 +579,7 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* ── FOOTER ───────────────────────────────────────────────────────── */}
-      <footer className="border-t px-6 py-10" style={{ borderColor: "var(--m-border)" }}>
-        <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-6 sm:flex-row">
-          <div className="flex items-center gap-1.5">
-            <span className="font-[family-name:var(--font-display)] text-base font-bold" style={{ color: "var(--m-text)" }}>Revo</span>
-            <span className="h-1.5 w-1.5 rounded-full" style={{ background: "var(--m-accent)" }} />
-          </div>
-          <p className="text-xs" style={{ color: "var(--m-text-faint)" }}>© 2026 Revo. Tous droits réservés.</p>
-          <div className="flex flex-wrap gap-6">
-            {[
-              { href: "/fonctionnalites", label: "Fonctionnalités" },
-              { href: "/tarifs", label: "Tarifs" },
-              { href: "/blog", label: "Blog" },
-              { href: "#", label: "CGU" },
-              { href: "#", label: "Confidentialité" },
-            ].map(({ href, label }) => (
-              <Link key={label} href={href} className="text-xs transition-opacity hover:opacity-70" style={{ color: "var(--m-text-faint)" }}>
-                {label}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </footer>
+      <MarketingFooter variant="full" />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { Nav } from "@/components/marketing/nav";
+import { MarketingFooter } from "@/components/marketing/marketing-footer";
 import { AnimateIn, StaggerChildren, StaggerItem } from "@/components/marketing/animate-in";
 
 export const metadata: Metadata = {
@@ -284,10 +285,7 @@ export default function FonctionnalitesPage() {
         </AnimateIn>
       </section>
 
-      {/* Footer minimal */}
-      <footer className="border-t px-6 py-8 text-center" style={{ borderColor: "var(--m-border)" }}>
-        <p className="text-xs" style={{ color: "var(--m-text-faint)" }}>© 2026 Revo. Tous droits réservés.</p>
-      </footer>
+      <MarketingFooter variant="compact" />
     </div>
   );
 }

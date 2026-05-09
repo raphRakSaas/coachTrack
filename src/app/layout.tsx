@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, Syne } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { frFR } from "@clerk/localizations";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { CookieConsentBanner } from "@/components/marketing/cookie-consent-banner";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -55,6 +56,7 @@ export default function RootLayout({
         <body className="min-h-full flex flex-col font-[family-name:var(--font-sans)]">
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
             {children}
+            <CookieConsentBanner />
           </ThemeProvider>
         </body>
       </html>

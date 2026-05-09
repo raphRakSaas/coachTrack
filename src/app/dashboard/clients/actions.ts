@@ -4,12 +4,23 @@ import { revalidatePath } from "next/cache"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser } from "@/lib/auth"
 import { FitnessLevel, GoalType, Gender } from "@prisma/client"
+import {
+  formHasMedicalNotesFields,
+  isSensitiveDataConsentChecked,
+} from "@/lib/sensitive-data-consent"
 
 export async function createClient(formData: FormData) {
   const user = await getCurrentUser()
   if (!user) throw new Error("Unauthorized")
 
   const parse = (key: string) => (formData.get(key) as string) || null
+
+  const incomingMedical = formHasMedicalNotesFields(formData)
+  if (incomingMedical && !isSensitiveDataConsentChecked(formData)) {
+    throw new Error(
+      "Pour enregistrer des informations médicales, cochez la confirmation relative au fondement légal (voir politique de confidentialité)."
+    )
+  }
 
   await prisma.client.create({
     data: {
@@ -29,6 +40,9 @@ export async function createClient(formData: FormData) {
         : null,
       goalType: (parse("goalType") as GoalType) || null,
       goal: parse("goal"),
+      injuries: parse("injuries"),
+      medicalNotes: parse("medicalNotes"),
+      sensitiveDataConsentAt: incomingMedical ? new Date() : null,
     },
   })
 

@@ -4,6 +4,11 @@ import { revalidatePath } from "next/cache"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser } from "@/lib/auth"
 import { FitnessLevel, GoalType, Gender } from "@prisma/client"
+import {
+  formHasMedicalNotesFields,
+  isMeasurementConsentChecked,
+  isSensitiveDataConsentChecked,
+} from "@/lib/sensitive-data-consent"
 
 export async function updateClient(id: string, formData: FormData) {
   const user = await getCurrentUser()
@@ -17,6 +22,32 @@ export async function updateClient(id: string, formData: FormData) {
   const parseInt_ = (key: string) => {
     const v = formData.get(key) as string
     return v ? parseInt(v) : null
+  }
+
+  const existing = await prisma.client.findFirst({
+    where: { id, coachId: user.id },
+    select: { sensitiveDataConsentAt: true },
+  })
+  if (!existing) throw new Error("Client introuvable")
+
+  const incomingMedical = formHasMedicalNotesFields(formData)
+  if (
+    incomingMedical &&
+    !existing.sensitiveDataConsentAt &&
+    !isSensitiveDataConsentChecked(formData)
+  ) {
+    throw new Error(
+      "Pour enregistrer des informations médicales, cochez la confirmation relative au fondement légal (voir politique de confidentialité)."
+    )
+  }
+
+  let sensitiveDataConsentAt = existing.sensitiveDataConsentAt
+  if (
+    incomingMedical &&
+    !existing.sensitiveDataConsentAt &&
+    isSensitiveDataConsentChecked(formData)
+  ) {
+    sensitiveDataConsentAt = new Date()
   }
 
   await prisma.client.update({
@@ -45,6 +76,7 @@ export async function updateClient(id: string, formData: FormData) {
       hourlyRate: parseFloat_("hourlyRate"),
       notes: parse("notes"),
       isActive: formData.get("isActive") !== "false",
+      sensitiveDataConsentAt,
     },
   })
 
@@ -55,6 +87,21 @@ export async function addMeasurement(clientId: string, formData: FormData) {
   const user = await getCurrentUser()
   if (!user) throw new Error("Unauthorized")
 
+  const clientRow = await prisma.client.findFirst({
+    where: { id: clientId, coachId: user.id },
+    select: { sensitiveDataConsentAt: true },
+  })
+  if (!clientRow) throw new Error("Client introuvable")
+
+  if (
+    !clientRow.sensitiveDataConsentAt &&
+    !isMeasurementConsentChecked(formData)
+  ) {
+    throw new Error(
+      "Pour enregistrer des mensurations, confirmez disposer d'une base légale pour ces données (voir politique de confidentialité)."
+    )
+  }
+
   const parseF = (key: string) => {
     const v = formData.get(key) as string
     return v ? parseFloat(v) : null
@@ -62,23 +109,32 @@ export async function addMeasurement(clientId: string, formData: FormData) {
 
   const dateStr = formData.get("date") as string
 
-  await prisma.bodyMeasurement.create({
-    data: {
-      clientId,
-      coachId: user.id,
-      date: dateStr ? new Date(dateStr) : new Date(),
-      weight: parseF("weight"),
-      bodyFat: parseF("bodyFat"),
-      muscleMass: parseF("muscleMass"),
-      waist: parseF("waist"),
-      hips: parseF("hips"),
-      chest: parseF("chest"),
-      leftArm: parseF("leftArm"),
-      rightArm: parseF("rightArm"),
-      leftThigh: parseF("leftThigh"),
-      rightThigh: parseF("rightThigh"),
-      notes: (formData.get("notes") as string) || null,
-    },
+  await prisma.$transaction(async (tx) => {
+    await tx.bodyMeasurement.create({
+      data: {
+        clientId,
+        coachId: user.id,
+        date: dateStr ? new Date(dateStr) : new Date(),
+        weight: parseF("weight"),
+        bodyFat: parseF("bodyFat"),
+        muscleMass: parseF("muscleMass"),
+        waist: parseF("waist"),
+        hips: parseF("hips"),
+        chest: parseF("chest"),
+        leftArm: parseF("leftArm"),
+        rightArm: parseF("rightArm"),
+        leftThigh: parseF("leftThigh"),
+        rightThigh: parseF("rightThigh"),
+        notes: (formData.get("notes") as string) || null,
+      },
+    })
+
+    if (!clientRow.sensitiveDataConsentAt) {
+      await tx.client.update({
+        where: { id: clientId },
+        data: { sensitiveDataConsentAt: new Date() },
+      })
+    }
   })
 
   revalidatePath(`/dashboard/clients/${clientId}`)

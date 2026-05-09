@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { ArrowRight, Check, X, HelpCircle } from "lucide-react";
 import { Nav } from "@/components/marketing/nav";
+import { MarketingFooter } from "@/components/marketing/marketing-footer";
 import { AnimateIn, StaggerChildren, StaggerItem } from "@/components/marketing/animate-in";
 
 const FREE_FEATURES = [
@@ -44,7 +45,7 @@ const FAQ = [
   { q: "Puis-je changer de plan à tout moment ?", a: "Oui, vous pouvez passer du plan gratuit au plan Pro à n'importe quel moment, et inversement. Sans engagement de durée." },
   { q: "Y a-t-il une période d'essai pour le plan Pro ?", a: "Oui, le plan Pro inclut 14 jours d'essai gratuit sans carte bancaire requise. Annulation à tout moment." },
   { q: "Mes données sont-elles conservées si je repasse en gratuit ?", a: "Absolument. Toutes vos données (clients, séances, programmes) sont conservées. Seule l'accès aux fonctionnalités Pro est restreint." },
-  { q: "Comment fonctionne la facturation ?", a: "La facturation est mensuelle ou annuelle (avec 2 mois offerts). Vous recevez une facture par email chaque mois. Paiement par carte bancaire via Stripe." },
+  { q: "Comment fonctionne la facturation ?", a: "Lorsque la facturation en ligne sera activée, les abonnements pourront être réglés par carte bancaire via Stripe : aucun numéro de carte ne transite par nos serveurs. Les factures et obligations légales (TVA, mentions) suivront la réglementation en vigueur au moment de l'activation." },
   { q: "Est-ce que Revo est adapté aux salles de sport ?", a: "Revo est conçu pour les coachs indépendants et les personal trainers. Pour les salles multi-coachs, contactez-nous pour un tarif sur mesure." },
 ];
 
@@ -247,9 +248,7 @@ export default function TarifsPage() {
         </AnimateIn>
       </section>
 
-      <footer className="border-t px-6 py-8 text-center" style={{ borderColor: "var(--m-border)" }}>
-        <p className="text-xs" style={{ color: "var(--m-text-faint)" }}>© 2026 Revo. Tous droits réservés.</p>
-      </footer>
+      <MarketingFooter variant="compact" />
     </div>
   );
 }
