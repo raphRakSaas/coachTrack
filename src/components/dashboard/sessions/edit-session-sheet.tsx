@@ -32,6 +32,8 @@ type SessionInput = {
   rpe: number | null
   mood: number | null
   energy: number | null
+  location: string | null
+  sessionFocus: string | null
 }
 
 const RPE_OPTIONS = Array.from({ length: 10 }, (_, i) => i + 1)
@@ -107,7 +109,26 @@ export function EditSessionSheet({ session }: { session: SessionInput }) {
             />
           </div>
 
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="location">Lieu</Label>
+            <Input
+              id="location"
+              name="location"
+              placeholder="Salle, domicile, extérieur…"
+              defaultValue={session.location ?? ""}
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="sessionFocus">Objectif ou thème</Label>
+            <Input
+              id="sessionFocus"
+              name="sessionFocus"
+              placeholder="Ex. tirage, jambes, mobilité…"
+              defaultValue={session.sessionFocus ?? ""}
+            />
+          </div>
+
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Ressenti
           </p>
           <div className="grid grid-cols-3 gap-3">

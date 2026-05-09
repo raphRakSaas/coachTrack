@@ -283,7 +283,23 @@ async function replaceDemoRelatedData(
     data: demoMeasurements(clientId, coachId),
   })
 
-  const sessionRows = buildDemoSessions().map((session) => ({
+  const demoLocations = [
+    "Salle partenaire",
+    "Domicile",
+    "Parc — extérieur",
+    "Club fitness",
+  ] as const
+  const demoFocuses = [
+    "Dos & posture",
+    "Jambes — volume modéré",
+    "Haut du corps — tirage",
+    "Mobilité & gainage",
+    "Full body",
+    "Cardio léger",
+    "Épaules & stabilité",
+  ] as const
+
+  const sessionRows = buildDemoSessions().map((session, index) => ({
     coachId,
     clientId,
     date: daysAgo(session.daysAgo),
@@ -292,6 +308,8 @@ async function replaceDemoRelatedData(
     rpe: session.rpe,
     mood: session.mood,
     energy: session.energy,
+    location: demoLocations[index % demoLocations.length]!,
+    sessionFocus: demoFocuses[index % demoFocuses.length]!,
   }))
   await tx.session.createMany({ data: sessionRows })
 

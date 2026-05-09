@@ -2,7 +2,15 @@
 
 import Link from "next/link"
 import { useRef, useTransition } from "react"
-import { ArrowLeft, Plus, Trash2 } from "lucide-react"
+import {
+  ArrowLeft,
+  Plus,
+  Trash2,
+  MapPin,
+  Target,
+  Layers,
+  ClipboardList,
+} from "lucide-react"
 import { MuscleGroup } from "@prisma/client"
 import type { Prisma } from "@prisma/client"
 
@@ -45,9 +53,9 @@ type Exercise = { id: string; name: string; muscleGroup: MuscleGroup }
 
 function StatBadge({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col items-center rounded-lg border border-zinc-200 bg-white px-4 py-3">
-      <p className="text-xs text-zinc-400">{label}</p>
-      <p className="text-lg font-semibold text-zinc-900">{value}</p>
+    <div className="flex flex-col items-center rounded-lg border border-border bg-card px-4 py-3 shadow-sm">
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="text-lg font-semibold text-foreground">{value}</p>
     </div>
   )
 }
@@ -61,6 +69,11 @@ export function SessionDetail({
 }) {
   const [isPending, startTransition] = useTransition()
   const addSetFormRefs = useRef<Record<string, HTMLFormElement | null>>({})
+
+  const totalSetsRecorded = session.exercises.reduce(
+    (sum, sessionExercise) => sum + sessionExercise.sets.length,
+    0
+  )
 
   function handleAddExercise(exerciseId: string | null) {
     if (!exerciseId) return
@@ -94,12 +107,12 @@ export function SessionDetail({
       <div className="mb-6">
         <Link
           href={`/dashboard/clients/${session.client.id}`}
-          className="mb-4 flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-900"
+          className="mb-4 flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" />
           {session.client.firstName} {session.client.lastName}
         </Link>
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-4">
             <ClientAvatar
               firstName={session.client.firstName}
@@ -107,8 +120,8 @@ export function SessionDetail({
               size="lg"
               ring
             />
-            <div>
-              <h1 className="text-2xl font-bold text-zinc-900">
+            <div className="min-w-0">
+              <h1 className="text-2xl font-bold capitalize text-foreground">
                 {new Date(session.date).toLocaleDateString("fr-FR", {
                   weekday: "long",
                   day: "numeric",
@@ -116,69 +129,131 @@ export function SessionDetail({
                   year: "numeric",
                 })}
               </h1>
-              <p className="text-sm text-zinc-500">
-                <span className={SECTION_ACCENTS.sessions.text + " font-medium"}>
+              <p className="mt-1 text-sm text-muted-foreground">
+                <span
+                  className={SECTION_ACCENTS.sessions.text + " font-medium"}
+                >
                   {session.client.firstName} {session.client.lastName}
                 </span>
-                {session.duration ? ` · ${session.duration} min` : ""}
+                {session.duration != null ? (
+                  <> · {session.duration} min</>
+                ) : (
+                  <span> · Durée non renseignée</span>
+                )}
               </p>
+              {(session.location || session.sessionFocus) && (
+                <div className="mt-3 flex flex-col gap-1.5 text-sm text-muted-foreground">
+                  {session.location && (
+                    <p className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                      <span>{session.location}</span>
+                    </p>
+                  )}
+                  {session.sessionFocus && (
+                    <p className="flex items-center gap-2">
+                      <Target className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                      <span>{session.sessionFocus}</span>
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
           <EditSessionSheet session={session} />
         </div>
       </div>
 
-      {/* Stats row */}
-      {(session.rpe || session.mood || session.energy) && (
-        <div className="mb-6 grid grid-cols-3 gap-3">
-          {session.rpe && (
-            <StatBadge label="RPE" value={`${session.rpe}/10`} />
-          )}
-          {session.mood && (
-            <StatBadge label="Humeur" value={`${session.mood}/5`} />
-          )}
-          {session.energy && (
-            <StatBadge label="Énergie" value={`${session.energy}/5`} />
-          )}
-        </div>
-      )}
+      {/* Stats row — toujours visible pour repères visuels */}
+      <div className="mb-4 grid grid-cols-3 gap-3">
+        <StatBadge
+          label="RPE"
+          value={session.rpe != null ? `${session.rpe}/10` : "—"}
+        />
+        <StatBadge
+          label="Humeur"
+          value={session.mood != null ? `${session.mood}/5` : "—"}
+        />
+        <StatBadge
+          label="Énergie"
+          value={session.energy != null ? `${session.energy}/5` : "—"}
+        />
+      </div>
+
+      {/* Synthèse charge */}
+      <div className="mb-6 flex flex-wrap items-center gap-3 rounded-xl border border-border bg-muted/30 px-4 py-3 text-sm">
+        <span className="inline-flex items-center gap-1.5 font-medium text-foreground">
+          <Layers className="h-4 w-4 text-muted-foreground" />
+          {session.exercises.length} exercice
+          {session.exercises.length !== 1 ? "s" : ""}
+        </span>
+        <span className="text-muted-foreground">·</span>
+        <span className="text-muted-foreground">
+          {totalSetsRecorded} série{totalSetsRecorded !== 1 ? "s" : ""}{" "}
+          enregistrée{totalSetsRecorded !== 1 ? "s" : ""}
+        </span>
+      </div>
 
       {/* Notes */}
-      {session.notes && (
-        <div className="mb-6 rounded-xl border border-zinc-200 bg-white p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400 mb-1">
-            Notes
+      <div className="mb-6 rounded-xl border border-border bg-card p-4 shadow-sm">
+        <p className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <ClipboardList className="h-3.5 w-3.5" />
+          Notes de séance
+        </p>
+        {session.notes ? (
+          <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+            {session.notes}
           </p>
-          <p className="text-sm text-zinc-700">{session.notes}</p>
-        </div>
-      )}
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            Aucune note pour le moment. Utilisez « Modifier » pour compléter le
+            compte rendu (objectifs, ressenti, consignes…).
+          </p>
+        )}
+      </div>
 
       {/* Exercises */}
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-base font-semibold text-zinc-900">
+        <h2 className="text-base font-semibold text-foreground">
           Exercices ({session.exercises.length})
         </h2>
       </div>
 
       <div className="flex flex-col gap-4">
+        {session.exercises.length === 0 && (
+          <div className="rounded-xl border border-dashed border-border bg-muted/20 px-4 py-10 text-center">
+            <p className="text-sm font-medium text-foreground">
+              Aucun exercice enregistré
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Ajoutez des exercices ci-dessous pour suivre séries, reps et
+              charges.
+            </p>
+          </div>
+        )}
         {session.exercises.map((se) => (
           <div
             key={se.id}
-            className="rounded-xl border border-zinc-200 bg-white"
+            className="rounded-xl border border-border bg-card shadow-sm"
           >
-            <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-3">
-              <div>
-                <p className="text-sm font-medium text-zinc-900">
+            <div className="flex items-center justify-between border-b border-border px-4 py-3">
+              <div className="min-w-0 pr-2">
+                <p className="text-sm font-medium text-foreground">
                   {se.exercise.name}
                 </p>
-                <p className="text-xs text-zinc-400">
+                <p className="text-xs text-muted-foreground">
                   {MUSCLE_GROUPS[se.exercise.muscleGroup]}
                 </p>
+                {se.notes && (
+                  <p className="mt-2 text-xs leading-snug text-muted-foreground">
+                    {se.notes}
+                  </p>
+                )}
               </div>
               <button
+                type="button"
                 onClick={() => handleRemoveExercise(se.id)}
                 disabled={isPending}
-                className="rounded p-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-red-500 disabled:opacity-50"
+                className="shrink-0 rounded p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-50"
               >
                 <Trash2 className="h-4 w-4" />
               </button>
@@ -187,7 +262,7 @@ export function SessionDetail({
             {/* Sets */}
             {se.sets.length > 0 && (
               <div className="px-4 py-2">
-                <div className="mb-1 grid grid-cols-3 gap-2 text-xs font-semibold text-zinc-400">
+                <div className="mb-1 grid grid-cols-3 gap-2 text-xs font-semibold text-muted-foreground">
                   <span>Série</span>
                   <span>Reps</span>
                   <span>Charge</span>
@@ -196,22 +271,23 @@ export function SessionDetail({
                   {se.sets.map((set) => (
                     <div
                       key={set.id}
-                      className="grid grid-cols-3 gap-2 items-center"
+                      className="grid grid-cols-3 items-center gap-2"
                     >
-                      <span className="text-sm font-medium text-zinc-700">
+                      <span className="text-sm font-medium text-foreground">
                         #{set.setNumber}
                       </span>
-                      <span className="text-sm text-zinc-700">
+                      <span className="text-sm text-foreground">
                         {set.reps ?? "—"}
                       </span>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-zinc-700">
-                          {set.weight ? `${set.weight} kg` : "—"}
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-sm text-foreground">
+                          {set.weight != null ? `${set.weight} kg` : "—"}
                         </span>
                         <button
+                          type="button"
                           onClick={() => handleRemoveSet(set.id)}
                           disabled={isPending}
-                          className="rounded p-1 text-zinc-300 hover:text-red-400 disabled:opacity-50"
+                          className="rounded p-1 text-muted-foreground hover:text-destructive disabled:opacity-50"
                         >
                           <Trash2 className="h-3 w-3" />
                         </button>
@@ -228,7 +304,7 @@ export function SessionDetail({
                 addSetFormRefs.current[se.id] = el
               }}
               action={(formData) => handleAddSet(se.id, formData)}
-              className="flex items-end gap-2 border-t border-zinc-100 px-4 py-3"
+              className="flex flex-wrap items-end gap-2 border-t border-border px-4 py-3"
             >
               <div className="flex flex-col gap-1">
                 <Label className="text-xs">Reps</Label>

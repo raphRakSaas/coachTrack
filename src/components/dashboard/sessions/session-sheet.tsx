@@ -108,7 +108,16 @@ export function SessionSheet({ clients }: { clients: Client[] }) {
             <Input id="duration" name="duration" type="number" min={1} max={300} placeholder="60" />
           </div>
 
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="location">Lieu</Label>
+            <Input id="location" name="location" placeholder="Salle, domicile, extérieur…" />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="sessionFocus">Objectif ou thème</Label>
+            <Input id="sessionFocus" name="sessionFocus" placeholder="Ex. tirage, jambes, mobilité…" />
+          </div>
+
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Ressenti
           </p>
           <div className="grid grid-cols-3 gap-3">

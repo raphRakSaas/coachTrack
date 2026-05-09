@@ -407,6 +407,11 @@ model Session {
   mood     Int? // 1-5 humeur client
   energy   Int? // 1-5 énergie client
 
+  /// Lieu (salle, domicile, extérieur…)
+  location String?
+  /// Objectif ou thème court (ex. tirage, jambes, mobilité)
+  sessionFocus String? @db.Text
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

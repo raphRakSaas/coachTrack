@@ -13,6 +13,11 @@ export async function createSession(formData: FormData) {
     return v ? parseInt(v) : null
   }
 
+  const optionalText = (key: string) => {
+    const raw = (formData.get(key) as string)?.trim()
+    return raw ? raw : null
+  }
+
   await prisma.session.create({
     data: {
       coachId: user.id,
@@ -23,6 +28,8 @@ export async function createSession(formData: FormData) {
       rpe: parseInt_("rpe"),
       mood: parseInt_("mood"),
       energy: parseInt_("energy"),
+      location: optionalText("location"),
+      sessionFocus: optionalText("sessionFocus"),
     },
   })
 
@@ -38,6 +45,11 @@ export async function updateSession(id: string, formData: FormData) {
     return v ? parseInt(v) : null
   }
 
+  const optionalText = (key: string) => {
+    const raw = (formData.get(key) as string)?.trim()
+    return raw ? raw : null
+  }
+
   await prisma.session.update({
     where: { id, coachId: user.id },
     data: {
@@ -47,6 +59,8 @@ export async function updateSession(id: string, formData: FormData) {
       rpe: parseInt_("rpe"),
       mood: parseInt_("mood"),
       energy: parseInt_("energy"),
+      location: optionalText("location"),
+      sessionFocus: optionalText("sessionFocus"),
     },
   })
 
