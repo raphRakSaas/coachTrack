@@ -43,7 +43,7 @@ export default async function ProgramDetailPage({
       <div className="mb-6">
         <Link
           href="/dashboard/programs"
-          className="mb-4 inline-flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-900"
+          className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
         >
           <ChevronLeft className="h-4 w-4" />
           Retour aux programmes
@@ -56,7 +56,7 @@ export default async function ProgramDetailPage({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold text-zinc-900">
+                <h1 className="text-2xl font-bold text-foreground">
                   {program.name}
                 </h1>
                 {!program.isActive && (
@@ -67,7 +67,7 @@ export default async function ProgramDetailPage({
               </div>
               <Link
                 href={`/dashboard/clients/${program.client.id}`}
-                className="mt-1 inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-900"
+                className="mt-1 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
               >
                 <ClientAvatar
                   firstName={program.client.firstName}
@@ -89,51 +89,51 @@ export default async function ProgramDetailPage({
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="rounded-xl border border-zinc-200 bg-white p-5 lg:col-span-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+        <div className="rounded-xl border border-border bg-card p-5 lg:col-span-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Jours d&apos;entraînement
           </p>
 
           {program.workoutDays.length === 0 ? (
-            <p className="mt-4 text-sm text-zinc-500">Aucun jour.</p>
+            <p className="mt-4 text-sm text-muted-foreground">Aucun jour.</p>
           ) : (
             <div className="mt-4 flex flex-col gap-4">
               {program.workoutDays.map((day) => (
                 <div
                   key={day.id}
-                  className="rounded-xl border border-zinc-100 bg-zinc-50 p-4"
+                  className="rounded-xl border border-border bg-muted p-4"
                 >
                   <div className="flex items-baseline justify-between gap-3">
-                    <p className="text-sm font-semibold text-zinc-900">
+                    <p className="text-sm font-semibold text-foreground">
                       Jour {day.dayNumber} · {day.name}
                     </p>
-                    <p className="text-xs text-zinc-500">
+                    <p className="text-xs text-muted-foreground">
                       {day.exercises.length} exercice
                       {day.exercises.length !== 1 ? "s" : ""}
                     </p>
                   </div>
 
                   {day.exercises.length === 0 ? (
-                    <p className="mt-3 text-xs text-zinc-400">Aucun exercice.</p>
+                    <p className="mt-3 text-xs text-muted-foreground">Aucun exercice.</p>
                   ) : (
-                    <ul className="mt-3 divide-y divide-zinc-200/60 rounded-lg border border-zinc-200/60 bg-white">
+                    <ul className="mt-3 divide-y divide-border rounded-lg border border-border/60 bg-card">
                       {day.exercises.map((programExercise) => (
                         <li
                           key={programExercise.id}
                           className="flex items-center justify-between gap-3 px-3 py-2"
                         >
                           <div className="min-w-0">
-                            <p className="truncate text-sm font-medium text-zinc-900">
+                            <p className="truncate text-sm font-medium text-foreground">
                               {programExercise.exercise.name}
                             </p>
-                            <p className="text-xs text-zinc-500">
+                            <p className="text-xs text-muted-foreground">
                               {programExercise.sets} séries · {programExercise.reps} reps
                               {programExercise.restTime
                                 ? ` · repos ${programExercise.restTime}s`
                                 : ""}
                             </p>
                           </div>
-                          <div className="text-right text-xs text-zinc-500">
+                          <div className="text-right text-xs text-muted-foreground">
                             {programExercise.weight !== null
                               ? `${programExercise.weight} kg`
                               : "—"}
@@ -148,35 +148,35 @@ export default async function ProgramDetailPage({
           )}
         </div>
 
-        <div className="rounded-xl border border-zinc-200 bg-white p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+        <div className="rounded-xl border border-border bg-card p-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Résumé
           </p>
           <div className="mt-4 space-y-2 text-sm">
             <div className="flex items-center justify-between">
-              <span className="text-zinc-500">Début</span>
-              <span className="font-medium text-zinc-900">
+              <span className="text-muted-foreground">Début</span>
+              <span className="font-medium text-foreground">
                 {new Date(program.startDate).toLocaleDateString("fr-FR")}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-zinc-500">Jours</span>
-              <span className="font-medium text-zinc-900">
+              <span className="text-muted-foreground">Jours</span>
+              <span className="font-medium text-foreground">
                 {program.workoutDays.length}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-zinc-500">Exercices</span>
-              <span className="font-medium text-zinc-900">
+              <span className="text-muted-foreground">Exercices</span>
+              <span className="font-medium text-foreground">
                 {program.workoutDays.reduce((acc, d) => acc + d.exercises.length, 0)}
               </span>
             </div>
           </div>
 
           {program.description && (
-            <div className="mt-5 rounded-lg border border-zinc-100 bg-zinc-50 p-3">
-              <p className="text-xs font-semibold text-zinc-700">Notes</p>
-              <p className="mt-1 text-xs text-zinc-600">{program.description}</p>
+            <div className="mt-5 rounded-lg border border-border bg-muted p-3">
+              <p className="text-xs font-semibold text-foreground">Notes</p>
+              <p className="mt-1 text-xs text-muted-foreground">{program.description}</p>
             </div>
           )}
         </div>

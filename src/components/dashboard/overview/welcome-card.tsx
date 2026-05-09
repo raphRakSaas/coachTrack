@@ -24,8 +24,8 @@ export function WelcomeCard(props: {
         <div className="grid grid-cols-12">
           <div className="col-span-12 md:col-span-7">
             <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white">
-                <TrendingUp size={24} className="text-neutral-600" />
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/95 shadow-sm dark:bg-white/90">
+                <TrendingUp size={24} className="text-neutral-700 dark:text-neutral-800" />
               </div>
               <h2 className="text-xl text-white">{props.title}</h2>
             </div>

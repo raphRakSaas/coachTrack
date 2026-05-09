@@ -87,7 +87,7 @@ export function ClientSheet() {
           className="flex flex-col gap-5 px-4 py-2"
         >
           {/* Identité */}
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Identité
           </p>
           <div className="grid grid-cols-2 gap-3">
@@ -150,7 +150,7 @@ export function ClientSheet() {
           </div>
 
           {/* Profil sportif */}
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Profil sportif
           </p>
           <div className="grid grid-cols-2 gap-3">
@@ -199,7 +199,7 @@ export function ClientSheet() {
           </div>
 
           {/* Objectifs */}
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Objectifs
           </p>
           <div className="flex flex-col gap-1.5">
@@ -229,10 +229,10 @@ export function ClientSheet() {
             />
           </div>
 
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Médical (optionnel)
           </p>
-          <p className="text-xs leading-relaxed text-zinc-500">
+          <p className="text-xs leading-relaxed text-muted-foreground">
             Ne renseignez ces champs que si nécessaire et avec un fondement
             légal (voir{" "}
             <a
@@ -253,7 +253,7 @@ export function ClientSheet() {
             <Label htmlFor="medicalNotes">Notes médicales</Label>
             <Textarea id="medicalNotes" name="medicalNotes" rows={2} />
           </div>
-          <label className="flex cursor-pointer items-start gap-2 text-xs leading-snug text-zinc-700">
+          <label className="flex cursor-pointer items-start gap-2 text-xs leading-snug text-foreground">
             <input
               type="checkbox"
               name="sensitiveDataConsent"

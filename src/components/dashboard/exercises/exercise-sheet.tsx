@@ -210,7 +210,7 @@ export function ExerciseSheet() {
               value={uploadedImagePublicId ?? ""}
             />
             {uploadedImageUrl && (
-              <div className="mt-2 overflow-hidden rounded-xl border border-zinc-200">
+              <div className="mt-2 overflow-hidden rounded-xl border border-border">
                 <img
                   src={uploadedImageUrl}
                   alt="Aperçu"

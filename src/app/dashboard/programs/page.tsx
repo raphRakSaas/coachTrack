@@ -94,8 +94,8 @@ export default async function ProgramsPage({
             <ClipboardList className={`h-5 w-5 ${accent.icon}`} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-zinc-900">Programmes</h1>
-            <p className="text-sm text-zinc-500">
+            <h1 className="text-2xl font-bold text-foreground">Programmes</h1>
+            <p className="text-sm text-muted-foreground">
               {activeCount} actif{activeCount !== 1 ? "s" : ""}
               {archivedCount > 0 &&
                 ` · ${archivedCount} archivé${archivedCount !== 1 ? "s" : ""}`}
@@ -113,7 +113,7 @@ export default async function ProgramsPage({
       {/* Filtres */}
       <div className="mb-6 flex flex-wrap items-center gap-4">
         {/* Statut */}
-        <div className="flex items-center gap-1 rounded-xl border border-zinc-200 bg-zinc-50 p-1">
+        <div className="flex items-center gap-1 rounded-xl border border-border bg-muted p-1">
           {filterTabs.map((tab) => {
             const isActive = statusFilter === tab.value
             return (
@@ -122,16 +122,16 @@ export default async function ProgramsPage({
                 href={buildHref({ status: tab.value })}
                 className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-all ${
                   isActive
-                    ? "bg-white text-zinc-900 shadow-sm"
-                    : "text-zinc-500 hover:text-zinc-700"
+                    ? "bg-card text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {tab.label}
                 <span
                   className={`rounded-full px-1.5 py-0.5 text-xs font-semibold ${
                     isActive
-                      ? "bg-violet-50 text-violet-700"
-                      : "bg-zinc-200 text-zinc-500"
+                      ? "bg-violet-500/15 text-violet-900 dark:bg-violet-950/50 dark:text-violet-300"
+                      : "bg-muted/80 text-muted-foreground"
                   }`}
                 >
                   {tab.count}
@@ -144,14 +144,14 @@ export default async function ProgramsPage({
         {/* Client filter */}
         {clients.length > 0 && (
           <div className="ml-auto flex items-center gap-2">
-            <Users className="h-4 w-4 text-zinc-400" />
+            <Users className="h-4 w-4 text-muted-foreground" />
             <div className="flex flex-wrap gap-1">
               <Link
                 href={buildHref({ clientId: "" })}
                 className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-all ${
                   !clientId
-                    ? "border-violet-200 bg-violet-50 text-violet-700"
-                    : "border-zinc-200 bg-white text-zinc-500 hover:border-zinc-300"
+                    ? "border-violet-500/35 bg-violet-500/10 text-violet-900 dark:bg-violet-950/40 dark:text-violet-300"
+                    : "border-border bg-card text-muted-foreground hover:border-muted-foreground/25"
                 }`}
               >
                 Tous
@@ -162,8 +162,8 @@ export default async function ProgramsPage({
                   href={buildHref({ clientId: c.id })}
                   className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-all ${
                     clientId === c.id
-                      ? "border-violet-200 bg-violet-50 text-violet-700"
-                      : "border-zinc-200 bg-white text-zinc-500 hover:border-zinc-300"
+                      ? "border-violet-500/35 bg-violet-500/10 text-violet-900 dark:bg-violet-950/40 dark:text-violet-300"
+                      : "border-border bg-card text-muted-foreground hover:border-muted-foreground/25"
                   }`}
                 >
                   {c.firstName} {c.lastName[0]}.
@@ -175,14 +175,14 @@ export default async function ProgramsPage({
       </div>
 
       {programs.length === 0 ? (
-        <div className="flex flex-col items-center rounded-xl border border-dashed border-zinc-200 bg-white py-20 text-center">
+        <div className="flex flex-col items-center rounded-xl border border-dashed border-border bg-card py-20 text-center">
           <div
             className={`mb-4 flex h-12 w-12 items-center justify-center rounded-2xl ${accent.bgSoft}`}
           >
             <ClipboardList className={`h-6 w-6 ${accent.icon}`} />
           </div>
-          <p className="text-sm font-medium text-zinc-700">Aucun programme</p>
-          <p className="mt-1 text-xs text-zinc-500">
+          <p className="text-sm font-medium text-foreground">Aucun programme</p>
+          <p className="mt-1 text-xs text-muted-foreground">
             {clientId
               ? "Ce client n'a pas encore de programme."
               : "Créez un programme d'entraînement personnalisé pour un client."}
@@ -201,7 +201,7 @@ export default async function ProgramsPage({
           {programs.map((program) => (
             <div
               key={program.id}
-              className="group rounded-xl border border-zinc-200 bg-white p-4 transition-all hover:border-violet-200 hover:shadow-sm"
+              className="group rounded-xl border border-border bg-card p-4 transition-all hover:border-violet-500/35 hover:shadow-sm"
             >
               <Link
                 href={`/dashboard/programs/${program.id}`}
@@ -214,10 +214,10 @@ export default async function ProgramsPage({
                     size="sm"
                   />
                   <div>
-                    <p className="text-sm font-semibold text-zinc-900">
+                    <p className="text-sm font-semibold text-foreground">
                       {program.name}
                     </p>
-                    <p className="text-xs text-zinc-500">
+                    <p className="text-xs text-muted-foreground">
                       {program.client.firstName} {program.client.lastName}
                     </p>
                   </div>
@@ -228,8 +228,8 @@ export default async function ProgramsPage({
                   </Badge>
                 )}
               </Link>
-              <div className="flex items-center justify-between border-t border-zinc-100 pt-3">
-                <div className="flex items-center gap-2 text-xs text-zinc-500">
+              <div className="flex items-center justify-between border-t border-border pt-3">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <span
                     className={`rounded-md ${accent.badge} px-2 py-0.5 font-medium`}
                   >
@@ -244,7 +244,7 @@ export default async function ProgramsPage({
                 <form action={deleteProgram.bind(null, program.id)}>
                   <button
                     type="submit"
-                    className="rounded p-1.5 text-zinc-300 opacity-0 transition-all hover:bg-red-50 hover:text-red-500 group-hover:opacity-100"
+                    className="rounded p-1.5 text-muted-foreground opacity-0 transition-all hover:bg-destructive/10 hover:text-red-500 group-hover:opacity-100"
                     aria-label="Supprimer"
                   >
                     <Trash2 className="h-3.5 w-3.5" />

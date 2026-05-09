@@ -56,7 +56,7 @@ export function EditExerciseSheet({ exercise }: { exercise: ExerciseInput }) {
         render={
           <button
             type="button"
-            className="rounded p-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700"
+            className="rounded p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             aria-label="Modifier"
           />
         }

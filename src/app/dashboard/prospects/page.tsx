@@ -29,39 +29,39 @@ const STATUS_CONFIG: Record<
 > = {
   NEW: {
     label: "Nouveau",
-    color: "text-zinc-700",
-    bg: "bg-zinc-100",
-    border: "border-zinc-200",
+    color: "text-foreground dark:text-zinc-200",
+    bg: "bg-muted dark:bg-zinc-800/70",
+    border: "border-border dark:border-zinc-600",
   },
   CONTACTED: {
     label: "Contacté",
-    color: "text-blue-700",
-    bg: "bg-blue-50",
-    border: "border-blue-200",
+    color: "text-blue-700 dark:text-blue-300",
+    bg: "bg-blue-50 dark:bg-blue-950/45",
+    border: "border-blue-200 dark:border-blue-800",
   },
   HOT: {
     label: "Chaud",
-    color: "text-orange-700",
-    bg: "bg-orange-50",
-    border: "border-orange-200",
+    color: "text-orange-700 dark:text-orange-300",
+    bg: "bg-orange-50 dark:bg-orange-950/45",
+    border: "border-orange-200 dark:border-orange-800",
   },
   COLD: {
     label: "Froid",
-    color: "text-sky-700",
-    bg: "bg-sky-50",
-    border: "border-sky-200",
+    color: "text-sky-700 dark:text-sky-300",
+    bg: "bg-sky-50 dark:bg-sky-950/45",
+    border: "border-sky-200 dark:border-sky-800",
   },
   CONVERTED: {
     label: "Converti",
-    color: "text-emerald-700",
-    bg: "bg-emerald-50",
-    border: "border-emerald-200",
+    color: "text-emerald-700 dark:text-emerald-300",
+    bg: "bg-emerald-50 dark:bg-emerald-950/45",
+    border: "border-emerald-200 dark:border-emerald-800",
   },
   LOST: {
     label: "Perdu",
-    color: "text-red-700",
-    bg: "bg-red-50",
-    border: "border-red-200",
+    color: "text-red-700 dark:text-red-300",
+    bg: "bg-red-50 dark:bg-red-950/45",
+    border: "border-red-200 dark:border-red-900",
   },
 }
 
@@ -122,8 +122,8 @@ export default async function ProspectsPage({
             <UserSearch className={`h-5 w-5 ${accent.icon}`} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-zinc-900">Prospects</h1>
-            <p className="text-sm text-zinc-500">
+            <h1 className="text-2xl font-bold text-foreground">Prospects</h1>
+            <p className="text-sm text-muted-foreground">
               {activeCount} prospect{activeCount !== 1 ? "s" : ""} actif
               {activeCount !== 1 ? "s" : ""}
               {" · "}
@@ -141,13 +141,13 @@ export default async function ProspectsPage({
           href="/dashboard/prospects"
           className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-all ${
             !filterStatus
-              ? "border-orange-200 bg-orange-50 text-orange-700"
-              : "border-zinc-200 bg-white text-zinc-500 hover:border-zinc-300"
+              ? "border-orange-500/35 bg-orange-500/10 text-orange-800 dark:bg-orange-950/40 dark:text-orange-300"
+              : "border-border bg-card text-muted-foreground hover:border-muted-foreground/25"
           }`}
         >
           En cours
           <span
-            className={`rounded-full px-1.5 text-xs font-bold ${!filterStatus ? "bg-orange-100 text-orange-700" : "bg-zinc-100 text-zinc-500"}`}
+            className={`rounded-full px-1.5 text-xs font-bold ${!filterStatus ? "bg-orange-500/20 text-orange-800 dark:text-orange-300" : "bg-muted text-muted-foreground"}`}
           >
             {activeCount}
           </span>
@@ -162,12 +162,12 @@ export default async function ProspectsPage({
               className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-all ${
                 isActive
                   ? `${cfg.border} ${cfg.bg} ${cfg.color}`
-                  : "border-zinc-200 bg-white text-zinc-500 hover:border-zinc-300"
+                  : "border-border bg-card text-muted-foreground hover:border-muted-foreground/25"
               }`}
             >
               {cfg.label}
               <span
-                className={`rounded-full px-1.5 text-xs font-bold ${isActive ? `${cfg.bg} ${cfg.color}` : "bg-zinc-100 text-zinc-500"}`}
+                className={`rounded-full px-1.5 text-xs font-bold ${isActive ? `${cfg.bg} ${cfg.color}` : "bg-muted text-muted-foreground"}`}
               >
                 {countsByStatus[s]}
               </span>
@@ -178,16 +178,16 @@ export default async function ProspectsPage({
 
       {/* Empty state */}
       {prospects.length === 0 ? (
-        <div className="flex flex-col items-center rounded-xl border border-dashed border-zinc-200 bg-white py-20 text-center">
+        <div className="flex flex-col items-center rounded-xl border border-dashed border-border bg-card py-20 text-center">
           <div
             className={`mb-4 flex h-12 w-12 items-center justify-center rounded-2xl ${accent.bgSoft}`}
           >
             <UserSearch className={`h-6 w-6 ${accent.icon}`} />
           </div>
-          <p className="text-sm font-medium text-zinc-700">
+          <p className="text-sm font-medium text-foreground">
             {filterStatus ? `Aucun prospect "${STATUS_CONFIG[filterStatus].label}"` : "Aucun prospect"}
           </p>
-          <p className="mt-1 text-xs text-zinc-500">
+          <p className="mt-1 text-xs text-muted-foreground">
             Ajoutez un prospect pour commencer votre pipeline commercial.
           </p>
         </div>
@@ -200,7 +200,7 @@ export default async function ProspectsPage({
             return (
               <div
                 key={prospect.id}
-                className="group relative flex flex-col gap-0 rounded-xl border border-zinc-200 bg-white transition-all hover:border-orange-200 hover:shadow-sm"
+                className="group relative flex flex-col gap-0 rounded-xl border border-border bg-card transition-all hover:border-orange-500/35 hover:shadow-sm"
               >
                 {/* Top */}
                 <div className="flex items-start gap-3 p-4">
@@ -211,7 +211,7 @@ export default async function ProspectsPage({
                   />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <p className="truncate text-sm font-semibold text-zinc-900">
+                      <p className="truncate text-sm font-semibold text-foreground">
                         {prospect.firstName} {prospect.lastName}
                       </p>
                       <span
@@ -221,19 +221,19 @@ export default async function ProspectsPage({
                       </span>
                     </div>
                     {prospect.email && (
-                      <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-zinc-400">
+                      <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground">
                         <Mail className="h-3 w-3 shrink-0" />
                         {prospect.email}
                       </p>
                     )}
                     {prospect.phone && (
-                      <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-zinc-400">
+                      <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground">
                         <Phone className="h-3 w-3 shrink-0" />
                         {prospect.phoneCountryCode} {prospect.phone}
                       </p>
                     )}
                     {prospect.prospectSource && (
-                      <p className="mt-1 text-[10px] text-zinc-400">
+                      <p className="mt-1 text-[10px] text-muted-foreground">
                         Source : {prospect.prospectSource}
                       </p>
                     )}
@@ -241,15 +241,15 @@ export default async function ProspectsPage({
                 </div>
 
                 {prospect.prospectNotes && (
-                  <div className="border-t border-zinc-100 px-4 py-2">
-                    <p className="line-clamp-2 text-xs text-zinc-500">
+                  <div className="border-t border-border px-4 py-2">
+                    <p className="line-clamp-2 text-xs text-muted-foreground">
                       {prospect.prospectNotes}
                     </p>
                   </div>
                 )}
 
                 {/* Actions */}
-                <div className="flex items-center justify-between border-t border-zinc-100 px-4 py-2.5">
+                <div className="flex items-center justify-between border-t border-border px-4 py-2.5">
                   <div className="flex items-center gap-1">
                     {/* Status change buttons */}
                     {prospect.prospectStatus !== "CONVERTED" &&
@@ -259,7 +259,7 @@ export default async function ProspectsPage({
                         >
                           <button
                             type="submit"
-                            className="flex items-center gap-1 rounded px-2 py-1 text-[10px] font-medium text-zinc-500 transition-all hover:bg-zinc-100"
+                            className="flex items-center gap-1 rounded px-2 py-1 text-[10px] font-medium text-muted-foreground transition-all hover:bg-muted"
                           >
                             <ArrowRight className="h-3 w-3" />
                             Avancer
@@ -271,7 +271,7 @@ export default async function ProspectsPage({
                       <form action={convertProspectToClient.bind(null, prospect.id)}>
                         <button
                           type="submit"
-                          className="flex items-center gap-1 rounded px-2 py-1 text-[10px] font-medium text-emerald-600 transition-all hover:bg-emerald-50"
+                          className="flex items-center gap-1 rounded px-2 py-1 text-[10px] font-medium text-emerald-600 transition-all hover:bg-emerald-500/15 dark:text-emerald-400 dark:hover:bg-emerald-950/40"
                         >
                           <CheckCircle2 className="h-3 w-3" />
                           Convertir
@@ -283,7 +283,7 @@ export default async function ProspectsPage({
                   <form action={deleteProspect.bind(null, prospect.id)}>
                     <button
                       type="submit"
-                      className="rounded p-1.5 text-zinc-300 opacity-0 transition-all hover:bg-red-50 hover:text-red-500 group-hover:opacity-100"
+                      className="rounded p-1.5 text-muted-foreground opacity-0 transition-all hover:bg-destructive/10 hover:text-red-500 group-hover:opacity-100"
                       aria-label="Supprimer"
                     >
                       <Trash2 className="h-3.5 w-3.5" />

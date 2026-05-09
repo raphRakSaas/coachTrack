@@ -21,8 +21,8 @@ export default async function SettingsPage() {
           <SettingsIcon className={`h-5 w-5 ${accent.icon}`} />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900">Paramètres</h1>
-          <p className="text-sm text-zinc-500">
+          <h1 className="text-2xl font-bold text-foreground">Paramètres</h1>
+          <p className="text-sm text-muted-foreground">
             Gérez votre profil de coach et vos informations
           </p>
         </div>
@@ -31,11 +31,11 @@ export default async function SettingsPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Form */}
         <div className="flex flex-col gap-6 lg:col-span-2">
-          <div className="rounded-xl border border-zinc-200 bg-white p-6">
-            <h2 className="mb-1 text-base font-semibold text-zinc-900">
+          <div className="rounded-xl border border-border bg-card p-6">
+            <h2 className="mb-1 text-base font-semibold text-foreground">
               Profil de coach
             </h2>
-            <p className="mb-5 text-sm text-zinc-500">
+            <p className="mb-5 text-sm text-muted-foreground">
               Ces informations apparaissent dans votre dashboard.
             </p>
             <SettingsForm
@@ -52,18 +52,18 @@ export default async function SettingsPage() {
 
         {/* Side info */}
         <div className="flex flex-col gap-4">
-          <div className="rounded-xl border border-zinc-200 bg-white p-5">
-            <h3 className="mb-3 text-sm font-semibold text-zinc-900">
+          <div className="rounded-xl border border-border bg-card p-5">
+            <h3 className="mb-3 text-sm font-semibold text-foreground">
               Compte
             </h3>
             <dl className="flex flex-col gap-2 text-sm">
               <div>
-                <dt className="text-xs text-zinc-500">Email</dt>
-                <dd className="font-medium text-zinc-900">{user.email}</dd>
+                <dt className="text-xs text-muted-foreground">Email</dt>
+                <dd className="font-medium text-foreground">{user.email}</dd>
               </div>
               <div>
-                <dt className="text-xs text-zinc-500">Membre depuis</dt>
-                <dd className="font-medium text-zinc-900">
+                <dt className="text-xs text-muted-foreground">Membre depuis</dt>
+                <dd className="font-medium text-foreground">
                   {new Date(user.createdAt).toLocaleDateString("fr-FR", {
                     month: "long",
                     year: "numeric",
@@ -75,15 +75,15 @@ export default async function SettingsPage() {
               href="https://accounts.clerk.com"
               target="_blank"
               rel="noreferrer"
-              className="mt-4 flex items-center gap-1 text-xs font-medium text-zinc-600 hover:text-zinc-900"
+              className="mt-4 flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
             >
               Gérer email & mot de passe
               <ExternalLink className="h-3 w-3" />
             </a>
           </div>
 
-          <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-5">
-            <p className="text-xs leading-relaxed text-zinc-500">
+          <div className="rounded-xl border border-border bg-muted p-5">
+            <p className="text-xs leading-relaxed text-muted-foreground">
               💡 Plus votre profil est complet, plus votre dashboard est
               personnalisé. Pensez à ajouter votre spécialité et votre
               expérience.

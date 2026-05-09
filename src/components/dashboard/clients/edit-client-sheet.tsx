@@ -185,7 +185,7 @@ export function EditClientSheet({ client }: { client: ClientInput }) {
           className="flex flex-col gap-5 px-4 py-2"
         >
           {/* ── Identité ── */}
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Identité
           </p>
           <div className="grid grid-cols-2 gap-3">
@@ -290,17 +290,17 @@ export function EditClientSheet({ client }: { client: ClientInput }) {
             <button
               type="button"
               onClick={() => setIsActive(!isActive)}
-              className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${isActive ? "bg-emerald-500" : "bg-zinc-300"}`}
+              className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${isActive ? "bg-emerald-500" : "bg-muted"}`}
             >
               <span
-                className={`inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform ${isActive ? "translate-x-4" : "translate-x-1"}`}
+                className={`inline-block h-3.5 w-3.5 rounded-full bg-background shadow transition-transform ${isActive ? "translate-x-4" : "translate-x-1"}`}
               />
             </button>
             <Label>{isActive ? "Client actif" : "Client inactif"}</Label>
           </div>
 
           {/* ── Profil sportif ── */}
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Profil sportif
           </p>
           <div className="grid grid-cols-2 gap-3">
@@ -386,7 +386,7 @@ export function EditClientSheet({ client }: { client: ClientInput }) {
           </div>
 
           {/* ── Objectifs ── */}
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Objectifs
           </p>
           <div className="grid grid-cols-2 gap-3">
@@ -462,7 +462,7 @@ export function EditClientSheet({ client }: { client: ClientInput }) {
           </div>
 
           {/* ── Nutrition ── */}
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Nutrition
           </p>
           <div className="grid grid-cols-2 gap-3">
@@ -517,17 +517,17 @@ export function EditClientSheet({ client }: { client: ClientInput }) {
               <button
                 type="button"
                 onClick={() => setHasTCA(!hasTCA)}
-                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${hasTCA ? "bg-rose-500" : "bg-zinc-300"}`}
+                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${hasTCA ? "bg-rose-500" : "bg-muted"}`}
               >
                 <span
-                  className={`inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform ${hasTCA ? "translate-x-4" : "translate-x-1"}`}
+                  className={`inline-block h-3.5 w-3.5 rounded-full bg-background shadow transition-transform ${hasTCA ? "translate-x-4" : "translate-x-1"}`}
                 />
               </button>
               <Label>TCA (troubles alimentaires)</Label>
             </div>
           </div>
 
-          <p className="text-[11px] text-zinc-400">
+          <p className="text-[11px] text-muted-foreground">
             Macronutriments (% — doit totaler 100%)
           </p>
           <div className="grid grid-cols-3 gap-3">
@@ -566,7 +566,7 @@ export function EditClientSheet({ client }: { client: ClientInput }) {
             </div>
           </div>
 
-          <p className="text-[11px] text-zinc-400">Calories par repas (%)</p>
+          <p className="text-[11px] text-muted-foreground">Calories par repas (%)</p>
           <div className="grid grid-cols-2 gap-3">
             {[
               {
@@ -605,7 +605,7 @@ export function EditClientSheet({ client }: { client: ClientInput }) {
           </div>
 
           {/* ── Coordonnées ── */}
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Coordonnées
           </p>
           <div className="grid grid-cols-2 gap-3">
@@ -652,7 +652,7 @@ export function EditClientSheet({ client }: { client: ClientInput }) {
           </div>
 
           {/* ── Réseaux sociaux ── */}
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Réseaux sociaux
           </p>
           <div className="grid grid-cols-2 gap-3">
@@ -675,7 +675,7 @@ export function EditClientSheet({ client }: { client: ClientInput }) {
           </div>
 
           {/* ── Notes ── */}
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Notes générales
           </p>
           <div className="flex flex-col gap-1.5">
@@ -689,7 +689,7 @@ export function EditClientSheet({ client }: { client: ClientInput }) {
           </div>
 
           {/* ── Médical ── */}
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Médical (optionnel)
           </p>
           {consentRecordedAt ? (
@@ -697,7 +697,7 @@ export function EditClientSheet({ client }: { client: ClientInput }) {
               ✓ Consentement enregistré le {consentRecordedAt}
             </p>
           ) : (
-            <p className="text-xs leading-relaxed text-zinc-500">
+            <p className="text-xs leading-relaxed text-muted-foreground">
               Ne renseignez ces champs que si nécessaire et avec un fondement
               légal (voir politique de confidentialité).
             </p>
@@ -721,7 +721,7 @@ export function EditClientSheet({ client }: { client: ClientInput }) {
             />
           </div>
           {!consentRecordedAt && (
-            <label className="flex cursor-pointer items-start gap-2 text-xs leading-snug text-zinc-700">
+            <label className="flex cursor-pointer items-start gap-2 text-xs leading-snug text-foreground">
               <input
                 type="checkbox"
                 name="sensitiveDataConsent"

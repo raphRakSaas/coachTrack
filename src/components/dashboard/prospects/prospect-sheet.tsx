@@ -80,7 +80,7 @@ export function ProspectSheet() {
           action={handleSubmit}
           className="flex flex-col gap-5 px-4 py-2"
         >
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Identité
           </p>
           <div className="grid grid-cols-2 gap-3">
@@ -136,7 +136,7 @@ export function ProspectSheet() {
             </div>
           </div>
 
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Pipeline
           </p>
           <div className="flex flex-col gap-1.5">

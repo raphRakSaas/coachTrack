@@ -22,25 +22,25 @@ export function SearchInput({ placeholder = "Rechercher..." }: { placeholder?: s
 
   return (
     <div className="relative">
-      <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+      <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
       <input
         type="text"
         value={value}
         onChange={(e) => update(e.target.value)}
         placeholder={placeholder}
-        className="h-9 w-64 rounded-lg border border-zinc-200 bg-white pl-8 pr-8 text-sm placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none"
+        className="h-9 w-64 rounded-lg border border-border bg-background pl-8 pr-8 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40"
       />
       {value && (
         <button
           type="button"
           onClick={() => update("")}
-          className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-zinc-400 hover:bg-zinc-100"
+          className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-muted-foreground hover:bg-muted"
         >
           <X className="h-3.5 w-3.5" />
         </button>
       )}
       {isPending && (
-        <div className="absolute right-7 top-1/2 h-3 w-3 -translate-y-1/2 animate-pulse rounded-full bg-zinc-300" />
+        <div className="absolute right-7 top-1/2 h-3 w-3 -translate-y-1/2 animate-pulse rounded-full bg-muted-foreground/35" />
       )}
     </div>
   )

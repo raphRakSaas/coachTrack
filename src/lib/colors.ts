@@ -128,14 +128,46 @@ export const SECTION_ACCENTS: Record<
 // 8 deterministic avatar palettes — chosen to be readable on light bg.
 // Pre-listed Tailwind classes so they survive purge.
 const AVATAR_PALETTE = [
-  { bg: "bg-rose-100", text: "text-rose-700", ring: "ring-rose-200" },
-  { bg: "bg-orange-100", text: "text-orange-700", ring: "ring-orange-200" },
-  { bg: "bg-amber-100", text: "text-amber-700", ring: "ring-amber-200" },
-  { bg: "bg-emerald-100", text: "text-emerald-700", ring: "ring-emerald-200" },
-  { bg: "bg-teal-100", text: "text-teal-700", ring: "ring-teal-200" },
-  { bg: "bg-sky-100", text: "text-sky-700", ring: "ring-sky-200" },
-  { bg: "bg-indigo-100", text: "text-indigo-700", ring: "ring-indigo-200" },
-  { bg: "bg-fuchsia-100", text: "text-fuchsia-700", ring: "ring-fuchsia-200" },
+  {
+    bg: "bg-rose-100 dark:bg-rose-950/55",
+    text: "text-rose-800 dark:text-rose-100",
+    ring: "ring-rose-200 dark:ring-rose-800/60",
+  },
+  {
+    bg: "bg-orange-100 dark:bg-orange-950/55",
+    text: "text-orange-800 dark:text-orange-100",
+    ring: "ring-orange-200 dark:ring-orange-800/60",
+  },
+  {
+    bg: "bg-amber-100 dark:bg-amber-950/55",
+    text: "text-amber-800 dark:text-amber-100",
+    ring: "ring-amber-200 dark:ring-amber-800/60",
+  },
+  {
+    bg: "bg-emerald-100 dark:bg-emerald-950/55",
+    text: "text-emerald-800 dark:text-emerald-100",
+    ring: "ring-emerald-200 dark:ring-emerald-800/60",
+  },
+  {
+    bg: "bg-teal-100 dark:bg-teal-950/55",
+    text: "text-teal-800 dark:text-teal-100",
+    ring: "ring-teal-200 dark:ring-teal-800/60",
+  },
+  {
+    bg: "bg-sky-100 dark:bg-sky-950/55",
+    text: "text-sky-800 dark:text-sky-100",
+    ring: "ring-sky-200 dark:ring-sky-800/60",
+  },
+  {
+    bg: "bg-indigo-100 dark:bg-indigo-950/55",
+    text: "text-indigo-800 dark:text-indigo-100",
+    ring: "ring-indigo-200 dark:ring-indigo-800/60",
+  },
+  {
+    bg: "bg-fuchsia-100 dark:bg-fuchsia-950/55",
+    text: "text-fuchsia-800 dark:text-fuchsia-100",
+    ring: "ring-fuchsia-200 dark:ring-fuchsia-800/60",
+  },
 ]
 
 function hash(str: string): number {

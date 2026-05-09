@@ -45,7 +45,7 @@ export default async function ExerciseDetailPage({
                 Retour
               </Link>
             </div>
-            <h1 className="mt-1 text-2xl font-bold text-zinc-900">
+            <h1 className="mt-1 text-2xl font-bold text-foreground">
               {exercise.name}
             </h1>
           </div>

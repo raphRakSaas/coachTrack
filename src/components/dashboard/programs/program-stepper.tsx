@@ -169,17 +169,17 @@ export function ProgramStepper({
   const steps = ["Informations", "Jours", "Récapitulatif"] as const
 
   return (
-    <div className="min-h-screen bg-zinc-50 p-8">
+    <div className="min-h-screen bg-muted p-8">
       <div className="mx-auto max-w-2xl">
         <div className="mb-8">
           <button
             onClick={() => router.back()}
-            className="mb-4 flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-900"
+            className="mb-4 flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
           >
             <ChevronLeft className="h-4 w-4" />
             Retour
           </button>
-          <h1 className="text-2xl font-bold text-zinc-900">
+          <h1 className="text-2xl font-bold text-foreground">
             Nouveau programme
           </h1>
         </div>
@@ -194,7 +194,7 @@ export function ProgramStepper({
                   className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold transition-colors ${
                     step >= s
                       ? "bg-indigo-600 text-white"
-                      : "bg-zinc-200 text-zinc-500"
+                      : "bg-muted text-muted-foreground"
                   }`}
                 >
                   {step > s ? <Check className="h-3.5 w-3.5" /> : s}
@@ -202,14 +202,14 @@ export function ProgramStepper({
                 <span
                   className={`text-sm ${
                     step === s
-                      ? "font-medium text-zinc-900"
-                      : "text-zinc-400"
+                      ? "font-medium text-foreground"
+                      : "text-muted-foreground"
                   }`}
                 >
                   {label}
                 </span>
                 {s < 3 && (
-                  <ChevronRight className="h-4 w-4 text-zinc-300" />
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
                 )}
               </div>
             )
@@ -218,7 +218,7 @@ export function ProgramStepper({
 
         {/* Step 1: Informations */}
         {step === 1 && (
-          <div className="rounded-xl border border-zinc-200 bg-white p-6">
+          <div className="rounded-xl border border-border bg-card p-6">
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
                 <Label>Client</Label>
@@ -285,7 +285,7 @@ export function ProgramStepper({
             {days.map((day) => (
               <div
                 key={day.uid}
-                className="rounded-xl border border-zinc-200 bg-white p-6"
+                className="rounded-xl border border-border bg-card p-6"
               >
                 <div className="mb-4 flex items-center gap-3">
                   <Input
@@ -296,7 +296,7 @@ export function ProgramStepper({
                   {days.length > 1 && (
                     <button
                       onClick={() => removeDay(day.uid)}
-                      className="shrink-0 rounded p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-red-500 transition-colors"
+                      className="shrink-0 rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-red-500 transition-colors"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -312,17 +312,17 @@ export function ProgramStepper({
                       return (
                         <div
                           key={ex.order}
-                          className="rounded-lg border border-zinc-100 bg-zinc-50 p-3"
+                          className="rounded-lg border border-border bg-muted p-3"
                         >
                           <div className="mb-2 flex items-center justify-between">
-                            <p className="text-sm font-medium text-zinc-900">
+                            <p className="text-sm font-medium text-foreground">
                               {info?.name}
                             </p>
                             <button
                               onClick={() =>
                                 removeExercise(day.uid, ex.order)
                               }
-                              className="rounded p-1 text-zinc-400 hover:text-red-500"
+                              className="rounded p-1 text-muted-foreground hover:text-red-500"
                             >
                               <Trash2 className="h-3.5 w-3.5" />
                             </button>
@@ -462,52 +462,52 @@ export function ProgramStepper({
         {/* Step 3: Récapitulatif */}
         {step === 3 && (
           <div className="flex flex-col gap-4">
-            <div className="rounded-xl border border-zinc-200 bg-white p-6">
-              <h2 className="mb-4 text-base font-semibold text-zinc-900">
+            <div className="rounded-xl border border-border bg-card p-6">
+              <h2 className="mb-4 text-base font-semibold text-foreground">
                 Récapitulatif
               </h2>
               <div className="flex flex-col gap-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-zinc-500">Client</span>
+                  <span className="text-muted-foreground">Client</span>
                   <span className="font-medium">
                     {selectedClient?.firstName} {selectedClient?.lastName}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-zinc-500">Programme</span>
+                  <span className="text-muted-foreground">Programme</span>
                   <span className="font-medium">{name}</span>
                 </div>
                 {description && (
                   <div className="flex justify-between">
-                    <span className="text-zinc-500">Description</span>
+                    <span className="text-muted-foreground">Description</span>
                     <span className="max-w-xs text-right font-medium">
                       {description}
                     </span>
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span className="text-zinc-500">Date de début</span>
+                  <span className="text-muted-foreground">Date de début</span>
                   <span className="font-medium">
                     {new Date(startDate).toLocaleDateString("fr-FR")}
                   </span>
                 </div>
-                <div className="flex justify-between border-t border-zinc-100 pt-3">
-                  <span className="text-zinc-500">Jours d'entraînement</span>
+                <div className="flex justify-between border-t border-border pt-3">
+                  <span className="text-muted-foreground">Jours d'entraînement</span>
                   <span className="font-medium">{days.length}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-zinc-500">Exercices au total</span>
+                  <span className="text-muted-foreground">Exercices au total</span>
                   <span className="font-medium">{totalExercises}</span>
                 </div>
               </div>
 
               {days.map((day) => (
                 <div key={day.uid} className="mt-4">
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                     {day.name}
                   </p>
                   {day.exercises.length === 0 ? (
-                    <p className="text-xs text-zinc-400">Aucun exercice</p>
+                    <p className="text-xs text-muted-foreground">Aucun exercice</p>
                   ) : (
                     <ul className="flex flex-col gap-1">
                       {day.exercises.map((ex) => {
@@ -519,8 +519,8 @@ export function ProgramStepper({
                             key={ex.order}
                             className="flex items-center justify-between text-xs"
                           >
-                            <span className="text-zinc-700">{info?.name}</span>
-                            <span className="text-zinc-400">
+                            <span className="text-foreground">{info?.name}</span>
+                            <span className="text-muted-foreground">
                               {ex.sets}×{ex.reps}
                               {ex.weight ? ` · ${ex.weight}kg` : ""}
                             </span>

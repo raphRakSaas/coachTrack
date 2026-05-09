@@ -63,7 +63,7 @@ export function MeasurementSheet({
             <Label htmlFor="date">Date</Label>
             <Input id="date" name="date" type="date" defaultValue={today} />
           </div>
-          <p className="text-xs leading-relaxed text-zinc-500">
+          <p className="text-xs leading-relaxed text-muted-foreground">
             Les mensurations et le poids peuvent constituer des données
             personnelles sensibles. Ne les enregistrez qu&apos;avec un fondement
             légal adapté.{" "}
@@ -77,7 +77,7 @@ export function MeasurementSheet({
             </a>
           </p>
           {!hasRecordedSensitiveConsent ? (
-            <label className="flex cursor-pointer items-start gap-2 text-xs leading-snug text-zinc-700">
+            <label className="flex cursor-pointer items-start gap-2 text-xs leading-snug text-foreground">
               <input
                 type="checkbox"
                 name="measurementConsent"
@@ -98,7 +98,7 @@ export function MeasurementSheet({
             <p className="text-xs font-medium text-red-600">{formError}</p>
           ) : null}
 
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Corps
           </p>
           <div className="grid grid-cols-2 gap-3">
@@ -138,7 +138,7 @@ export function MeasurementSheet({
             </div>
           </div>
 
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Mensurations (cm)
           </p>
           <div className="grid grid-cols-2 gap-3">

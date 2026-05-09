@@ -45,8 +45,8 @@ export default async function ExercisesPage({
             <Dumbbell className={`h-5 w-5 ${accent.icon}`} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-zinc-900">Exercices</h1>
-            <p className="text-sm text-zinc-500">
+            <h1 className="text-2xl font-bold text-foreground">Exercices</h1>
+            <p className="text-sm text-muted-foreground">
               {exercises.length} exercice{exercises.length !== 1 ? "s" : ""}
               {customCount > 0 && ` · ${customCount} personnalisé${customCount !== 1 ? "s" : ""}`}
             </p>
@@ -59,12 +59,12 @@ export default async function ExercisesPage({
       </div>
 
       {exercises.length === 0 ? (
-        <div className="flex flex-col items-center rounded-xl border border-dashed border-zinc-200 bg-white py-20 text-center">
+        <div className="flex flex-col items-center rounded-xl border border-dashed border-border bg-card py-20 text-center">
           <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-2xl ${accent.bgSoft}`}>
             <Dumbbell className={`h-6 w-6 ${accent.icon}`} />
           </div>
-          <p className="text-sm font-medium text-zinc-700">Aucun exercice</p>
-          <p className="mt-1 text-xs text-zinc-500">
+          <p className="text-sm font-medium text-foreground">Aucun exercice</p>
+          <p className="mt-1 text-xs text-muted-foreground">
             Ajoutez votre premier exercice ou exécutez le seed des exercices globaux.
           </p>
         </div>
@@ -73,12 +73,12 @@ export default async function ExercisesPage({
           {Object.entries(grouped).map(([group, items]) => (
             <div key={group}>
               <div className="mb-2 flex items-baseline gap-2">
-                <p className="text-xs font-bold uppercase tracking-wide text-zinc-500">
+                <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
                   {MUSCLE_GROUPS[group as keyof typeof MUSCLE_GROUPS]}
                 </p>
-                <span className="text-xs text-zinc-400">{items.length}</span>
+                <span className="text-xs text-muted-foreground">{items.length}</span>
               </div>
-              <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white p-4">
+              <div className="overflow-hidden rounded-xl border border-border bg-card p-4">
                 <div className="flex gap-4 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                   {items.map((exercise) => (
                     <ExerciseCard3d

@@ -85,11 +85,11 @@ export function PrivacyDataCard() {
   }
 
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-6">
-      <h2 className="mb-1 text-base font-semibold text-zinc-900">
+    <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+      <h2 className="mb-1 text-base font-semibold text-foreground">
         Données personnelles (RGPD)
       </h2>
-      <p className="mb-5 text-sm text-zinc-500">
+      <p className="mb-5 text-sm text-muted-foreground">
         Exercice des droits d&apos;accès (export) et d&apos;effacement (suppression
         du compte). Les données de vos clients sont effacées en cascade avec
         votre compte coach ; pour les personnes concernées qui vous contactent
@@ -98,11 +98,11 @@ export function PrivacyDataCard() {
       </p>
 
       <div className="flex flex-col gap-4">
-        <div className="rounded-lg border border-zinc-100 bg-zinc-50 p-4">
-          <p className="text-sm font-medium text-zinc-800">
+        <div className="rounded-lg border border-border bg-muted p-4">
+          <p className="text-sm font-medium text-foreground">
             Exporter mes données
           </p>
-          <p className="mt-1 text-xs text-zinc-500">
+          <p className="mt-1 text-xs text-muted-foreground">
             Fichier JSON structuré (compte, clients, séances, programmes, etc.).
           </p>
           <Button
@@ -122,18 +122,18 @@ export function PrivacyDataCard() {
           </Button>
         </div>
 
-        <div className="rounded-lg border border-red-200 bg-red-50/80 p-4">
-          <p className="text-sm font-medium text-red-900">
+        <div className="rounded-lg border border-destructive/35 bg-destructive/10 p-4 dark:bg-destructive/15">
+          <p className="text-sm font-medium text-destructive">
             Supprimer définitivement mon compte
           </p>
-          <p className="mt-1 text-xs text-red-800/90">
+          <p className="mt-1 text-xs text-destructive/90">
             Cette action supprime toutes vos données dans Revo et ferme votre
             compte Clerk. Elle est irréversible.
           </p>
           <div className="mt-3 space-y-2">
             <Label
               htmlFor="delete-confirm"
-              className="text-xs font-normal text-red-900"
+              className="text-xs font-normal text-destructive"
             >
               Saisissez : {DELETE_CONFIRMATION}
             </Label>
@@ -141,7 +141,7 @@ export function PrivacyDataCard() {
               id="delete-confirm"
               value={deletePhrase}
               onChange={(e) => setDeletePhrase(e.target.value)}
-              className="border-red-200 bg-white text-sm"
+              className="border-destructive/30 bg-card text-sm text-foreground"
               autoComplete="off"
               disabled={deleteLoading}
             />

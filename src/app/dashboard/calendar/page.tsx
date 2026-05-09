@@ -48,8 +48,7 @@ export default async function CalendarPage({
 }: {
   searchParams: Promise<{ week?: string; view?: string }>
 }) {
-  const { week, view } = await searchParams
-  const viewMode = view === "month" ? "month" : "week"
+  const { week } = await searchParams
 
   const user = await getCurrentUser()
   if (!user) redirect("/sign-in")
@@ -111,8 +110,8 @@ export default async function CalendarPage({
             <CalendarDays className={`h-5 w-5 ${accent.icon}`} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-zinc-900">Calendrier</h1>
-            <p className="text-sm text-zinc-500">
+            <h1 className="text-2xl font-bold text-foreground">Calendrier</h1>
+            <p className="text-sm text-muted-foreground">
               {totalThisWeek} séance{totalThisWeek !== 1 ? "s" : ""} cette
               semaine
             </p>
@@ -129,19 +128,19 @@ export default async function CalendarPage({
           >
             Aujourd&apos;hui
           </Link>
-          <div className="flex items-center gap-1 rounded-lg border border-zinc-200 bg-white">
+          <div className="flex items-center gap-1 rounded-lg border border-border bg-card shadow-sm">
             <Link
               href={`/dashboard/calendar?week=${isoDate(prevWeekStart)}`}
-              className="flex h-8 w-8 items-center justify-center rounded-l-lg text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900"
+              className="flex h-8 w-8 items-center justify-center rounded-l-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
               <ChevronLeft className="h-4 w-4" />
             </Link>
-            <span className="px-3 text-sm font-medium text-zinc-700">
+            <span className="px-3 text-sm font-medium text-foreground">
               {weekLabel}
             </span>
             <Link
               href={`/dashboard/calendar?week=${isoDate(nextWeekStart)}`}
-              className="flex h-8 w-8 items-center justify-center rounded-r-lg text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900"
+              className="flex h-8 w-8 items-center justify-center rounded-r-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
               <ChevronRight className="h-4 w-4" />
             </Link>
@@ -157,26 +156,26 @@ export default async function CalendarPage({
       </div>
 
       {/* Calendar grid */}
-      <div className="flex-1 overflow-hidden rounded-xl border border-zinc-200 bg-white">
+      <div className="flex-1 overflow-hidden rounded-xl border border-border bg-card shadow-sm">
         {/* Day headers */}
-        <div className="grid grid-cols-7 border-b border-zinc-100">
+        <div className="grid grid-cols-7 border-b border-border bg-muted/20">
           {days.map(({ date, isToday }, idx) => (
             <div
               key={idx}
-              className={`border-r border-zinc-100 px-3 py-3 text-center last:border-r-0 ${
-                isToday ? "bg-teal-50" : ""
+              className={`border-r border-border px-3 py-3 text-center last:border-r-0 ${
+                isToday ? accent.activeBg : ""
               }`}
             >
               <p
                 className={`text-xs font-semibold uppercase tracking-wide ${
-                  isToday ? "text-teal-700" : "text-zinc-400"
+                  isToday ? accent.activeText : "text-muted-foreground"
                 }`}
               >
                 {WEEKDAY_LABELS[idx]}
               </p>
               <p
                 className={`mt-1 text-lg font-bold ${
-                  isToday ? "text-teal-700" : "text-zinc-900"
+                  isToday ? accent.activeText : "text-foreground"
                 }`}
               >
                 {date.getDate()}
@@ -186,15 +185,19 @@ export default async function CalendarPage({
         </div>
 
         {/* Events */}
-        <div className="grid grid-cols-7 divide-x divide-zinc-100">
-          {days.map(({ sessions: daySessions, isToday, dateKey }, idx) => (
+        <div className="grid grid-cols-7 divide-x divide-border">
+          {days.map(({ sessions: daySessions, isToday }, idx) => (
             <div
               key={idx}
-              className={`min-h-[320px] p-2 ${isToday ? "bg-teal-50/30" : ""}`}
+              className={`min-h-[320px] p-2 ${
+                isToday
+                  ? "bg-teal-500/[0.06] dark:bg-teal-400/[0.10]"
+                  : ""
+              }`}
             >
               {daySessions.length === 0 ? (
                 <div className="flex h-full items-start justify-center pt-6">
-                  <p className="text-xs text-zinc-300">—</p>
+                  <p className="text-xs text-muted-foreground/60">—</p>
                 </div>
               ) : (
                 <div className="flex flex-col gap-1.5">
@@ -206,7 +209,7 @@ export default async function CalendarPage({
                       <Link
                         key={session.id}
                         href={`/dashboard/sessions/${session.id}`}
-                        className={`group rounded-lg border p-2 transition-all hover:shadow-sm ${colors.ring} ${colors.bg} border-transparent hover:border-current/20`}
+                        className={`group rounded-lg border border-border/80 p-2 transition-all hover:border-primary/40 hover:shadow-md ${colors.ring} ${colors.bg} hover:brightness-[1.02] dark:hover:brightness-110`}
                       >
                         <p
                           className={`truncate text-xs font-semibold ${colors.text}`}
@@ -214,15 +217,15 @@ export default async function CalendarPage({
                           {session.client.firstName}{" "}
                           {session.client.lastName[0]}.
                         </p>
-                        <p className="mt-0.5 text-[10px] text-zinc-500">
+                        <p className="mt-0.5 text-[10px] text-muted-foreground">
                           {session.duration
                             ? `${session.duration} min`
                             : "Durée inconnue"}
                           {session._count.exercises > 0 &&
                             ` · ${session._count.exercises} ex.`}
                         </p>
-                        {session.rpe && (
-                          <p className="mt-0.5 text-[10px] font-medium text-zinc-500">
+                        {session.rpe != null && (
+                          <p className="mt-0.5 text-[10px] font-medium text-muted-foreground">
                             RPE {session.rpe}
                           </p>
                         )}
@@ -244,16 +247,16 @@ export default async function CalendarPage({
             .map(({ date, sessions: daySessions }) => (
               <div
                 key={isoDate(date)}
-                className="flex items-center gap-2 rounded-lg border border-zinc-100 bg-white px-3 py-2 text-xs text-zinc-500"
+                className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs text-muted-foreground shadow-sm"
               >
-                <span className="font-semibold text-zinc-900">
+                <span className="font-semibold text-foreground">
                   {WEEKDAY_LABELS[
                     date.getDay() === 0 ? 6 : date.getDay() - 1
                   ] ?? ""}{" "}
                   {date.getDate()}
                 </span>
                 {daySessions.map((s) => (
-                  <span key={s.id} className="text-zinc-400">
+                  <span key={s.id} className="text-muted-foreground">
                     {s.client.firstName} {s.client.lastName[0]}.
                   </span>
                 ))}

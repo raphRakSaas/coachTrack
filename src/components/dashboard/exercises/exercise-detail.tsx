@@ -54,11 +54,11 @@ export function ExerciseDetail({ exercise }: { exercise: ExerciseDetailInput }) 
 
   return (
     <div className="grid gap-6 lg:grid-cols-[420px_1fr]">
-      <div className="rounded-xl border border-zinc-200 bg-white p-4">
-        <p className="text-xs font-bold uppercase tracking-wide text-zinc-500">
+      <div className="rounded-xl border border-border bg-card p-4">
+        <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
           Aperçu
         </p>
-        <div className="mt-3 overflow-hidden rounded-xl ring-1 ring-zinc-200">
+        <div className="mt-3 overflow-hidden rounded-xl ring-1 ring-border">
           <img
             src={resolvedImageUrl}
             alt={exercise.name}
@@ -68,16 +68,16 @@ export function ExerciseDetail({ exercise }: { exercise: ExerciseDetailInput }) 
           />
         </div>
         <div className="mt-4 space-y-1">
-          <p className="text-sm font-semibold text-zinc-900">{exercise.name}</p>
-          <p className="text-xs text-zinc-500">{MUSCLE_GROUPS[muscleGroup]}</p>
+          <p className="text-sm font-semibold text-foreground">{exercise.name}</p>
+          <p className="text-xs text-muted-foreground">{MUSCLE_GROUPS[muscleGroup]}</p>
         </div>
       </div>
 
-      <div className="rounded-xl border border-zinc-200 bg-white p-4">
+      <div className="rounded-xl border border-border bg-card p-4">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-sm font-semibold text-zinc-900">Détails</p>
-            <p className="mt-1 text-xs text-zinc-500">
+            <p className="text-sm font-semibold text-foreground">Détails</p>
+            <p className="mt-1 text-xs text-muted-foreground">
               {exercise.isGlobal
                 ? "Cet exercice est global et ne peut pas être modifié."
                 : "Modifiez le nom, la description et l'image."}
