@@ -22,17 +22,17 @@ const FEATURES_FULL = [
       "Alerte si un client ne s'est pas entraîné depuis X jours",
       "Export des données client en PDF",
     ],
-    accent: "#22c55e",
+    accent: "#ea580c",
     direction: "left" as const,
     IllustrationEl: () => (
       <div className="w-full max-w-sm rounded-2xl border p-6" style={{ background: "var(--m-bg)", borderColor: "var(--m-border)" }}>
         <div className="mb-4 flex items-center gap-3">
-          <div className="h-12 w-12 rounded-full flex items-center justify-center text-white text-lg font-bold" style={{ background: "#22c55e" }}>M</div>
+          <div className="h-12 w-12 rounded-full flex items-center justify-center text-white text-lg font-bold" style={{ background: "#ea580c" }}>M</div>
           <div>
             <p className="font-semibold" style={{ color: "var(--m-text)" }}>Marc Dupont</p>
             <p className="text-xs" style={{ color: "var(--m-text-faint)" }}>Client depuis 4 mois · 18 séances</p>
           </div>
-          <span className="ml-auto rounded-full px-2 py-0.5 text-xs font-medium" style={{ background: "rgba(34,197,94,0.15)", color: "#22c55e" }}>Actif</span>
+          <span className="ml-auto rounded-full px-2 py-0.5 text-xs font-medium" style={{ background: "rgba(34,197,94,0.15)", color: "#ea580c" }}>Actif</span>
         </div>
         <div className="space-y-2">
           {[{ label: "Objectif", value: "Prise de masse" }, { label: "Programme", value: "Push/Pull/Legs" }, { label: "Dernier RM", value: "Squat : 100 kg" }].map(({ label, value }) => (
@@ -71,7 +71,7 @@ const FEATURES_FULL = [
               <p className="text-sm font-semibold" style={{ color: "var(--m-text)" }}>{exercise}</p>
               <p className="text-xs" style={{ color: "var(--m-text-faint)" }}>{sets} · {weight}</p>
             </div>
-            {pr && <span className="rounded-full px-2 py-0.5 text-xs font-bold" style={{ background: "rgba(139,92,246,0.15)", color: "var(--m-accent-mid)" }}>🏆 PR</span>}
+            {pr && <span className="rounded-full px-2 py-0.5 text-xs font-bold" style={{ background: "rgba(139,92,246,0.15)", color: "#ea580c" }}>🏆 PR</span>}
           </div>
         ))}
       </div>
@@ -92,7 +92,7 @@ const FEATURES_FULL = [
     direction: "left" as const,
     IllustrationEl: () => (
       <div className="w-full max-w-sm rounded-2xl border p-6" style={{ background: "var(--m-bg)", borderColor: "var(--m-border)" }}>
-        <p className="text-xs font-bold mb-3" style={{ color: "var(--m-accent-mid)" }}>Programme Push / Pull / Legs — 12 semaines</p>
+        <p className="text-xs font-bold mb-3" style={{ color: "#ea580c" }}>Programme Push / Pull / Legs — 12 semaines</p>
         {["Jour 1 — Push (Poitrine, Épaules, Triceps)", "Jour 2 — Pull (Dos, Biceps)", "Jour 3 — Legs (Quadriceps, Ischio, Mollets)"].map((day, i) => (
           <div key={i} className="mb-2 flex items-center gap-3 rounded-xl px-4 py-2.5" style={{ background: "var(--m-bg-section)" }}>
             <div className="h-6 w-6 rounded-lg flex items-center justify-center text-xs font-bold text-white" style={{ background: "var(--m-accent)" }}>{i + 1}</div>
@@ -158,7 +158,7 @@ const FEATURES_FULL = [
         </div>
         <div className="mt-3 flex items-center justify-between">
           <span className="text-xs" style={{ color: "var(--m-text-faint)" }}>Mars</span>
-          <span className="rounded-full px-2 py-0.5 text-xs font-bold" style={{ background: "rgba(139,92,246,0.15)", color: "var(--m-accent-mid)" }}>+67% en 3 mois</span>
+          <span className="rounded-full px-2 py-0.5 text-xs font-bold" style={{ background: "rgba(139,92,246,0.15)", color: "#ea580c" }}>+67% en 3 mois</span>
           <span className="text-xs" style={{ color: "var(--m-text-faint)" }}>Mai</span>
         </div>
       </div>
@@ -197,35 +197,34 @@ const FEATURES_FULL = [
 
 export default function FonctionnalitesPage() {
   return (
-    <div className="min-h-screen overflow-x-hidden" style={{ background: "var(--m-bg)", color: "var(--m-text)" }}>
+    <div className="min-h-screen overflow-x-hidden bg-white text-slate-900">
       <Nav />
 
       {/* Hero */}
-      <section className="relative px-6 pt-36 pb-20 text-center">
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[400px] w-[800px]"
-            style={{ background: "radial-gradient(ellipse, var(--m-glow-primary) 0%, transparent 70%)", filter: "blur(40px)" }} />
-        </div>
-        <div className="relative z-10 mx-auto max-w-3xl">
+      <section className="border-b border-slate-200 px-8 pb-20 pt-36 sm:px-12">
+        <div className="mx-auto max-w-6xl">
           <AnimateIn>
-            <span className="mb-4 inline-block rounded-full border px-4 py-1.5 text-sm font-medium"
-              style={{ borderColor: "rgba(139,92,246,0.3)", background: "rgba(139,92,246,0.08)", color: "var(--m-accent-mid)" }}>
+            <div className="mb-8 h-0.5 w-10" style={{ background: "#ea580c" }} />
+            <p className="mb-5 text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "#ea580c" }}>
               Fonctionnalités
-            </span>
-            <h1 className="mt-4 text-6xl font-[family-name:var(--font-display)] font-bold tracking-tight" style={{ color: "var(--m-text)" }}>
-              Tout ce dont un coach a besoin.
-            </h1>
-            <p className="mt-5 text-xl leading-relaxed" style={{ color: "var(--m-text-muted)" }}>
-              Revo centralise tous vos outils de coaching en une seule plateforme simple,
-              rapide et conçue pour le terrain.
             </p>
-            <div className="mt-8 flex flex-wrap justify-center gap-4">
-              <Link href="/sign-up" className="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white transition-all hover:opacity-90"
-                style={{ background: "linear-gradient(135deg, var(--m-accent), var(--m-accent))", boxShadow: "0 8px 32px rgba(139,92,246,0.3)" }}>
+            <h1
+              className="font-[family-name:var(--font-display)] font-bold uppercase leading-[0.92] tracking-[-0.03em] text-slate-900"
+              style={{ fontSize: "clamp(3rem, 7vw, 6rem)" }}
+            >
+              Tout ce dont<br />un coach a besoin.
+            </h1>
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-slate-500">
+              Revo centralise tous vos outils de coaching en une seule plateforme simple, rapide et conçue pour le terrain.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-4">
+              <Link href="/sign-up"
+                className="inline-flex h-12 items-center gap-2 rounded-xl px-7 text-sm font-bold uppercase tracking-wide text-white transition-all hover:opacity-90"
+                style={{ background: "linear-gradient(135deg, #ea580c, #c2410c)", boxShadow: "0 4px 20px rgba(234,88,12,0.3)" }}>
                 Commencer gratuitement <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link href="/tarifs" className="inline-flex items-center gap-2 rounded-xl border px-6 py-3 text-sm font-semibold transition-all hover:opacity-70"
-                style={{ borderColor: "var(--m-border)", color: "var(--m-text-muted)" }}>
+              <Link href="/tarifs"
+                className="inline-flex h-12 items-center gap-2 rounded-xl border border-slate-200 px-7 text-sm font-semibold text-slate-700 transition-all hover:bg-slate-50">
                 Voir les tarifs
               </Link>
             </div>
@@ -234,24 +233,25 @@ export default function FonctionnalitesPage() {
       </section>
 
       {/* Features alternées */}
-      <section className="px-6 pb-28">
+      <section className="px-8 pb-32 pt-24 sm:px-12">
         <div className="mx-auto max-w-6xl space-y-28">
           {FEATURES_FULL.map(({ tag, title, description, points, accent, direction, IllustrationEl }, idx) => (
             <AnimateIn key={tag} direction={direction} delay={0.1}>
               <div className={`grid items-center gap-12 lg:grid-cols-2 ${idx % 2 === 1 ? "lg:flex-row-reverse" : ""}`}
                 style={{ direction: idx % 2 === 1 ? "rtl" : "ltr" }}>
                 <div style={{ direction: "ltr" }}>
-                  <span className="mb-4 inline-block rounded-full px-3 py-1 text-xs font-semibold"
-                    style={{ background: `${accent}18`, color: accent }}>
-                    {tag}
-                  </span>
-                  <h2 className="text-4xl font-[family-name:var(--font-display)] font-bold tracking-tight" style={{ color: "var(--m-text)" }}>
+                  <div className="mb-5 h-0.5 w-8" style={{ background: accent }} />
+                  <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em]" style={{ color: accent }}>{tag}</p>
+                  <h2
+                    className="font-[family-name:var(--font-display)] font-bold uppercase leading-[0.92] tracking-[-0.025em] text-slate-900"
+                    style={{ fontSize: "clamp(2rem, 3.5vw, 3rem)" }}
+                  >
                     {title}
                   </h2>
-                  <p className="mt-4 text-base leading-relaxed" style={{ color: "var(--m-text-muted)" }}>{description}</p>
+                  <p className="mt-4 text-base leading-relaxed text-slate-500">{description}</p>
                   <ul className="mt-6 space-y-2.5">
                     {points.map((point) => (
-                      <li key={point} className="flex items-start gap-3 text-sm" style={{ color: "var(--m-text-muted)" }}>
+                      <li key={point} className="flex items-start gap-3 text-sm text-slate-600">
                         <Check className="mt-0.5 h-4 w-4 flex-shrink-0" style={{ color: accent }} strokeWidth={2.5} />
                         {point}
                       </li>
@@ -268,24 +268,29 @@ export default function FonctionnalitesPage() {
       </section>
 
       {/* CTA */}
-      <section className="px-6 py-20" style={{ background: "var(--m-bg-section)" }}>
+      <section className="relative overflow-hidden border-t border-slate-200 bg-slate-900 px-8 py-32 sm:px-12">
+        <div className="pointer-events-none absolute -bottom-20 -right-20 h-72 w-72 rounded-full opacity-20"
+          style={{ background: "radial-gradient(circle, #ea580c 0%, transparent 70%)" }} />
         <AnimateIn>
-          <div className="mx-auto max-w-3xl rounded-3xl border px-10 py-14 text-center"
-            style={{ background: "rgba(139,92,246,0.07)", borderColor: "rgba(139,92,246,0.25)" }}>
-            <h2 className="text-4xl font-[family-name:var(--font-display)] font-bold" style={{ color: "var(--m-text)" }}>
+          <div className="relative z-10 mx-auto max-w-3xl">
+            <div className="mb-6 h-0.5 w-10" style={{ background: "#ea580c" }} />
+            <h2
+              className="font-[family-name:var(--font-display)] font-bold uppercase leading-[0.92] tracking-[-0.025em] text-white"
+              style={{ fontSize: "clamp(2.5rem, 5vw, 4.5rem)" }}
+            >
               Prêt à tester Revo ?
             </h2>
-            <p className="mt-3 text-base" style={{ color: "var(--m-text-muted)" }}>Gratuit, sans engagement, opérationnel en 2 minutes.</p>
+            <p className="mt-5 text-base text-slate-400">Gratuit, sans engagement, opérationnel en 2 minutes.</p>
             <Link href="/sign-up"
-              className="mt-8 inline-flex items-center gap-2 rounded-xl px-7 py-3.5 text-base font-semibold text-white transition-all hover:opacity-90"
-              style={{ background: "linear-gradient(135deg, var(--m-accent), var(--m-accent))" }}>
+              className="mt-8 inline-flex h-12 items-center gap-2 rounded-xl px-7 text-sm font-bold uppercase tracking-wide text-white transition-all hover:opacity-90"
+              style={{ background: "linear-gradient(135deg, #ea580c, #c2410c)", boxShadow: "0 4px 20px rgba(234,88,12,0.4)" }}>
               Créer mon compte gratuit <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </AnimateIn>
       </section>
 
-      <MarketingFooter variant="compact" />
+      <MarketingFooter variant="full" />
     </div>
   );
 }

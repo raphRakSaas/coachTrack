@@ -1,75 +1,105 @@
 import Link from "next/link"
 
-const FOOTER_NAV = [
-  { href: "/fonctionnalites", label: "Fonctionnalités" },
-  { href: "/tarifs", label: "Tarifs" },
-  { href: "/blog", label: "Blog" },
-  { href: "/mentions-legales", label: "Mentions légales" },
-  { href: "/cgu", label: "CGU" },
-  { href: "/confidentialite", label: "Confidentialité" },
-] as const
+type FooterLink = { href: string; label: string }
+type FooterCol = { title: string; links: FooterLink[] }
+
+const FOOTER_COLS: FooterCol[] = [
+  {
+    title: "Produit",
+    links: [
+      { href: "/fonctionnalites", label: "Fonctionnalités" },
+      { href: "/tarifs", label: "Tarifs" },
+      { href: "/blog", label: "Blog & Ressources" },
+    ],
+  },
+  {
+    title: "Démarrer",
+    links: [
+      { href: "/sign-up", label: "Créer un compte" },
+      { href: "/sign-in", label: "Se connecter" },
+    ],
+  },
+  {
+    title: "Légal",
+    links: [
+      { href: "/mentions-legales", label: "Mentions légales" },
+      { href: "/cgu", label: "CGU" },
+      { href: "/cgv", label: "CGV" },
+      { href: "/confidentialite", label: "Politique de confidentialité" },
+    ],
+  },
+]
 
 type MarketingFooterProps = {
-  /** Pleine largeur avec logo (landing). Sinon pied minimal centré. */
   variant?: "full" | "compact"
 }
 
 export function MarketingFooter({ variant = "compact" }: MarketingFooterProps) {
+  const year = new Date().getFullYear()
+
   if (variant === "full") {
     return (
-      <footer
-        className="border-t px-6 py-10"
-        style={{ borderColor: "var(--m-border)" }}
-      >
-        <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-6 sm:flex-row">
-          <div className="flex items-center gap-1.5">
-            <span
-              className="font-[family-name:var(--font-display)] text-base font-bold"
-              style={{ color: "var(--m-text)" }}
-            >
-              Revo
-            </span>
-            <span
-              className="h-1.5 w-1.5 rounded-full"
-              style={{ background: "var(--m-accent)" }}
-            />
-          </div>
-          <p className="text-xs" style={{ color: "var(--m-text-faint)" }}>
-            © {new Date().getFullYear()} Revo. Tous droits réservés.
-          </p>
-          <nav className="flex flex-wrap justify-center gap-6">
-            {FOOTER_NAV.map(({ href, label }) => (
-              <Link
-                key={href}
-                href={href}
-                className="text-xs transition-opacity hover:opacity-70"
-                style={{ color: "var(--m-text-faint)" }}
-              >
-                {label}
-              </Link>
+      <footer className="border-t border-slate-200 bg-white">
+        <div className="mx-auto max-w-6xl px-6 py-16">
+          <div className="grid grid-cols-2 gap-10 md:grid-cols-4">
+            {/* Brand */}
+            <div className="col-span-2 md:col-span-1">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg text-white text-sm font-bold"
+                  style={{ background: "linear-gradient(135deg, #ea580c, #c2410c)" }}>
+                  R
+                </div>
+                <span className="text-base font-[family-name:var(--font-display)] font-bold text-slate-900">
+                  Revo
+                </span>
+              </div>
+              <p className="text-sm leading-relaxed text-slate-500 max-w-[220px]">
+                La plateforme tout-en-un pour les coachs sportifs qui veulent passer plus de temps sur le terrain.
+              </p>
+              <p className="mt-6 text-xs text-slate-400">
+                © {year} Revo. Tous droits réservés.
+              </p>
+            </div>
+
+            {/* Nav columns */}
+            {FOOTER_COLS.map(({ title, links }) => (
+              <div key={title}>
+                <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-slate-400">{title}</p>
+                <nav className="flex flex-col gap-3">
+                  {links.map(({ href, label }) => (
+                    <Link
+                      key={href}
+                      href={href}
+                      className="text-sm text-slate-500 transition-colors hover:text-slate-900"
+                    >
+                      {label}
+                    </Link>
+                  ))}
+                </nav>
+              </div>
             ))}
-          </nav>
+          </div>
         </div>
       </footer>
     )
   }
 
   return (
-    <footer
-      className="border-t px-6 py-8"
-      style={{ borderColor: "var(--m-border)" }}
-    >
-      <div className="mx-auto flex max-w-5xl flex-col items-center gap-4 text-center sm:flex-row sm:justify-between sm:text-left">
-        <p className="text-xs" style={{ color: "var(--m-text-faint)" }}>
-          © {new Date().getFullYear()} Revo. Tous droits réservés.
-        </p>
-        <nav className="flex flex-wrap justify-center gap-4 sm:justify-end">
-          {FOOTER_NAV.map(({ href, label }) => (
+    <footer className="border-t border-slate-200 bg-white">
+      <div className="mx-auto flex max-w-5xl flex-col items-center gap-4 px-6 py-8 text-center sm:flex-row sm:justify-between sm:text-left">
+        <div className="flex items-center gap-2">
+          <div className="flex h-6 w-6 items-center justify-center rounded-md text-white text-xs font-bold"
+            style={{ background: "linear-gradient(135deg, #ea580c, #c2410c)" }}>
+            R
+          </div>
+          <p className="text-xs text-slate-400">© {year} Revo. Tous droits réservés.</p>
+        </div>
+        <nav className="flex flex-wrap justify-center gap-5 sm:justify-end">
+          {FOOTER_COLS.flatMap(({ links }) => links).map(({ href, label }) => (
             <Link
               key={href}
               href={href}
-              className="text-xs transition-opacity hover:opacity-70"
-              style={{ color: "var(--m-text-faint)" }}
+              className="text-xs text-slate-400 transition-colors hover:text-slate-700"
             >
               {label}
             </Link>

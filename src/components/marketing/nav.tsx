@@ -4,8 +4,7 @@ import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 import { ArrowRight, Menu, X } from "lucide-react";
-import { useState } from "react";
-import { ThemeToggle } from "@/components/marketing/theme-toggle";
+import { useState, useEffect } from "react";
 
 const NAV_LINKS = [
   { href: "/fonctionnalites", label: "Fonctionnalités" },
@@ -17,24 +16,36 @@ export function Nav() {
   const { isSignedIn } = useAuth();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
       <div className="mx-auto max-w-6xl px-4 pt-4">
         <div
-          className="flex h-14 items-center justify-between rounded-2xl border px-5 dark:bg-[rgba(7,12,20,0.88)] bg-[rgba(255,255,255,0.92)]"
+          className="flex h-14 items-center justify-between rounded-2xl px-5 transition-all duration-300"
           style={{
-            borderColor: "var(--m-border)",
-            backdropFilter: "blur(18px)",
-            WebkitBackdropFilter: "blur(18px)",
+            background: scrolled ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.85)",
+            border: `1px solid ${scrolled ? "#e2e8f0" : "rgba(226,232,240,0.6)"}`,
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            boxShadow: scrolled ? "0 4px 24px rgba(0,0,0,0.06)" : "none",
           }}
         >
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-1.5 shrink-0">
-            <span className="text-lg font-[family-name:var(--font-display)] font-bold tracking-tight" style={{ color: "var(--m-text)" }}>
+          <Link href="/" className="flex items-center gap-2 shrink-0 group">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg text-white text-sm font-bold transition-transform group-hover:scale-105"
+              style={{ background: "linear-gradient(135deg, #ea580c, #c2410c)" }}>
+              R
+            </div>
+            <span className="text-base font-[family-name:var(--font-display)] font-bold tracking-tight text-slate-900">
               Revo
             </span>
-            <span className="h-1.5 w-1.5 rounded-full" style={{ background: "var(--m-accent)" }} />
           </Link>
 
           {/* Desktop nav */}
@@ -45,10 +56,8 @@ export function Nav() {
                 <Link
                   key={href}
                   href={href}
-                  className="text-sm font-medium transition-colors"
-                  style={{
-                    color: active ? "var(--m-accent)" : "var(--m-text-muted)",
-                  }}
+                  className="text-sm font-medium transition-colors hover:text-slate-900"
+                  style={{ color: active ? "#ea580c" : "#64748b" }}
                 >
                   {label}
                 </Link>
@@ -58,13 +67,11 @@ export function Nav() {
 
           {/* Right actions */}
           <div className="flex items-center gap-2">
-            <ThemeToggle />
-
             {isSignedIn ? (
               <Link
                 href="/dashboard"
-                className="hidden sm:inline-flex h-8 items-center gap-1.5 rounded-xl px-4 text-sm font-semibold text-white transition-opacity hover:opacity-80"
-                style={{ background: "linear-gradient(135deg, var(--m-accent), var(--m-accent-mid))" }}
+                className="hidden sm:inline-flex h-9 items-center gap-1.5 rounded-xl px-4 text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95"
+                style={{ background: "linear-gradient(135deg, #ea580c, #c2410c)", boxShadow: "0 2px 8px rgba(234,88,12,0.3)" }}
               >
                 Tableau de bord
                 <ArrowRight className="h-3.5 w-3.5" />
@@ -73,26 +80,24 @@ export function Nav() {
               <>
                 <Link
                   href="/sign-in"
-                  className="hidden text-sm font-medium transition-colors lg:block"
-                  style={{ color: "var(--m-text-muted)" }}
+                  className="hidden text-sm font-medium text-slate-500 transition-colors hover:text-slate-900 lg:block"
                 >
                   Se connecter
                 </Link>
                 <Link
                   href="/sign-up"
-                  className="hidden sm:inline-flex h-8 items-center gap-1.5 rounded-xl px-4 text-sm font-semibold text-white transition-opacity hover:opacity-80"
-                style={{ background: "linear-gradient(135deg, var(--m-accent), var(--m-accent-mid))" }}
-              >
-                Commencer
-                <ArrowRight className="h-3.5 w-3.5" />
+                  className="hidden sm:inline-flex h-9 items-center gap-1.5 rounded-xl px-4 text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95"
+                  style={{ background: "linear-gradient(135deg, #ea580c, #c2410c)", boxShadow: "0 2px 8px rgba(234,88,12,0.3)" }}
+                >
+                  Commencer
+                  <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </>
             )}
 
             {/* Mobile hamburger */}
             <button
-              className="flex h-8 w-8 items-center justify-center rounded-xl md:hidden dark:bg-white/5 bg-black/5"
-              style={{ border: "1px solid var(--m-border)", color: "var(--m-text)" }}
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition-colors hover:bg-slate-50 md:hidden"
               onClick={() => setMobileOpen(!mobileOpen)}
             >
               {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
@@ -102,43 +107,34 @@ export function Nav() {
 
         {/* Mobile menu */}
         {mobileOpen && (
-          <div
-            className="mt-2 rounded-2xl border p-4 dark:bg-[rgba(7,12,20,0.95)] bg-white"
-            style={{
-              borderColor: "var(--m-border)",
-              backdropFilter: "blur(18px)",
-            }}
-          >
+          <div className="mt-2 rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
             <nav className="flex flex-col gap-1">
               {NAV_LINKS.map(({ href, label }) => (
                 <Link
                   key={href}
                   href={href}
                   onClick={() => setMobileOpen(false)}
-                  className="rounded-xl px-4 py-2.5 text-sm font-medium transition-colors hover:bg-violet-500/10"
-                  style={{ color: "var(--m-text-muted)" }}
+                  className="rounded-xl px-4 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-orange-50 hover:text-orange-600"
                 >
                   {label}
                 </Link>
               ))}
-              <div className="mt-2 border-t pt-3" style={{ borderColor: "var(--m-border)" }}>
-                {isSignedIn ? (
-                  <Link
-                    href="/dashboard"
-                    className="flex h-10 items-center justify-center rounded-xl text-sm font-semibold text-white"
-                    style={{ background: "linear-gradient(135deg, var(--m-accent), var(--m-accent-mid))" }}
-                  >
-                    Tableau de bord
-                  </Link>
-                ) : (
-                  <Link
-                    href="/sign-up"
-                    className="flex h-10 items-center justify-center rounded-xl text-sm font-semibold text-white"
-                    style={{ background: "linear-gradient(135deg, var(--m-accent), var(--m-accent-mid))" }}
-                  >
-                    Commencer gratuitement
-                  </Link>
-                )}
+              <div className="mt-2 border-t border-slate-100 pt-3 space-y-2">
+                <Link
+                  href="/sign-in"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex h-10 items-center justify-center rounded-xl border border-slate-200 text-sm font-medium text-slate-600"
+                >
+                  Se connecter
+                </Link>
+                <Link
+                  href="/sign-up"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex h-10 items-center justify-center rounded-xl text-sm font-semibold text-white"
+                  style={{ background: "linear-gradient(135deg, #ea580c, #c2410c)" }}
+                >
+                  Commencer gratuitement
+                </Link>
               </div>
             </nav>
           </div>
