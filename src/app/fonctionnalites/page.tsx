@@ -105,10 +105,10 @@ const FEATURES_FULL = [
   },
   {
     tag: "Bibliothèque d'exercices",
-    title: "Des centaines d'exercices prêts à l'emploi",
+    title: "Un catalogue d'exercices prêt à l'emploi",
     description: "Accédez à une bibliothèque complète classée par groupe musculaire, matériel et niveau. Créez vos propres exercices personnalisés avec photos et instructions. Partagez votre bibliothèque entre clients.",
     points: [
-      "500+ exercices avec descriptions et illustrations",
+      "76 exercices illustrés avec descriptions",
       "Filtres : groupe musculaire, matériel, difficulté",
       "Création d'exercices personnalisés avec photo/vidéo",
       "Historique de charge par exercice et par client",

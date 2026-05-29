@@ -2,7 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 
-export const REVO_LOGO_SRC = "/revoLogo.png"
+export const REVO_LOGO_SRC = "/revoLogo-mark.png"
 
 const sizeConfig = {
   xs: {

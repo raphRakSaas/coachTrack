@@ -31,7 +31,7 @@ const PRO_FEATURES = [
 const COMPARISON = [
   { feature: "Clients actifs",            free: "5 max",   pro: "Illimités" },
   { feature: "Séances enregistrées",      free: true,      pro: true },
-  { feature: "Bibliothèque d'exercices",  free: "500+",    pro: "500+ + perso" },
+  { feature: "Bibliothèque d'exercices",  free: "Catalogue complet",    pro: "Catalogue + perso" },
   { feature: "Programmes",               free: "3 max",   pro: "Illimités" },
   { feature: "Statistiques de base",      free: true,      pro: true },
   { feature: "Courbes de progression",    free: false,     pro: true },

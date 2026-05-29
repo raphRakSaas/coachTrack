@@ -265,7 +265,7 @@ export default async function DashboardPage() {
         <div className="relative hidden shrink-0 self-end md:block">
           <Image
             src="/revo-mascot-coach.png"
-            alt="CoachTrack mascot"
+            alt="Mascotte Revo"
             width={200}
             height={200}
             className="revo-float h-48 w-auto object-contain"

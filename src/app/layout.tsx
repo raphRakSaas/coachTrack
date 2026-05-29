@@ -55,7 +55,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider localization={frFR}>
+    <ClerkProvider
+      localization={frFR}
+      appearance={{
+        variables: {
+          colorPrimary: "#ea580c",
+          colorTextOnPrimaryBackground: "#ffffff",
+          borderRadius: "0.75rem",
+        },
+      }}
+    >
       <html lang="fr" className={`${jakarta.variable} ${syne.variable} h-full antialiased`} suppressHydrationWarning>
         <body className="min-h-full flex flex-col font-[family-name:var(--font-sans)]">
           <ThemeProvider
