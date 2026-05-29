@@ -1,6 +1,6 @@
 import type { User } from "@prisma/client"
 import { prisma } from "@/lib/prisma"
-import { ensureDemoClientForCoach } from "@/lib/demo-client"
+import { refreshDemoClientForCoach } from "@/lib/demo-client"
 
 /** Clerk user ID du coach démo partagé (variable d'environnement). */
 export function getDemoCoachClerkId(): string | null {
@@ -20,9 +20,9 @@ export function isSystemDemoCoach(user: Pick<User, "clerkId"> | null | undefined
 }
 
 /**
- * Prépare le compte coach démo en base : profil prêt + client Marie avec données complètes.
+ * Chemin rapide pour /api/demo/start : vérifie le compte sans resynchroniser les données.
  */
-export async function ensureSystemDemoCoachReady(clerkIdOverride?: string): Promise<User> {
+export async function ensureSystemDemoCoachSession(clerkIdOverride?: string): Promise<User> {
   const clerkId = clerkIdOverride?.trim() || getDemoCoachClerkId()
   if (!clerkId) {
     throw new Error(
@@ -48,6 +48,23 @@ export async function ensureSystemDemoCoachReady(clerkIdOverride?: string): Prom
     },
   })
 
-  await ensureDemoClientForCoach(user.id)
+  const demoClientExists = await prisma.client.findFirst({
+    where: { coachId: user.id, isDemo: true },
+    select: { id: true },
+  })
+
+  if (!demoClientExists) {
+    await refreshDemoClientForCoach(user.id)
+  }
+
+  return user
+}
+
+/**
+ * Prépare le compte coach démo en base (seed complet — scripts uniquement).
+ */
+export async function ensureSystemDemoCoachReady(clerkIdOverride?: string): Promise<User> {
+  const user = await ensureSystemDemoCoachSession(clerkIdOverride)
+  await refreshDemoClientForCoach(user.id)
   return user
 }

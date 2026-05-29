@@ -248,6 +248,22 @@
   touch-action: pan-y;
 }
 
+/* Écran de lancement démo */
+@keyframes revo-demo-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes revo-demo-progress {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+.revo-demo-bounce {
+  animation: revo-demo-bounce 1.4s ease-in-out infinite;
+}
+.revo-demo-progress {
+  animation: revo-demo-progress 1.2s ease-in-out infinite;
+}
+
 .anim-delay-100 { animation-delay: 0.1s; }
 .anim-delay-200 { animation-delay: 0.2s; }
 .anim-delay-300 { animation-delay: 0.3s; }

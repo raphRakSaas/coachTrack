@@ -643,7 +643,8 @@ export async function syncDemoClientFullSeed(clientId: string, coachId: string) 
 }
 
 /**
- * Crée le client démo pour un coach s’il n’existe pas, puis synchronise le jeu de données complet.
+ * Crée le client démo pour un coach s'il n'existe pas (seed complet à la création uniquement).
+ * Utilisez `refreshDemoClientForCoach` pour forcer une resynchronisation (scripts admin).
  */
 export async function ensureDemoClientForCoach(coachId: string): Promise<void> {
   const existing = await prisma.client.findFirst({
@@ -651,12 +652,24 @@ export async function ensureDemoClientForCoach(coachId: string): Promise<void> {
     select: { id: true },
   })
 
+  if (existing) return
+
+  const created = await prisma.client.create({
+    data: fullDemoClientUncheckedData(coachId),
+    select: { id: true },
+  })
+  await syncDemoClientFullSeed(created.id, coachId)
+}
+
+/** Resynchronise le jeu de données démo (scripts / maintenance). */
+export async function refreshDemoClientForCoach(coachId: string): Promise<void> {
+  const existing = await prisma.client.findFirst({
+    where: { coachId, isDemo: true },
+    select: { id: true },
+  })
+
   if (!existing) {
-    const created = await prisma.client.create({
-      data: fullDemoClientUncheckedData(coachId),
-      select: { id: true },
-    })
-    await syncDemoClientFullSeed(created.id, coachId)
+    await ensureDemoClientForCoach(coachId)
     return
   }
 
@@ -703,7 +716,7 @@ export async function ensureDemoClientsForAllCoaches(): Promise<{
       where: { coachId: id, isDemo: true },
       select: { id: true },
     })
-    await ensureDemoClientForCoach(id)
+    await refreshDemoClientForCoach(id)
     if (!hadDemo) created++
     else synced++
   }
