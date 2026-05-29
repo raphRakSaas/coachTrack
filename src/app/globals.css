@@ -179,19 +179,27 @@
 
 /* Cartes stats vitrées — fond dense pour lire sur mascotte verte */
 .revo-glass {
-  backdrop-filter: blur(22px) saturate(165%);
-  -webkit-backdrop-filter: blur(22px) saturate(165%);
+  /* Mobile-first : fond opaque, pas de backdrop-filter (coûteux GPU) */
   border-radius: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.78);
-  background: linear-gradient(
-    152deg,
-    rgba(255, 255, 255, 0.96) 0%,
-    rgba(248, 250, 252, 0.93) 45%,
-    rgba(241, 245, 249, 0.94) 100%
-  );
+  background: rgba(255, 255, 255, 0.97);
   box-shadow:
     0 10px 36px rgba(15, 23, 42, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+@media (min-width: 640px) {
+  .revo-glass {
+    /* Sur tablette/desktop : effet verre translucide */
+    background: linear-gradient(
+      152deg,
+      rgba(255, 255, 255, 0.96) 0%,
+      rgba(248, 250, 252, 0.93) 45%,
+      rgba(241, 245, 249, 0.94) 100%
+    );
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+  }
 }
 
 
@@ -230,23 +238,47 @@
 .revo-float     { animation: revo-float    4s  ease-in-out infinite; }
 .revo-pulse     { animation: revo-pulse-glow 3s ease-in-out infinite; }
 
+/* Mobile : pas d'animation flottante (calcul continu inutile) */
+@media (max-width: 639px) {
+  .revo-float { animation: none; }
+}
+
 /* ── Marquee horizontal (carousel d'écrans) ──────────────────────────────── */
 @keyframes revo-marquee {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
 }
+
+/* Mobile-first : scroll natif, pas d'animation automatique */
 .revo-marquee {
-  animation: revo-marquee 48s linear infinite;
-  will-change: transform;
+  display: flex;
+  gap: 1.25rem;
+  padding-bottom: 0.5rem;
 }
-.group:hover .revo-marquee {
-  animation-play-state: paused;
-}
-/* Fondu sur les bords gauche/droite */
+/* Fondu sur les bords gauche/droite — masque simple */
 .revo-marquee-mask {
-  -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
-  mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
+.revo-marquee-mask::-webkit-scrollbar { display: none; }
+
+/* Sur desktop : animation automatique */
+@media (min-width: 640px) {
+  .revo-marquee {
+    animation: revo-marquee 52s linear infinite;
+    will-change: transform;
+  }
+  .group:hover .revo-marquee {
+    animation-play-state: paused;
+  }
+  .revo-marquee-mask {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .revo-marquee { animation: none; }
 }
@@ -257,6 +289,29 @@
 .anim-delay-400 { animation-delay: 0.4s; }
 .anim-delay-500 { animation-delay: 0.5s; }
 .anim-delay-600 { animation-delay: 0.6s; }
+
+/* ── Stagger CSS (remplace Framer Motion) ────────────────────────────────── */
+.revo-stagger-item {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s cubic-bezier(0.25,0.4,0.25,1),
+              transform 0.5s cubic-bezier(0.25,0.4,0.25,1);
+}
+[data-stagger-visible="true"] .revo-stagger-item {
+  opacity: 1;
+  transform: none;
+}
+[data-stagger-visible="true"] .revo-stagger-item:nth-child(1) { transition-delay: calc(var(--stagger-delay, 0.1s) * 0); }
+[data-stagger-visible="true"] .revo-stagger-item:nth-child(2) { transition-delay: calc(var(--stagger-delay, 0.1s) * 1); }
+[data-stagger-visible="true"] .revo-stagger-item:nth-child(3) { transition-delay: calc(var(--stagger-delay, 0.1s) * 2); }
+[data-stagger-visible="true"] .revo-stagger-item:nth-child(4) { transition-delay: calc(var(--stagger-delay, 0.1s) * 3); }
+[data-stagger-visible="true"] .revo-stagger-item:nth-child(5) { transition-delay: calc(var(--stagger-delay, 0.1s) * 4); }
+[data-stagger-visible="true"] .revo-stagger-item:nth-child(6) { transition-delay: calc(var(--stagger-delay, 0.1s) * 5); }
+[data-stagger-visible="true"] .revo-stagger-item:nth-child(7) { transition-delay: calc(var(--stagger-delay, 0.1s) * 6); }
+[data-stagger-visible="true"] .revo-stagger-item:nth-child(8) { transition-delay: calc(var(--stagger-delay, 0.1s) * 7); }
+@media (prefers-reduced-motion: reduce) {
+  .revo-stagger-item { opacity: 1; transform: none; transition: none; }
+}
 
 @layer base {
   * {

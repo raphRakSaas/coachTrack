@@ -32,19 +32,10 @@ export default async function LandingPage() {
 
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden">
+        {/* Halo léger : sans blur CSS, juste un gradient — zéro coût GPU */}
         <div
-          className="pointer-events-none absolute -top-32 right-0 h-[34rem] w-[34rem] rounded-full opacity-60 blur-3xl"
-          style={{ background: "radial-gradient(circle, rgba(251,146,60,0.18) 0%, transparent 70%)" }}
-        />
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.4]"
-          style={{
-            backgroundImage:
-              "linear-gradient(to right, rgba(15,23,42,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(15,23,42,0.04) 1px, transparent 1px)",
-            backgroundSize: "56px 56px",
-            maskImage: "radial-gradient(ellipse at 70% 0%, black 30%, transparent 75%)",
-            WebkitMaskImage: "radial-gradient(ellipse at 70% 0%, black 30%, transparent 75%)",
-          }}
+          className="pointer-events-none absolute -top-32 right-0 h-[34rem] w-[34rem] rounded-full opacity-40 hidden sm:block"
+          style={{ background: "radial-gradient(circle, rgba(251,146,60,0.22) 0%, transparent 70%)" }}
         />
 
         <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-6 pb-20 pt-28 sm:px-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-10 lg:pt-36">

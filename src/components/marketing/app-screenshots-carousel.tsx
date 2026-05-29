@@ -14,10 +14,18 @@ const SHOTS: Shot[] = [
   { src: "/screenshots/shot-exercices.png", caption: "Bibliothèque complète" },
 ];
 
-function ScreenshotFrame({ shot }: { shot: Shot }) {
+function ScreenshotFrame({
+  shot,
+  priority = false,
+  hidden = false,
+}: {
+  shot: Shot;
+  priority?: boolean;
+  hidden?: boolean;
+}) {
   return (
-    <figure className="w-[260px] shrink-0 sm:w-[300px]">
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-300/40">
+    <figure className="w-[240px] shrink-0 sm:w-[300px]" aria-hidden={hidden || undefined}>
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg shadow-slate-200/60">
         <div className="flex items-center gap-1.5 border-b border-slate-100 bg-slate-50 px-3 py-2">
           <span className="h-2 w-2 rounded-full bg-red-300" />
           <span className="h-2 w-2 rounded-full bg-amber-300" />
@@ -30,6 +38,7 @@ function ScreenshotFrame({ shot }: { shot: Shot }) {
           width={408}
           height={457}
           className="h-auto w-full object-cover"
+          loading={priority ? "eager" : "lazy"}
         />
       </div>
       <figcaption className="mt-3 text-center text-xs font-medium text-slate-500">
@@ -40,15 +49,24 @@ function ScreenshotFrame({ shot }: { shot: Shot }) {
 }
 
 export function AppScreenshotsCarousel() {
-  const doubled = [...SHOTS, ...SHOTS];
+  /*
+   * Sur mobile : scroll natif (CSS overflow-x: auto) → 6 images seulement
+   * Sur desktop : boucle infinie CSS (doubled pour la continuité de l'animation)
+   * La distinction est gérée côté CSS (.revo-marquee / .revo-marquee-mask).
+   * On ajoute aria-hidden sur les doublons pour éviter la redondance screen reader.
+   */
   return (
     <div
-      className="revo-marquee-mask group relative overflow-hidden"
+      className="revo-marquee-mask group relative"
       aria-label="Aperçu réel de l'application Revo"
     >
-      <div className="revo-marquee flex w-max gap-5 py-2">
-        {doubled.map((shot, index) => (
-          <ScreenshotFrame key={`${shot.src}-${index}`} shot={shot} />
+      <div className="revo-marquee w-max py-2 sm:flex">
+        {SHOTS.map((shot, index) => (
+          <ScreenshotFrame key={shot.src} shot={shot} priority={index < 2} />
+        ))}
+        {/* Doublons pour la boucle CSS sur desktop — masqués aux lecteurs d'écran */}
+        {SHOTS.map((shot) => (
+          <ScreenshotFrame key={`${shot.src}-dup`} shot={shot} hidden />
         ))}
       </div>
     </div>

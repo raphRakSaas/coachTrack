@@ -1,7 +1,6 @@
 "use client";
 
-import { motion, useInView } from "motion/react";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface AnimateInProps {
   children: React.ReactNode;
@@ -12,36 +11,57 @@ interface AnimateInProps {
   duration?: number;
 }
 
+const TRANSLATE: Record<NonNullable<AnimateInProps["direction"]>, string> = {
+  up:    "translateY(24px)",
+  down:  "translateY(-24px)",
+  left:  "translateX(-24px)",
+  right: "translateX(24px)",
+  none:  "none",
+};
+
 export function AnimateIn({
   children,
   className,
   style,
   delay = 0,
   direction = "up",
-  duration = 0.6,
+  duration = 0.55,
 }: AnimateInProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-80px" });
+  const [visible, setVisible] = useState(false);
 
-  const directionOffset = {
-    up:    { y: 30, x: 0 },
-    down:  { y: -30, x: 0 },
-    left:  { y: 0, x: -30 },
-    right: { y: 0, x: 30 },
-    none:  { y: 0, x: 0 },
-  }[direction];
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "-60px" },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <motion.div
+    <div
       ref={ref}
       className={className}
-      style={style}
-      initial={{ opacity: 0, ...directionOffset }}
-      animate={isInView ? { opacity: 1, x: 0, y: 0 } : {}}
-      transition={{ duration, delay, ease: [0.25, 0.4, 0.25, 1] }}
+      style={{
+        ...style,
+        opacity: visible ? 1 : 0,
+        transform: visible ? "none" : TRANSLATE[direction],
+        transition: visible
+          ? `opacity ${duration}s cubic-bezier(0.25,0.4,0.25,1) ${delay}s, transform ${duration}s cubic-bezier(0.25,0.4,0.25,1) ${delay}s`
+          : "none",
+      }}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }
 
@@ -55,21 +75,34 @@ export function StaggerChildren({
   staggerDelay?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-60px" });
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "-50px" },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <motion.div
+    <div
       ref={ref}
       className={className}
-      initial="hidden"
-      animate={isInView ? "visible" : "hidden"}
-      variants={{
-        hidden:  {},
-        visible: { transition: { staggerChildren: staggerDelay } },
-      }}
+      data-stagger-visible={visible ? "true" : undefined}
+      style={{ "--stagger-delay": `${staggerDelay}s` } as React.CSSProperties}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }
 
@@ -81,14 +114,8 @@ export function StaggerItem({
   className?: string;
 }) {
   return (
-    <motion.div
-      className={className}
-      variants={{
-        hidden:  { opacity: 0, y: 24 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.25, 0.4, 0.25, 1] } },
-      }}
-    >
+    <div className={`revo-stagger-item ${className ?? ""}`}>
       {children}
-    </motion.div>
+    </div>
   );
 }
