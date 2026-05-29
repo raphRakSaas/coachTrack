@@ -6,6 +6,7 @@ import {
   ArrowRight, Users, Dumbbell, BarChart3, CalendarDays,
   Check, Star, TrendingUp, Target, Trophy, Clock
 } from "lucide-react";
+import { RevoLogo } from "@/components/brand/revo-logo";
 import { Nav } from "@/components/marketing/nav";
 import { MarketingFooter } from "@/components/marketing/marketing-footer";
 import { GlassStatCard } from "@/components/marketing/glass-stat-card";
@@ -55,10 +56,8 @@ function DashboardMockup() {
       </div>
       <div className="flex h-72 sm:h-80">
         <div className="w-44 shrink-0 bg-slate-900 p-3">
-          <div className="mb-5 flex items-center gap-2 px-2 pt-1">
-            <div className="flex h-6 w-6 items-center justify-center rounded-md text-xs font-bold text-white"
-              style={{ background: "linear-gradient(135deg, #ea580c, #c2410c)" }}>R</div>
-            <span className="text-sm font-bold text-white">Revo</span>
+          <div className="mb-5 px-2 pt-1">
+            <RevoLogo href={null} size="sm" showLabel tone="dark" />
           </div>
           {[
             { label: "Tableau de bord", active: false },

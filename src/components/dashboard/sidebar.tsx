@@ -19,7 +19,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { RevoWordmark } from "@/components/auth/revo-wordmark";
+import { RevoLogo } from "@/components/brand/revo-logo";
 import { ThemeToggle } from "@/components/dashboard/theme-toggle";
 import { SECTION_ACCENTS, type Section } from "@/lib/colors";
 
@@ -47,18 +47,21 @@ export function Sidebar() {
   const pathname = usePathname();
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const labelTone =
+    mounted && resolvedTheme === "dark" ? "dark" : "light";
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const wordmarkTone =
-    mounted && resolvedTheme === "dark" ? "dark" : "light";
-
   return (
     <aside className="hidden md:flex h-screen w-60 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
       <div className="flex h-14 items-center justify-between gap-2 border-b border-sidebar-border px-4">
-        <RevoWordmark tone={wordmarkTone} size="sm" href="/dashboard" />
+        {mounted ? (
+          <RevoLogo size="sm" href="/dashboard" showLabel tone={labelTone} />
+        ) : (
+          <span className="inline-block h-6 w-12" aria-hidden />
+        )}
         <ThemeToggle />
       </div>
 

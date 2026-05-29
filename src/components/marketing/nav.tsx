@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { RevoLogo } from "@/components/brand/revo-logo";
 import { useAuth } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 import { ArrowRight, Menu, X } from "lucide-react";
@@ -37,16 +38,7 @@ export function Nav() {
             boxShadow: scrolled ? "0 4px 24px rgba(0,0,0,0.06)" : "none",
           }}
         >
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 shrink-0 group">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg text-white text-sm font-bold transition-transform group-hover:scale-105"
-              style={{ background: "linear-gradient(135deg, #ea580c, #c2410c)" }}>
-              R
-            </div>
-            <span className="text-base font-[family-name:var(--font-display)] font-bold tracking-tight text-slate-900">
-              Revo
-            </span>
-          </Link>
+          <RevoLogo href="/" size="md" showLabel priority />
 
           {/* Desktop nav */}
           <nav className="hidden items-center gap-7 md:flex">

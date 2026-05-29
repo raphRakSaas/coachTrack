@@ -25,6 +25,10 @@ export const metadata: Metadata = {
   },
   description: "La plateforme tout-en-un pour coachs sportifs. Gérez vos clients, programmes et séances.",
   applicationName: "Revo",
+  icons: {
+    icon: "/revoLogo.png",
+    apple: "/revoLogo.png",
+  },
   appleWebApp: {
     capable: true,
     title: "Revo",

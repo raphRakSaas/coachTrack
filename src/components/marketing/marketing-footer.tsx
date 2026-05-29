@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { RevoLogo } from "@/components/brand/revo-logo"
 
 type FooterLink = { href: string; label: string }
 type FooterCol = { title: string; links: FooterLink[] }
@@ -44,14 +45,8 @@ export function MarketingFooter({ variant = "compact" }: MarketingFooterProps) {
           <div className="grid grid-cols-2 gap-10 md:grid-cols-4">
             {/* Brand */}
             <div className="col-span-2 md:col-span-1">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg text-white text-sm font-bold"
-                  style={{ background: "linear-gradient(135deg, #ea580c, #c2410c)" }}>
-                  R
-                </div>
-                <span className="text-base font-[family-name:var(--font-display)] font-bold text-slate-900">
-                  Revo
-                </span>
+              <div className="mb-4">
+                <RevoLogo href="/" size="md" showLabel />
               </div>
               <p className="text-sm leading-relaxed text-slate-500 max-w-[220px]">
                 La plateforme tout-en-un pour les coachs sportifs qui veulent passer plus de temps sur le terrain.
@@ -87,11 +82,8 @@ export function MarketingFooter({ variant = "compact" }: MarketingFooterProps) {
   return (
     <footer className="border-t border-slate-200 bg-white">
       <div className="mx-auto flex max-w-5xl flex-col items-center gap-4 px-6 py-8 text-center sm:flex-row sm:justify-between sm:text-left">
-        <div className="flex items-center gap-2">
-          <div className="flex h-6 w-6 items-center justify-center rounded-md text-white text-xs font-bold"
-            style={{ background: "linear-gradient(135deg, #ea580c, #c2410c)" }}>
-            R
-          </div>
+        <div className="flex items-center gap-3">
+          <RevoLogo href="/" size="sm" showLabel />
           <p className="text-xs text-slate-400">© {year} Revo. Tous droits réservés.</p>
         </div>
         <nav className="flex flex-wrap justify-center gap-5 sm:justify-end">
