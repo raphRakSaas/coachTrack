@@ -140,7 +140,7 @@ export default async function LandingPage() {
               De vraies captures, pas des promesses.
             </h2>
             <p className="mt-4 max-w-lg text-base leading-relaxed text-slate-500">
-              Voici l&apos;application telle qu&apos;elle est aujourd&apos;hui. Survolez pour mettre le défilement en pause.
+              Voici l&apos;application telle qu&apos;elle est aujourd&apos;hui. Le défilement est automatique — utilisez les flèches ou faites glisser pour prendre la main.
             </p>
           </AnimateIn>
         </div>

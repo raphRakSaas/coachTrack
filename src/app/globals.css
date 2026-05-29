@@ -243,44 +243,9 @@
   .revo-float { animation: none; }
 }
 
-/* ── Marquee horizontal (carousel d'écrans) ──────────────────────────────── */
-@keyframes revo-marquee {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-
-/* Mobile-first : scroll natif, pas d'animation automatique */
-.revo-marquee {
-  display: flex;
-  gap: 1.25rem;
-  padding-bottom: 0.5rem;
-}
-/* Fondu sur les bords gauche/droite — masque simple */
-.revo-marquee-mask {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-.revo-marquee-mask::-webkit-scrollbar { display: none; }
-
-/* Sur desktop : animation automatique */
-@media (min-width: 640px) {
-  .revo-marquee {
-    animation: revo-marquee 52s linear infinite;
-    will-change: transform;
-  }
-  .group:hover .revo-marquee {
-    animation-play-state: paused;
-  }
-  .revo-marquee-mask {
-    overflow: hidden;
-    -webkit-mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
-    mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .revo-marquee { animation: none; }
+/* ── Carousel screenshots ─────────────────────────────────────────────────── */
+.revo-marquee-track {
+  touch-action: pan-y;
 }
 
 .anim-delay-100 { animation-delay: 0.1s; }
