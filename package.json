@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
-    "db:backfill-demo": "tsx scripts/backfill-demo-clients.ts"
+    "db:backfill-demo": "tsx scripts/backfill-demo-clients.ts",
+    "db:ensure-demo-coach": "tsx scripts/ensure-system-demo-coach.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1045.0",

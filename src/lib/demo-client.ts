@@ -630,13 +630,16 @@ async function replaceDemoRelatedData(
  * Idempotent : remplace les sous-ressources du client démo par le jeu canonique.
  */
 export async function syncDemoClientFullSeed(clientId: string, coachId: string) {
-  await prisma.$transaction(async (tx) => {
-    await tx.client.update({
-      where: { id: clientId },
-      data: fullDemoClientUpdateData(),
-    })
-    await replaceDemoRelatedData(tx, clientId, coachId)
-  })
+  await prisma.$transaction(
+    async (tx) => {
+      await tx.client.update({
+        where: { id: clientId },
+        data: fullDemoClientUpdateData(),
+      })
+      await replaceDemoRelatedData(tx, clientId, coachId)
+    },
+    { timeout: 60_000 },
+  )
 }
 
 /**

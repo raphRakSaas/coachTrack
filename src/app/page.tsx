@@ -10,6 +10,7 @@ import { Nav } from "@/components/marketing/nav";
 import { MarketingFooter } from "@/components/marketing/marketing-footer";
 import { AppScreenshotsCarousel } from "@/components/marketing/app-screenshots-carousel";
 import { GlassStatCard } from "@/components/marketing/glass-stat-card";
+import { DemoStartButton } from "@/components/demo/demo-start-button";
 import { AnimateIn, StaggerChildren, StaggerItem } from "@/components/marketing/animate-in";
 
 // ── Section chip (tag orange discret) ──────────────────────────────────────
@@ -64,6 +65,7 @@ export default async function LandingPage() {
                 Commencer gratuitement
                 <ArrowRight className="h-4 w-4" />
               </Link>
+              <DemoStartButton className="w-auto" />
               <Link
                 href="/fonctionnalites"
                 className="inline-flex h-12 items-center gap-1.5 px-2 text-sm font-semibold text-slate-700 transition-colors hover:text-orange-600"

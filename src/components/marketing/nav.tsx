@@ -71,6 +71,12 @@ export function Nav() {
             ) : (
               <>
                 <Link
+                  href="/demo"
+                  className="hidden text-sm font-semibold text-slate-700 transition-colors hover:text-orange-600 lg:block"
+                >
+                  Démo
+                </Link>
+                <Link
                   href="/sign-in"
                   className="hidden text-sm font-medium text-slate-500 transition-colors hover:text-slate-900 lg:block"
                 >
@@ -112,6 +118,13 @@ export function Nav() {
                 </Link>
               ))}
               <div className="mt-2 border-t border-slate-100 pt-3 space-y-2">
+                <Link
+                  href="/demo"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex h-10 items-center justify-center rounded-xl border border-slate-900 bg-slate-900 text-sm font-semibold text-white"
+                >
+                  Voir la démo
+                </Link>
                 <Link
                   href="/sign-in"
                   onClick={() => setMobileOpen(false)}
