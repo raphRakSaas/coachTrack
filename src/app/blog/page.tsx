@@ -148,8 +148,13 @@ export default function BlogPage() {
       {/* Hero */}
       <section className="relative px-6 pt-36 pb-16 text-center">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[350px] w-[700px]"
-            style={{ background: "radial-gradient(ellipse, var(--m-glow-primary) 0%, transparent 70%)", filter: "blur(40px)" }} />
+          <div
+            className="absolute top-0 left-1/2 h-[350px] w-[700px] -translate-x-1/2"
+            style={{
+              background:
+                "radial-gradient(ellipse, var(--m-glow-primary) 0%, transparent 70%)",
+            }}
+          />
         </div>
         <div className="relative z-10 mx-auto max-w-2xl">
           <AnimateIn>

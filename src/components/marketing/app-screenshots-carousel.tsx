@@ -21,7 +21,7 @@ const SHOTS: Shot[] = [
 
 const LOOPED_SHOTS = [...SHOTS, ...SHOTS];
 const GAP_PX = 20;
-const AUTO_SCROLL_SPEED = 55; // px/s
+const AUTO_SCROLL_SPEED = 55;
 const RESUME_DELAY_MS = 2000;
 
 function ScreenshotFrame({
@@ -35,10 +35,10 @@ function ScreenshotFrame({
 }) {
   return (
     <figure
-      className="w-[240px] shrink-0 sm:w-[280px] md:w-[300px]"
+      className="w-[220px] shrink-0 sm:w-[280px] md:w-[300px]"
       aria-hidden={hidden || undefined}
     >
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg shadow-slate-200/60">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md shadow-slate-200/50 sm:shadow-lg sm:shadow-slate-200/60">
         <div className="flex items-center gap-1.5 border-b border-slate-100 bg-slate-50 px-3 py-2">
           <span className="h-2 w-2 rounded-full bg-red-300" />
           <span className="h-2 w-2 rounded-full bg-amber-300" />
@@ -50,6 +50,7 @@ function ScreenshotFrame({
           alt={hidden ? "" : shot.caption}
           width={408}
           height={457}
+          sizes="(max-width: 640px) 220px, (max-width: 768px) 280px, 300px"
           draggable={false}
           className="pointer-events-none h-auto w-full select-none object-cover"
           loading={priority ? "eager" : "lazy"}
@@ -63,14 +64,17 @@ function ScreenshotFrame({
 }
 
 export function AppScreenshotsCarousel() {
+  const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const offsetRef = useRef(0);
   const loopWidthRef = useRef(0);
   const isPausedRef = useRef(false);
+  const isVisibleRef = useRef(false);
+  const autoScrollEnabledRef = useRef(true);
   const dragState = useRef({ active: false, startX: 0, startOffset: 0 });
   const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const applyTransform = useCallback(() => {
     const track = trackRef.current;
@@ -100,15 +104,19 @@ export function AppScreenshotsCarousel() {
 
   const pauseAutoScroll = useCallback((temporary = false) => {
     isPausedRef.current = true;
+    setIsAnimating(false);
 
     if (resumeTimerRef.current) {
       clearTimeout(resumeTimerRef.current);
       resumeTimerRef.current = null;
     }
 
-    if (temporary) {
+    if (temporary && autoScrollEnabledRef.current) {
       resumeTimerRef.current = setTimeout(() => {
-        isPausedRef.current = false;
+        if (isVisibleRef.current) {
+          isPausedRef.current = false;
+          setIsAnimating(true);
+        }
         resumeTimerRef.current = null;
       }, RESUME_DELAY_MS);
     }
@@ -119,19 +127,56 @@ export function AppScreenshotsCarousel() {
       clearTimeout(resumeTimerRef.current);
       resumeTimerRef.current = null;
     }
-    isPausedRef.current = false;
+    if (isVisibleRef.current && autoScrollEnabledRef.current) {
+      isPausedRef.current = false;
+      setIsAnimating(true);
+    }
   }, []);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReducedMotion(mediaQuery.matches);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const mobileViewport = window.matchMedia("(max-width: 767px)");
 
-    const handleChange = (event: MediaQueryListEvent) => {
-      setPrefersReducedMotion(event.matches);
+    const updateMotionPrefs = () => {
+      autoScrollEnabledRef.current =
+        !reducedMotion.matches && !mobileViewport.matches;
+      if (!autoScrollEnabledRef.current) {
+        isPausedRef.current = true;
+        setIsAnimating(false);
+      }
     };
 
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
+    updateMotionPrefs();
+    reducedMotion.addEventListener("change", updateMotionPrefs);
+    mobileViewport.addEventListener("change", updateMotionPrefs);
+    return () => {
+      reducedMotion.removeEventListener("change", updateMotionPrefs);
+      mobileViewport.removeEventListener("change", updateMotionPrefs);
+    };
+  }, []);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisibleRef.current = entry.isIntersecting;
+        if (!entry.isIntersecting) {
+          isPausedRef.current = true;
+          setIsAnimating(false);
+          return;
+        }
+        if (autoScrollEnabledRef.current && !dragState.current.active) {
+          isPausedRef.current = false;
+          setIsAnimating(true);
+        }
+      },
+      { rootMargin: "80px", threshold: 0.05 }
+    );
+
+    observer.observe(container);
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -151,8 +196,6 @@ export function AppScreenshotsCarousel() {
   }, [measureLoopWidth]);
 
   useEffect(() => {
-    if (prefersReducedMotion) return;
-
     let animationFrame = 0;
     let lastTimestamp = performance.now();
 
@@ -160,10 +203,17 @@ export function AppScreenshotsCarousel() {
       const deltaMs = Math.min(timestamp - lastTimestamp, 32);
       lastTimestamp = timestamp;
 
-      if (!isPausedRef.current && !dragState.current.active && loopWidthRef.current > 0) {
+      if (
+        autoScrollEnabledRef.current &&
+        isVisibleRef.current &&
+        !isPausedRef.current &&
+        !dragState.current.active &&
+        loopWidthRef.current > 0
+      ) {
         offsetRef.current -= (AUTO_SCROLL_SPEED * deltaMs) / 1000;
         normalizeOffset();
         applyTransform();
+        setIsAnimating(true);
       }
 
       animationFrame = requestAnimationFrame(tick);
@@ -171,7 +221,7 @@ export function AppScreenshotsCarousel() {
 
     animationFrame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(animationFrame);
-  }, [applyTransform, normalizeOffset, prefersReducedMotion]);
+  }, [applyTransform, normalizeOffset]);
 
   useEffect(() => {
     return () => {
@@ -181,10 +231,10 @@ export function AppScreenshotsCarousel() {
 
   const getScrollStep = useCallback(() => {
     const track = trackRef.current;
-    if (!track) return 280;
+    if (!track) return 240;
 
     const firstFrame = track.querySelector("figure");
-    if (!firstFrame) return 280;
+    if (!firstFrame) return 240;
 
     return firstFrame.getBoundingClientRect().width + GAP_PX;
   }, []);
@@ -197,7 +247,7 @@ export function AppScreenshotsCarousel() {
       normalizeOffset();
       applyTransform();
     },
-    [applyTransform, getScrollStep, normalizeOffset, pauseAutoScroll],
+    [applyTransform, getScrollStep, normalizeOffset, pauseAutoScroll]
   );
 
   const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -209,6 +259,7 @@ export function AppScreenshotsCarousel() {
       startOffset: offsetRef.current,
     };
     setIsDragging(true);
+    setIsAnimating(true);
     event.currentTarget.setPointerCapture(event.pointerId);
   };
 
@@ -226,6 +277,7 @@ export function AppScreenshotsCarousel() {
 
     dragState.current.active = false;
     setIsDragging(false);
+    setIsAnimating(false);
 
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
@@ -236,6 +288,7 @@ export function AppScreenshotsCarousel() {
 
   return (
     <div
+      ref={containerRef}
       className="relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2"
       aria-label="Aperçu réel de l'application Revo"
     >
@@ -260,7 +313,7 @@ export function AppScreenshotsCarousel() {
       <div
         className={cn(
           "overflow-hidden py-2",
-          isDragging ? "cursor-grabbing select-none" : "cursor-grab",
+          isDragging ? "cursor-grabbing select-none" : "cursor-grab"
         )}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
@@ -273,7 +326,10 @@ export function AppScreenshotsCarousel() {
       >
         <div
           ref={trackRef}
-          className="revo-marquee-track flex w-max gap-5 will-change-transform"
+          className={cn(
+            "revo-marquee-track flex w-max gap-5",
+            isAnimating && "will-change-transform"
+          )}
         >
           {LOOPED_SHOTS.map((shot, index) => (
             <ScreenshotFrame

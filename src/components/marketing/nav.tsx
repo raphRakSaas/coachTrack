@@ -5,7 +5,7 @@ import { RevoLogo } from "@/components/brand/revo-logo";
 import { useAuth } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 import { ArrowRight, Menu, X } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const NAV_LINKS = [
   { href: "/fonctionnalites", label: "Fonctionnalités" },
@@ -17,10 +17,30 @@ export function Nav() {
   const { isSignedIn } = useAuth();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const navInnerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
+    setMobileOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    const navInner = navInnerRef.current;
+    if (!navInner) return;
+
+    let ticking = false;
+
+    const updateScrolledState = () => {
+      navInner.dataset.scrolled = window.scrollY > 12 ? "true" : "false";
+      ticking = false;
+    };
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(updateScrolledState);
+    };
+
+    updateScrolledState();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -29,18 +49,11 @@ export function Nav() {
     <header className="fixed top-0 left-0 right-0 z-50">
       <div className="mx-auto max-w-6xl px-4 pt-4">
         <div
-          className="flex h-14 items-center justify-between rounded-2xl px-5 transition-all duration-300"
-          style={{
-            background: scrolled ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.85)",
-            border: `1px solid ${scrolled ? "#e2e8f0" : "rgba(226,232,240,0.6)"}`,
-            backdropFilter: "blur(20px)",
-            WebkitBackdropFilter: "blur(20px)",
-            boxShadow: scrolled ? "0 4px 24px rgba(0,0,0,0.06)" : "none",
-          }}
+          ref={navInnerRef}
+          className="marketing-nav-inner flex h-14 items-center justify-between rounded-2xl px-5"
         >
           <RevoLogo href="/" size="md" showLabel priority />
 
-          {/* Desktop nav */}
           <nav className="hidden items-center gap-7 md:flex">
             {NAV_LINKS.map(({ href, label }) => {
               const active = pathname === href;
@@ -57,13 +70,15 @@ export function Nav() {
             })}
           </nav>
 
-          {/* Right actions */}
           <div className="flex items-center gap-2">
             {isSignedIn ? (
               <Link
                 href="/dashboard"
-                className="hidden sm:inline-flex h-9 items-center gap-1.5 rounded-xl px-4 text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95"
-                style={{ background: "linear-gradient(135deg, #ea580c, #c2410c)", boxShadow: "0 2px 8px rgba(234,88,12,0.3)" }}
+                className="hidden h-9 items-center gap-1.5 rounded-xl px-4 text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95 sm:inline-flex"
+                style={{
+                  background: "linear-gradient(135deg, #ea580c, #c2410c)",
+                  boxShadow: "0 2px 8px rgba(234,88,12,0.3)",
+                }}
               >
                 Tableau de bord
                 <ArrowRight className="h-3.5 w-3.5" />
@@ -84,8 +99,11 @@ export function Nav() {
                 </Link>
                 <Link
                   href="/sign-up"
-                  className="hidden sm:inline-flex h-9 items-center gap-1.5 rounded-xl px-4 text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95"
-                  style={{ background: "linear-gradient(135deg, #ea580c, #c2410c)", boxShadow: "0 2px 8px rgba(234,88,12,0.3)" }}
+                  className="hidden h-9 items-center gap-1.5 rounded-xl px-4 text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95 sm:inline-flex"
+                  style={{
+                    background: "linear-gradient(135deg, #ea580c, #c2410c)",
+                    boxShadow: "0 2px 8px rgba(234,88,12,0.3)",
+                  }}
                 >
                   Commencer
                   <ArrowRight className="h-3.5 w-3.5" />
@@ -93,17 +111,18 @@ export function Nav() {
               </>
             )}
 
-            {/* Mobile hamburger */}
             <button
+              type="button"
+              aria-expanded={mobileOpen}
+              aria-label={mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}
               className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition-colors hover:bg-slate-50 md:hidden"
-              onClick={() => setMobileOpen(!mobileOpen)}
+              onClick={() => setMobileOpen((open) => !open)}
             >
               {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile menu */}
         {mobileOpen && (
           <div className="mt-2 rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
             <nav className="flex flex-col gap-1">
@@ -117,7 +136,7 @@ export function Nav() {
                   {label}
                 </Link>
               ))}
-              <div className="mt-2 border-t border-slate-100 pt-3 space-y-2">
+              <div className="mt-2 space-y-2 border-t border-slate-100 pt-3">
                 <Link
                   href="/demo"
                   onClick={() => setMobileOpen(false)}

@@ -12,11 +12,11 @@ interface AnimateInProps {
 }
 
 const TRANSLATE: Record<NonNullable<AnimateInProps["direction"]>, string> = {
-  up:    "translateY(24px)",
-  down:  "translateY(-24px)",
-  left:  "translateX(-24px)",
+  up: "translateY(24px)",
+  down: "translateY(-24px)",
+  left: "translateX(-24px)",
   right: "translateX(24px)",
-  none:  "none",
+  none: "none",
 };
 
 export function AnimateIn({
@@ -31,8 +31,15 @@ export function AnimateIn({
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+    const element = ref.current;
+    if (!element) return;
+
+    const mobileViewport = window.matchMedia("(max-width: 767px)");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (mobileViewport.matches || reducedMotion.matches) {
+      setVisible(true);
+      return;
+    }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -41,16 +48,17 @@ export function AnimateIn({
           observer.disconnect();
         }
       },
-      { rootMargin: "-60px" },
+      { rootMargin: "-40px" }
     );
-    observer.observe(el);
+
+    observer.observe(element);
     return () => observer.disconnect();
   }, []);
 
   return (
     <div
       ref={ref}
-      className={className}
+      className={`revo-animate-in ${className ?? ""}`}
       style={{
         ...style,
         opacity: visible ? 1 : 0,
@@ -78,8 +86,15 @@ export function StaggerChildren({
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+    const element = ref.current;
+    if (!element) return;
+
+    const mobileViewport = window.matchMedia("(max-width: 767px)");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (mobileViewport.matches || reducedMotion.matches) {
+      setVisible(true);
+      return;
+    }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -88,9 +103,10 @@ export function StaggerChildren({
           observer.disconnect();
         }
       },
-      { rootMargin: "-50px" },
+      { rootMargin: "-40px" }
     );
-    observer.observe(el);
+
+    observer.observe(element);
     return () => observer.disconnect();
   }, []);
 
@@ -114,8 +130,6 @@ export function StaggerItem({
   className?: string;
 }) {
   return (
-    <div className={`revo-stagger-item ${className ?? ""}`}>
-      {children}
-    </div>
+    <div className={`revo-stagger-item ${className ?? ""}`}>{children}</div>
   );
 }

@@ -90,26 +90,27 @@ export default async function LandingPage() {
                   alt="Coach sportif accompagnant une cliente en séance"
                   width={1024}
                   height={683}
+                  sizes="(max-width: 1024px) 100vw, 512px"
                   className="h-[24rem] w-full object-cover sm:h-[28rem]"
                   priority
                 />
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-900/35 via-transparent to-transparent" />
               </div>
 
-              {/* Cards vitrées flottantes */}
-              <GlassStatCard className="absolute -left-3 top-8 w-40 sm:-left-6" rotateDeg={-4}>
+              {/* Cards vitrées flottantes — desktop only (allègement mobile) */}
+              <GlassStatCard className="absolute -left-3 top-8 hidden w-40 sm:-left-6 sm:block" rotateDeg={-4}>
                 <p className="revo-glass-label">Bibliothèque</p>
                 <p className="revo-glass-value text-2xl">76</p>
                 <p className="revo-glass-sub">exercices illustrés</p>
               </GlassStatCard>
 
-              <GlassStatCard className="absolute -right-3 top-24 w-44 sm:-right-7" rotateDeg={3}>
+              <GlassStatCard className="absolute -right-3 top-24 hidden w-44 sm:-right-7 sm:block" rotateDeg={3}>
                 <p className="revo-glass-label">Nouveau record</p>
                 <p className="revo-glass-value-neutral text-base">Squat 100 kg 🏆</p>
                 <p className="revo-glass-sub">détecté automatiquement</p>
               </GlassStatCard>
 
-              <GlassStatCard className="absolute -bottom-5 left-6 w-48" rotateDeg={-2}>
+              <GlassStatCard className="absolute -bottom-5 left-6 hidden w-48 sm:block" rotateDeg={-2}>
                 <p className="revo-glass-label">Séance enregistrée</p>
                 <p className="revo-glass-value-neutral text-base">en moins de 2 min</p>
                 <p className="revo-glass-sub">pendant ou après l'entraînement</p>
@@ -121,7 +122,8 @@ export default async function LandingPage() {
                 alt=""
                 width={160}
                 height={160}
-                className="revo-float absolute -bottom-8 -right-4 w-24 drop-shadow-2xl sm:w-28"
+                sizes="96px"
+                className="absolute -bottom-8 -right-4 hidden w-24 drop-shadow-2xl sm:block sm:w-28"
               />
             </div>
           </AnimateIn>
@@ -129,7 +131,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ── APERÇU APP — carousel de vrais écrans ────────────────────────── */}
-      <section className="overflow-hidden border-t border-slate-200 py-20">
+      <section className="marketing-scroll-section overflow-hidden border-t border-slate-200 py-20">
         <div className="mx-auto mb-12 max-w-6xl px-6 sm:px-12">
           <AnimateIn>
             <Chip>
@@ -152,7 +154,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ── STATS BARRE ──────────────────────────────────────────────────── */}
-      <section className="border-y border-slate-200 bg-slate-50">
+      <section className="marketing-scroll-section border-y border-slate-200 bg-slate-50">
         <StaggerChildren className="mx-auto grid max-w-5xl grid-cols-3 divide-x divide-slate-200">
           {[
             { value: "76", label: "exercices", sub: "catalogue illustré inclus" },
@@ -176,7 +178,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ── FONCTIONNALITÉS — 3 cartes ────────────────────────────────────── */}
-      <section className="px-6 py-24 sm:px-12">
+      <section className="marketing-scroll-section px-6 py-24 sm:px-12">
         <div className="mx-auto max-w-6xl">
           <AnimateIn className="mb-14">
             <Chip>Fonctionnalités</Chip>
@@ -243,7 +245,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ── COMMENT ÇA MARCHE ─────────────────────────────────────────────── */}
-      <section className="border-y border-slate-200 bg-slate-50 px-6 py-24 sm:px-12">
+      <section className="marketing-scroll-section border-y border-slate-200 bg-slate-50 px-6 py-24 sm:px-12">
         <div className="mx-auto max-w-4xl">
           <AnimateIn className="mb-14 text-center">
             <Chip>Démarrage rapide</Chip>
@@ -306,7 +308,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ── DEEP-DIVE CLIENTS ────────────────────────────────────────────── */}
-      <section className="px-6 py-24 sm:px-12">
+      <section className="marketing-scroll-section px-6 py-24 sm:px-12">
         <div className="mx-auto max-w-6xl">
           <AnimateIn>
             <div className="grid items-center gap-14 lg:grid-cols-2">
@@ -374,7 +376,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ── DEEP-DIVE SÉANCES ────────────────────────────────────────────── */}
-      <section className="border-t border-slate-200 bg-slate-50 px-6 py-24 sm:px-12">
+      <section className="marketing-scroll-section border-t border-slate-200 bg-slate-50 px-6 py-24 sm:px-12">
         <div className="mx-auto max-w-6xl">
           <AnimateIn>
             <div className="grid items-center gap-14 lg:grid-cols-2">
@@ -444,7 +446,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ── ACCÈS ANTICIPÉ ───────────────────────────────────────────────── */}
-      <section className="px-6 py-24 sm:px-12">
+      <section className="marketing-scroll-section px-6 py-24 sm:px-12">
         <div className="mx-auto max-w-5xl">
           <AnimateIn>
             <div className="relative overflow-hidden rounded-3xl border border-orange-100 bg-gradient-to-br from-orange-50 to-white p-8 sm:p-12">
@@ -481,7 +483,8 @@ export default async function LandingPage() {
                     alt="Mascotte Revo"
                     width={260}
                     height={300}
-                    className="revo-float w-44 drop-shadow-2xl sm:w-56"
+                    sizes="(max-width: 640px) 176px, 224px"
+                    className="hidden w-44 drop-shadow-2xl sm:block sm:w-56 lg:revo-float"
                   />
                 </div>
               </div>
@@ -491,7 +494,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ── TARIFS ───────────────────────────────────────────────────────── */}
-      <section className="border-t border-slate-200 bg-slate-50 px-6 py-24 sm:px-12">
+      <section className="marketing-scroll-section border-t border-slate-200 bg-slate-50 px-6 py-24 sm:px-12">
         <div className="mx-auto max-w-4xl">
           <AnimateIn className="mb-14">
             <Chip>Tarifs</Chip>
@@ -571,7 +574,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ── CTA FINAL ────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden border-t border-slate-200 bg-slate-900 px-6 py-32 text-white sm:px-12">
+      <section className="marketing-scroll-section relative overflow-hidden border-t border-slate-200 bg-slate-900 px-6 py-32 text-white sm:px-12">
         <div className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full opacity-20"
           style={{ background: "radial-gradient(circle, #ea580c 0%, transparent 70%)" }} />
         <div className="pointer-events-none absolute -top-24 -left-24 h-64 w-64 rounded-full opacity-10"
