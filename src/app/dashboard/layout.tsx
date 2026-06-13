@@ -1,26 +1,21 @@
-import { redirect } from "next/navigation"
-import { Sidebar, MobileDashboardNav } from "@/components/dashboard/sidebar"
-import { DemoBanner } from "@/components/dashboard/demo-banner"
-import { getCurrentUser } from "@/lib/auth"
-import { isSystemDemoCoach } from "@/lib/demo-account"
+import { Suspense } from "react"
 
-export default async function DashboardLayout({
+import { Sidebar } from "@/components/dashboard/sidebar"
+import { DashboardAuthHeader } from "@/components/dashboard/dashboard-auth-header"
+import { DashboardHeaderSkeleton } from "@/components/dashboard/loading/page-skeletons"
+
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const user = await getCurrentUser()
-  if (!user) redirect("/sign-in")
-  if (!user.onboardingCompleted) redirect("/onboarding")
-
-  const isDemoSession = isSystemDemoCoach(user)
-
   return (
     <div className="flex h-screen bg-background text-foreground">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        {isDemoSession && <DemoBanner />}
-        <MobileDashboardNav />
+        <Suspense fallback={<DashboardHeaderSkeleton />}>
+          <DashboardAuthHeader />
+        </Suspense>
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>

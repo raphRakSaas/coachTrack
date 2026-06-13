@@ -1,7 +1,8 @@
+import { cache } from "react"
 import { auth, currentUser } from "@clerk/nextjs/server"
 import { prisma } from "@/lib/prisma"
 
-export async function getCurrentUser() {
+async function resolveCurrentUser() {
   const { userId } = await auth()
   if (!userId) return null
 
@@ -25,3 +26,5 @@ export async function getCurrentUser() {
 
   return user
 }
+
+export const getCurrentUser = cache(resolveCurrentUser)
