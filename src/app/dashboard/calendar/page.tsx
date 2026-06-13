@@ -7,10 +7,12 @@ import { getCurrentUser } from "@/lib/auth"
 import { SECTION_ACCENTS } from "@/lib/colors"
 import { buttonVariants } from "@/components/ui/button"
 import { CalendarWeekTimeGrid } from "@/components/dashboard/calendar/calendar-week-time-grid"
+import { CalendarWeekAgenda } from "@/components/dashboard/calendar/calendar-week-agenda"
 import {
   buildSessionsByDayKey,
   CalendarMonthGrid,
 } from "@/components/dashboard/calendar/calendar-month-grid"
+import { CalendarMonthAgenda } from "@/components/dashboard/calendar/calendar-month-agenda"
 import {
   addDays,
   addMonths,
@@ -112,16 +114,18 @@ export default async function CalendarPage({
     const toggleMonthDate = startOfMonth(anchorDate)
 
     return (
-      <div className="flex min-h-0 flex-1 flex-col p-8">
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+      <div className="flex min-h-0 flex-1 flex-col p-4 md:p-8">
+        <div className="mb-4 flex flex-col gap-4 md:mb-6 md:flex-row md:flex-wrap md:items-center md:justify-between">
           <div className="flex items-center gap-3">
             <div
-              className={`flex h-10 w-10 items-center justify-center rounded-xl ${accent.bgSoft}`}
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${accent.bgSoft}`}
             >
               <CalendarDays className={`h-5 w-5 ${accent.icon}`} />
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">Calendrier</h1>
+            <div className="min-w-0">
+              <h1 className="text-xl font-bold text-foreground md:text-2xl">
+                Calendrier
+              </h1>
               <p className="text-sm text-muted-foreground">
                 {totalThisWeek} séance{totalThisWeek !== 1 ? "s" : ""} cette
                 semaine
@@ -129,102 +133,114 @@ export default async function CalendarPage({
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="flex rounded-lg border border-border bg-muted/30 p-0.5">
+          <div className="flex w-full flex-col gap-2 md:w-auto">
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex rounded-lg border border-border bg-muted/30 p-0.5">
+                <Link
+                  href={calendarHref("week", weekStart)}
+                  className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${accent.bgSoft} ${accent.activeText} shadow-sm`}
+                >
+                  Semaine
+                </Link>
+                <Link
+                  href={calendarHref("month", toggleMonthDate)}
+                  className="rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  Mois
+                </Link>
+              </div>
+
               <Link
-                href={calendarHref("week", weekStart)}
-                className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${accent.bgSoft} ${accent.activeText} shadow-sm`}
+                href={calendarHref("week", new Date())}
+                className={
+                  buttonVariants({ variant: "outline", size: "sm" }) +
+                  " text-xs font-medium"
+                }
               >
-                Semaine
+                Aujourd&apos;hui
               </Link>
+
               <Link
-                href={calendarHref("month", toggleMonthDate)}
-                className="rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+                href="/dashboard/sessions"
+                className={buttonVariants({ size: "sm" }) + " gap-1"}
               >
-                Mois
+                <Plus className="h-3.5 w-3.5" />
+                Séance
               </Link>
             </div>
 
-            <Link
-              href={calendarHref("week", new Date())}
-              className={
-                buttonVariants({ variant: "outline", size: "sm" }) +
-                " text-xs font-medium"
-              }
-            >
-              Aujourd&apos;hui
-            </Link>
-            <div className="flex items-center gap-1 rounded-lg border border-border bg-card shadow-sm">
+            <div className="flex w-full items-center rounded-lg border border-border bg-card shadow-sm sm:w-auto">
               <Link
                 href={calendarHref("week", prevWeekStart)}
-                className="flex h-8 w-8 items-center justify-center rounded-l-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-l-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                aria-label="Semaine précédente"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Link>
-              <span className="px-3 text-sm font-medium text-foreground">
+              <span className="flex-1 whitespace-nowrap px-3 text-center text-sm font-medium text-foreground sm:min-w-[12rem] sm:flex-none">
                 {weekLabel}
               </span>
               <Link
                 href={calendarHref("week", nextWeekStart)}
-                className="flex h-8 w-8 items-center justify-center rounded-r-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-r-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                aria-label="Semaine suivante"
               >
                 <ChevronRight className="h-4 w-4" />
               </Link>
             </div>
-            <Link
-              href="/dashboard/sessions"
-              className={buttonVariants({ size: "sm" }) + " gap-1"}
-            >
-              <Plus className="h-3.5 w-3.5" />
-              Séance
-            </Link>
           </div>
         </div>
 
-        <div className="flex min-h-[520px] flex-1 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm">
-          <div className="flex shrink-0 border-b border-border bg-muted/20">
-            <div
-              className="w-12 shrink-0 border-r border-border bg-muted/10"
-              aria-hidden
-            />
-            <div className="grid min-w-0 flex-1 grid-cols-7">
-              {days.map(({ date, isToday }, index) => (
-                <div
-                  key={index}
-                  className={`border-r border-border px-3 py-3 text-center last:border-r-0 ${
-                    isToday ? accent.activeBg : ""
-                  }`}
-                >
-                  <p
-                    className={`text-xs font-semibold uppercase tracking-wide ${
-                      isToday ? accent.activeText : "text-muted-foreground"
+        <div className="flex min-h-[420px] flex-1 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm md:min-h-[520px]">
+          <div className="hidden min-h-0 flex-1 flex-col md:flex">
+            <div className="flex shrink-0 border-b border-border bg-muted/20">
+              <div
+                className="w-12 shrink-0 border-r border-border bg-muted/10"
+                aria-hidden
+              />
+              <div className="grid min-w-0 flex-1 grid-cols-7">
+                {days.map(({ date, isToday }, index) => (
+                  <div
+                    key={index}
+                    className={`border-r border-border px-3 py-3 text-center last:border-r-0 ${
+                      isToday ? accent.activeBg : ""
                     }`}
                   >
-                    {WEEKDAY_LABELS[index]}
-                  </p>
-                  <p
-                    className={`mt-1 text-lg font-bold ${
-                      isToday ? accent.activeText : "text-foreground"
-                    }`}
-                  >
-                    {date.getDate()}
-                  </p>
-                </div>
-              ))}
+                    <p
+                      className={`text-xs font-semibold uppercase tracking-wide ${
+                        isToday ? accent.activeText : "text-muted-foreground"
+                      }`}
+                    >
+                      {WEEKDAY_LABELS[index]}
+                    </p>
+                    <p
+                      className={`mt-1 text-lg font-bold ${
+                        isToday ? accent.activeText : "text-foreground"
+                      }`}
+                    >
+                      {date.getDate()}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
+
+            <CalendarWeekTimeGrid
+              days={days.map(({ dateKey, isToday, sessions: daySessions }) => ({
+                dateKey,
+                isToday,
+                sessions: daySessions,
+              }))}
+            />
           </div>
 
-          <CalendarWeekTimeGrid
-            days={days.map(({ dateKey, isToday, sessions: daySessions }) => ({
-              dateKey,
-              isToday,
-              sessions: daySessions,
-            }))}
-          />
+          <div className="flex min-h-0 flex-1 flex-col md:hidden">
+            <CalendarWeekAgenda days={days} accent={accent} />
+          </div>
         </div>
 
         {sessions.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-4 hidden flex-wrap gap-2 md:flex">
             {days
               .filter((dayItem) => dayItem.sessions.length > 0)
               .map(({ date, sessions: daySessions }) => (
@@ -292,16 +308,18 @@ export default async function CalendarPage({
   const toggleWeekDate = getMonday(anchorDate)
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col p-8">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+    <div className="flex min-h-0 flex-1 flex-col p-4 md:p-8">
+      <div className="mb-4 flex flex-col gap-4 md:mb-6 md:flex-row md:flex-wrap md:items-center md:justify-between">
         <div className="flex items-center gap-3">
           <div
-            className={`flex h-10 w-10 items-center justify-center rounded-xl ${accent.bgSoft}`}
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${accent.bgSoft}`}
           >
             <CalendarDays className={`h-5 w-5 ${accent.icon}`} />
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Calendrier</h1>
+          <div className="min-w-0">
+            <h1 className="text-xl font-bold text-foreground md:text-2xl">
+              Calendrier
+            </h1>
             <p className="text-sm text-muted-foreground">
               {totalThisMonth} séance{totalThisMonth !== 1 ? "s" : ""} en{" "}
               {monthTitleRaw}
@@ -309,74 +327,90 @@ export default async function CalendarPage({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="flex rounded-lg border border-border bg-muted/30 p-0.5">
+        <div className="flex w-full flex-col gap-2 md:w-auto">
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex rounded-lg border border-border bg-muted/30 p-0.5">
+              <Link
+                href={calendarHref("week", toggleWeekDate)}
+                className="rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Semaine
+              </Link>
+              <Link
+                href={calendarHref("month", monthStart)}
+                className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${accent.bgSoft} ${accent.activeText} shadow-sm`}
+              >
+                Mois
+              </Link>
+            </div>
+
             <Link
-              href={calendarHref("week", toggleWeekDate)}
-              className="rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+              href={calendarHref("month", new Date())}
+              className={
+                buttonVariants({ variant: "outline", size: "sm" }) +
+                " text-xs font-medium"
+              }
             >
-              Semaine
+              Aujourd&apos;hui
             </Link>
+
             <Link
-              href={calendarHref("month", monthStart)}
-              className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${accent.bgSoft} ${accent.activeText} shadow-sm`}
+              href="/dashboard/sessions"
+              className={buttonVariants({ size: "sm" }) + " gap-1"}
             >
-              Mois
+              <Plus className="h-3.5 w-3.5" />
+              Séance
             </Link>
           </div>
 
-          <Link
-            href={calendarHref("month", new Date())}
-            className={
-              buttonVariants({ variant: "outline", size: "sm" }) +
-              " text-xs font-medium"
-            }
-          >
-            Aujourd&apos;hui
-          </Link>
-          <div className="flex items-center gap-1 rounded-lg border border-border bg-card shadow-sm">
+          <div className="flex w-full items-center rounded-lg border border-border bg-card shadow-sm sm:w-auto">
             <Link
               href={calendarHref("month", prevMonthStart)}
-              className="flex h-8 w-8 items-center justify-center rounded-l-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-l-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              aria-label="Mois précédent"
             >
               <ChevronLeft className="h-4 w-4" />
             </Link>
-            <span className="min-w-[10rem] px-3 text-center text-sm font-medium capitalize text-foreground">
+            <span className="flex-1 whitespace-nowrap px-3 text-center text-sm font-medium capitalize text-foreground sm:min-w-[10rem] sm:flex-none">
               {monthTitle}
             </span>
             <Link
               href={calendarHref("month", nextMonthStart)}
-              className="flex h-8 w-8 items-center justify-center rounded-r-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-r-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              aria-label="Mois suivant"
             >
               <ChevronRight className="h-4 w-4" />
             </Link>
           </div>
-          <Link
-            href="/dashboard/sessions"
-            className={buttonVariants({ size: "sm" }) + " gap-1"}
-          >
-            <Plus className="h-3.5 w-3.5" />
-            Séance
-          </Link>
         </div>
       </div>
 
-      <div className="flex min-h-[520px] flex-1 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm">
-        <div className="grid shrink-0 grid-cols-7 border-b border-border bg-muted/20">
-          {WEEKDAY_LABELS.map((weekdayLabel) => (
-            <div
-              key={weekdayLabel}
-              className="border-r border-border px-2 py-2 text-center text-xs font-semibold uppercase tracking-wide text-muted-foreground last:border-r-0"
-            >
-              {weekdayLabel}
-            </div>
-          ))}
+      <div className="flex min-h-[420px] flex-1 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm md:min-h-[520px]">
+        <div className="hidden min-h-0 flex-1 flex-col md:flex">
+          <div className="grid shrink-0 grid-cols-7 border-b border-border bg-muted/20">
+            {WEEKDAY_LABELS.map((weekdayLabel) => (
+              <div
+                key={weekdayLabel}
+                className="border-r border-border px-2 py-2 text-center text-xs font-semibold uppercase tracking-wide text-muted-foreground last:border-r-0"
+              >
+                {weekdayLabel}
+              </div>
+            ))}
+          </div>
+
+          <div className="min-h-0 flex-1 overflow-y-auto p-2">
+            <CalendarMonthGrid
+              cells={monthCells}
+              sessionsByDay={sessionsByDay}
+              accent={accent}
+              todayKey={todayKey}
+            />
+          </div>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto p-2">
-          <CalendarMonthGrid
-            cells={monthCells}
-            sessionsByDay={sessionsByDay}
+        <div className="flex min-h-0 flex-1 flex-col md:hidden">
+          <CalendarMonthAgenda
+            sessions={sessionsForMonth}
             accent={accent}
             todayKey={todayKey}
           />
