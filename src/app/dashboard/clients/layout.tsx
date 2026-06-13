@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser } from "@/lib/auth"
-import { ClientListPanel } from "@/components/dashboard/clients/client-list-panel"
+import { ClientsLayoutShell } from "@/components/dashboard/clients/clients-layout-shell"
 
 export default async function ClientsLayout({
   children,
@@ -25,11 +25,6 @@ export default async function ClientsLayout({
   })
 
   return (
-    <div className="flex h-full min-h-0 overflow-hidden">
-      <ClientListPanel clients={clients} />
-      <div className="min-w-0 flex-1 overflow-y-auto bg-background">
-        {children}
-      </div>
-    </div>
+    <ClientsLayoutShell clients={clients}>{children}</ClientsLayoutShell>
   )
 }

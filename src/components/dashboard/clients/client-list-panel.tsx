@@ -8,6 +8,7 @@ import type { Prisma } from "@prisma/client"
 
 import { ClientAvatar } from "@/components/ui/client-avatar"
 import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
 import { ClientSheet } from "./client-sheet"
 
 type ClientRow = Prisma.ClientGetPayload<{
@@ -19,7 +20,13 @@ type ClientRow = Prisma.ClientGetPayload<{
 
 type FilterType = "all" | "active" | "inactive"
 
-export function ClientListPanel({ clients }: { clients: ClientRow[] }) {
+export function ClientListPanel({
+  clients,
+  className,
+}: {
+  clients: ClientRow[]
+  className?: string
+}) {
   const pathname = usePathname()
   const [search, setSearch] = useState("")
   const [filter, setFilter] = useState<FilterType>("active")
@@ -45,7 +52,12 @@ export function ClientListPanel({ clients }: { clients: ClientRow[] }) {
   const activeCount = clients.filter((c) => c.isActive).length
 
   return (
-    <aside className="flex h-full w-56 shrink-0 flex-col border-r border-border bg-card">
+    <aside
+      className={cn(
+        "flex h-full w-full shrink-0 flex-col border-r border-border bg-card md:w-56",
+        className
+      )}
+    >
       {/* Header */}
       <div className="border-b border-border px-3 py-3">
         <div className="mb-2 flex items-center justify-between">

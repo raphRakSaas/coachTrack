@@ -349,18 +349,25 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
   return (
     <div className="flex h-full flex-col">
       {/* ── Sticky header ── */}
-      <div className="border-b border-border bg-card px-6 py-4">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+      <div className="border-b border-border bg-card px-4 py-4 md:px-6">
+        <div className="flex items-start justify-between gap-3 md:items-center md:gap-4">
+          <div className="flex min-w-0 flex-1 items-start gap-3">
+            <Link
+              href="/dashboard/clients"
+              className="mt-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground md:hidden"
+              aria-label="Retour à la liste des clients"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </Link>
             <ClientAvatar
               firstName={client.firstName}
               lastName={client.lastName}
               size="lg"
               ring
             />
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl font-bold text-foreground">
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <h1 className="truncate text-lg font-bold text-foreground md:text-xl">
                   {client.firstName} {client.lastName}
                 </h1>
                 {client.isDemo && (
@@ -371,22 +378,24 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                     Démo
                   </Badge>
                 )}
-                <button
-                  onClick={handleToggleActive}
-                  disabled={isPending || client.isDemo}
-                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
-                    client.isActive ? "bg-emerald-500" : "bg-muted"
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-3.5 w-3.5 rounded-full bg-card shadow transition-transform ${
-                      client.isActive ? "translate-x-4" : "translate-x-1"
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleToggleActive}
+                    disabled={isPending || client.isDemo}
+                    className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+                      client.isActive ? "bg-emerald-500" : "bg-muted"
                     }`}
-                  />
-                </button>
-                <span className="text-xs font-medium text-muted-foreground">
-                  {client.isActive ? "Actif" : "Inactif"}
-                </span>
+                  >
+                    <span
+                      className={`inline-block h-3.5 w-3.5 rounded-full bg-card shadow transition-transform ${
+                        client.isActive ? "translate-x-4" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                  <span className="text-xs font-medium text-muted-foreground">
+                    {client.isActive ? "Actif" : "Inactif"}
+                  </span>
+                </div>
               </div>
               <p className="mt-0.5 text-sm text-muted-foreground">
                 <span className={SECTION_ACCENTS.clients.text + " font-medium"}>
@@ -397,7 +406,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             <EditClientSheet client={client} />
           </div>
         </div>
@@ -437,8 +446,8 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
       {/* ── Tabs ── */}
       <div className="flex-1 overflow-y-auto">
         <Tabs defaultValue="apercu" className="h-full">
-          <div className="sticky top-0 z-10 border-b border-border bg-card px-6">
-            <TabsList className="h-auto rounded-none bg-transparent p-0">
+          <div className="sticky top-0 z-10 overflow-x-auto border-b border-border bg-card px-4 md:px-6">
+            <TabsList className="h-auto w-max min-w-full rounded-none bg-transparent p-0">
               {[
                 { value: "apercu", label: "Vue d'ensemble" },
                 { value: "informations", label: "Informations" },
@@ -451,7 +460,7 @@ export function ClientDetail({ client }: { client: ClientWithRelations }) {
                 <TabsTrigger
                   key={tab.value}
                   value={tab.value}
-                  className="rounded-none border-b-2 border-transparent px-4 py-3 text-sm font-medium text-muted-foreground data-[state=active]:border-blue-600 data-[state=active]:text-blue-700 data-[state=active]:shadow-none"
+                  className="shrink-0 rounded-none border-b-2 border-transparent px-3 py-3 text-sm font-medium text-muted-foreground data-[state=active]:border-blue-600 data-[state=active]:text-blue-700 data-[state=active]:shadow-none md:px-4"
                 >
                   {tab.label}
                 </TabsTrigger>
